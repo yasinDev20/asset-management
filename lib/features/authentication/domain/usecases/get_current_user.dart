@@ -3,13 +3,13 @@ import 'package:computer_lab_inventory_application/features/authentication/domai
 import 'package:computer_lab_inventory_application/features/authentication/domain/repositories/auth_repository.dart';
 import 'package:dartz/dartz.dart';
 
-class GetCurrentUserUsecase {
+class GetUserUsecase {
   final AuthRepository authRepository;
 
-  GetCurrentUserUsecase({required this.authRepository});
+  GetUserUsecase({required this.authRepository});
 
-  Future<Either<Failure, AuthEntity>> call() async {
-    return await authRepository.getCurrentUser();
+  Future<Either<Failure, AuthEntity>> call({required String id}) async {
+    return await authRepository.getCurrentUser(id: id);
   }
   
 }

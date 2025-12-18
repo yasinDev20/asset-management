@@ -9,23 +9,35 @@ class IntialEvent extends AuthEvent{
   List<Object?> get props => [];
 }
 
-class AuthCheckEvent extends AuthEvent{
+class AuthLoggedOutEvent extends AuthEvent{
   @override
   List<Object?> get props =>[];
   
 }
+class AuthLoggedInEvent extends AuthEvent{
+  final String userId;
+
+  const AuthLoggedInEvent({required this.userId});
+
+  @override
+  List<Object?> get props =>[userId];
+  
+}
 
 class GoogleSignInEvent extends AuthEvent {
+  final GoogleSignInAccount googleSignInAccaount;
+
+  const GoogleSignInEvent({required this.googleSignInAccaount});
   @override
   List<Object?> get props => [];
   
 }
 
-class AuthLoginEvent extends AuthEvent {
+class EmailPasswordSignEvent extends AuthEvent {
   final String email;
   final String password;
 
-  const AuthLoginEvent({
+  const EmailPasswordSignEvent({
     required this.email,
     required this.password,
   });

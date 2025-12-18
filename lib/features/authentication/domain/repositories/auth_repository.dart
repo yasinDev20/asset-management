@@ -1,12 +1,13 @@
 import 'package:computer_lab_inventory_application/core/error/failure.dart';
 import 'package:computer_lab_inventory_application/features/authentication/domain/entities/auth_entity.dart';
 import 'package:dartz/dartz.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 abstract class AuthRepository {
-  Future<Either<Failure, AuthEntity>> login(String email, String password);
-  Future<Either<Failure, AuthEntity>> signInWithGoogle();
+  Future<Either<Failure, AuthEntity>> emailPasswordSignIn(String email, String password);
+  Future<Either<Failure, AuthEntity>> googleSignIn({required GoogleSignInAccount googleSignInAccaount});
   Future<Either<Failure, Unit>> signOut();
-  Future<Either<Failure, AuthEntity>> getCurrentUser();
+  Future<Either<Failure, AuthEntity>> getCurrentUser({required String id});
 
   // // Tambahan untuk local data
   // Future<void> saveToken(String token);

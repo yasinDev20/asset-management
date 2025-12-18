@@ -3,10 +3,13 @@ import 'package:computer_lab_inventory_application/features/authentication/domai
 import 'package:computer_lab_inventory_application/features/authentication/domain/repositories/auth_repository.dart';
 import 'package:dartz/dartz.dart';
 
-class GoogleSignInUsecase {
+class EmailPasswordSignUsecase {
   final AuthRepository authRepository;
-  GoogleSignInUsecase({required this.authRepository});
-  Future<Either<Failure, AuthEntity>> call() async {
-    return await authRepository.signInWithGoogle();
+
+  EmailPasswordSignUsecase({required this.authRepository});
+
+  Future<Either<Failure, AuthEntity>> call(String email, String password) async {
+    return await authRepository.emailPasswordSignIn(email, password);
   }
+  
 }

@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:computer_lab_inventory_application/core/common/widgets/bottom_sheet_filter.dart';
 import 'package:computer_lab_inventory_application/core/common/widgets/button.dart';
 import 'package:computer_lab_inventory_application/core/common/widgets/text_form_field.dart';
 import 'package:computer_lab_inventory_application/features/authentication/domain/entities/user_entity.dart';
@@ -22,14 +21,7 @@ class UserDetailPage extends StatefulWidget {
 
 class _UserDetailPageState extends State<UserDetailPage> {
   TextEditingController emailController = TextEditingController();
-  TextEditingController identityNumberController = TextEditingController();
   TextEditingController nameController = TextEditingController();
-  TextEditingController termStartController = TextEditingController();
-  TextEditingController termEndController = TextEditingController();
-  TextEditingController locationsController = TextEditingController();
-  DateTime? selectedTermStart;
-  DateTime? selectedTermEnd;
-  List<String> selectedlocations = [];
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -37,11 +29,7 @@ class _UserDetailPageState extends State<UserDetailPage> {
     super.dispose();
 
     emailController.dispose();
-    identityNumberController.dispose();
     nameController.dispose();
-    termStartController.dispose();
-    termEndController.dispose();
-    locationsController.dispose();
   }
 
   @override
@@ -53,16 +41,7 @@ class _UserDetailPageState extends State<UserDetailPage> {
     if (widget.user != null) {
       final user = widget.user!;
       emailController.text = user.email;
-      identityNumberController.text = user.identityNumber;
       nameController.text = user.name;
-      termStartController.text =
-          "${user.termStart.day}/${user.termStart.month}/${user.termStart.year}";
-      termEndController.text =
-          "${user.termEnd.day}/${user.termEnd.month}/${user.termEnd.year}";
-      locationsController.text = user.locations.join(', ');
-      selectedTermStart = user.termStart;
-      selectedTermEnd = user.termEnd;
-      selectedlocations = user.locations;
     }
 
     if (widget.user == null && widget.userId != null) {
@@ -97,16 +76,8 @@ class _UserDetailPageState extends State<UserDetailPage> {
                           final user = state.user;
 
                           emailController.text = user.email;
-                          identityNumberController.text = user.identityNumber;
                           nameController.text = user.name;
-                          termStartController.text =
-                              "${user.termStart.day}/${user.termStart.month}/${user.termStart.year}";
-                          termEndController.text =
-                              "${user.termEnd.day}/${user.termEnd.month}/${user.termEnd.year}";
-                          locationsController.text = user.locations.join(', ');
-                          selectedTermStart = user.termStart;
-                          selectedTermEnd = user.termEnd;
-                          selectedlocations = user.locations;
+  
                         }
                       },
                       child: Form(
@@ -122,12 +93,7 @@ class _UserDetailPageState extends State<UserDetailPage> {
                               labelText: 'Email',
                               validator: FormBuilderValidators.email(),
                             ),
-                            CommonTextFormField(
-                              controller: identityNumberController,
-                              labelText: 'No Identitas',
-
-                              validator: FormBuilderValidators.required(),
-                            ),
+                            
                             CommonTextFormField(
                               controller: nameController,
                               validator: FormBuilderValidators.required(),
@@ -135,87 +101,7 @@ class _UserDetailPageState extends State<UserDetailPage> {
                               labelText: 'Nama',
                             ),
 
-                            TextFormField(
-                              controller: termStartController,
-                              readOnly: true,
-                              validator: FormBuilderValidators.required(),
-                              onTap: () async {
-                                final DateTime? picked = await showDatePicker(
-                                  context: context,
-                                  firstDate: DateTime(2000),
-                                  lastDate: DateTime(3000),
-                                  initialDate: DateTime.now(),
-                                );
-
-                                if (picked != null) {
-                                  selectedTermStart = picked;
-                                  termStartController.text =
-                                      "${picked.day}/${picked.month}/${picked.year}";
-                                }
-                              },
-
-                              decoration: InputDecoration(
-                                labelText: 'Mulai Jabatan',
-                                border: OutlineInputBorder(),
-                              ),
-                            ),
-
-                            TextFormField(
-                              validator: FormBuilderValidators.required(),
-                              controller: termEndController,
-                              readOnly: true,
-                              onTap: () async {
-                                final DateTime? picked = await showDatePicker(
-                                  context: context,
-                                  firstDate: DateTime(2000),
-                                  lastDate: DateTime(3000),
-                                  initialDate: DateTime.now(),
-                                );
-
-                                if (picked != null) {
-                                  selectedTermEnd = picked;
-                                  termEndController.text =
-                                      "${picked.day}/${picked.month}/${picked.year}";
-                                }
-                              },
-
-                              decoration: InputDecoration(
-                                labelText: 'Akhir Jabatan',
-                                border: OutlineInputBorder(),
-                              ),
-                            ),
-
-                            TextFormField(
-                              validator: FormBuilderValidators.required(),
-                              controller: locationsController,
-                              readOnly: true,
-                              onTap: () async {
-                                final result = await showModalBottomSheet(
-                                  context: context,
-                                  builder: (context) => BottomSheetFilter(
-                                    initialSelected: selectedlocations,
-                                    listOfChoice: [
-                                      'Technopreneur dan Inkubator Bisnis',
-                                      'Riset Data Science dan Business Intelligence',
-                                      'Riset Kecerdasan Buatan dan Sains Komputer',
-                                      'Pemrograman dan Pengembangan Aplikasi',
-                                    ],
-                                  ),
-                                );
-
-                                if (result != null) {
-                                  selectedlocations = List.from(result);
-                                  locationsController.text = result.join(', ');
-                                }
-                              },
-
-                              decoration: InputDecoration(
-                                suffixIcon: Icon(Icons.arrow_drop_down),
-                                labelText: 'Lokasi',
-                                border: OutlineInputBorder(),
-                              ),
-                            ),
-
+                           
                             BlocBuilder<AuthBloc, AuthState>(
                               builder: (context, state) {
                                 // if (state is AuthStateAuthenticated &&
@@ -332,16 +218,11 @@ class _UserDetailPageState extends State<UserDetailPage> {
                                               context.read<UserBloc>().add(
                                                 AddUserEvent(
                                                   userData: UserEntity(
+                                                    id: 'add user',
                                                     email: emailController.text,
                                                     name: nameController.text,
-                                                    identityNumber:
-                                                        identityNumberController
-                                                            .text,
-                                                    locations:
-                                                        selectedlocations,
-                                                    termStart:
-                                                        selectedTermStart!,
-                                                    termEnd: selectedTermEnd!,
+                                                    createdAt: DateTime.now()
+                                                    
                                                   ),
                                                 ),
                                               );

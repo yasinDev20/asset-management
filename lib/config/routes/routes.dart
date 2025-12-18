@@ -14,32 +14,36 @@ import 'package:go_router/go_router.dart';
 
 class MyRouter {
   GoRouter get router => GoRouter(
-    initialLocation: '/',
+    initialLocation: '/${RouteNames.login}',
 
     errorPageBuilder: (context, state) {
       return const MaterialPage(child: NotFoundPage());
     },
-
     
 
-    // redirect: (context, state) {
-    //   final authState = context.read<AuthBloc>().state;
-    //   final currentPath = state.uri.path;
+    redirect: (context, state) {
+      final authState = context.read<AuthBloc>().state;
+      final currentPath = state.uri.path;
+      final loginPath = '/${RouteNames.login}';
 
-    //   if (authState is AuthAuthenticatedState) {
-    //     if (currentPath == '/${RouteNames.login}') {
-    //       return '/';
-    //     }
-    //   }
+      // debugPrint(authState.toString());
+
+      // 1️⃣ Biarkan auth proses dulu (ex: auto login)
       
-    //    else {
-    //     if (currentPath != '/${RouteNames.login}') {
-    //       return '/${RouteNames.login}';
-    //     }
-    //   }
-    //   return null;
 
-    // },
+      // 2️⃣ Sudah login → jangan ke login page
+      if (authState is AuthenticatedState && currentPath == loginPath) {
+        return '/';
+      }
+
+      // 3️⃣ Belum login → arahkan ke login
+      if (authState is! AuthenticatedState && currentPath != loginPath) {
+        return loginPath;
+      }
+
+      return null;
+    },
+
     routes: [
       //login
       GoRoute(
@@ -68,24 +72,27 @@ class MyRouter {
                     const MaterialPage(child: UsersPage()),
                 routes: [
                   //UserDetail
-                    GoRoute(
-                      path: '${RouteNames.userDetail}/:userId',
-                      name: RouteNames.userDetail,
-                      pageBuilder: (context, state) => MaterialPage(
-                        //untuk menghemat query tambahkan extra karena extra tidak perlu query user lagi
-                        child: UserDetailPage(user: state.extra as UserEntity?, userId: state.pathParameters['userId']),
+                  GoRoute(
+                    path: '${RouteNames.userDetail}/:userId',
+                    name: RouteNames.userDetail,
+                    pageBuilder: (context, state) => MaterialPage(
+                      //untuk menghemat query tambahkan extra karena extra tidak perlu query user lagi
+                      child: UserDetailPage(
+                        user: state.extra as UserEntity?,
+                        userId: state.pathParameters['userId'],
                       ),
                     ),
+                  ),
 
-                    //Add user
-                    GoRoute(
-                      path: RouteNames.addUser,
-                      name: RouteNames.addUser,
-                      pageBuilder: (context, state) => MaterialPage(
-                        //untuk menghemat query tambahkan extra karena extra tidak perlu query user lagi
-                        child: UserDetailPage(),
-                      ),
+                  //Add user
+                  GoRoute(
+                    path: RouteNames.addUser,
+                    name: RouteNames.addUser,
+                    pageBuilder: (context, state) => MaterialPage(
+                      //untuk menghemat query tambahkan extra karena extra tidak perlu query user lagi
+                      child: UserDetailPage(),
                     ),
+                  ),
 
                   //ForgotPassword
                   GoRoute(

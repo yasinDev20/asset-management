@@ -1,3 +1,6 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:equatable/equatable.dart';
+
 import 'package:computer_lab_inventory_application/core/error/exception.dart';
 
 class ExceptionToFailureMapper {
@@ -16,45 +19,49 @@ class ExceptionToFailureMapper {
       case ExceptionType.server:
         return ServerFailure(message: e.message, code: e.code);
       case ExceptionType.unknown:
-        return UnexpectedFailure(message: e.message, code: e.code);
+        return UnknownFailure(message: e.message, code: e.code);
     }
   }
 }
 
-abstract class Failure {
+//failure is object to comunicate with ui
+abstract class Failure extends Equatable {
   final String message;
   final String? code;
 
-  Failure({required this.message, this.code});
+  const Failure({required this.message, this.code});
 
   @override
   String toString() => '$runtimeType: $message (code: $code)';
+
+  @override
+  List<Object> get props => [message, ?code];
 }
 
 class ServerFailure extends Failure {
-  ServerFailure({required super.message, super.code});
+  const ServerFailure({required super.message, super.code});
 }
 
 class NetworkFailure extends Failure {
-  NetworkFailure({required super.message, super.code});
+  const NetworkFailure({required super.message, super.code});
 }
 
 class AuthFailure extends Failure {
-  AuthFailure({required super.message, super.code});
+  const AuthFailure({required super.message, super.code});
 }
 
 class ValidationFailure extends Failure {
-  ValidationFailure({required super.message, super.code});
+  const ValidationFailure({required super.message, super.code});
 }
 
 class CacheFailure extends Failure {
-  CacheFailure({required super.message, super.code});
+  const CacheFailure({required super.message, super.code});
 }
 
 class PermissionFailure extends Failure {
-  PermissionFailure({required super.message, super.code});
+  const PermissionFailure({required super.message, super.code});
 }
 
-class UnexpectedFailure extends Failure {
-  UnexpectedFailure({required super.message, super.code});
+class UnknownFailure extends Failure {
+  const UnknownFailure({required super.message, super.code});
 }

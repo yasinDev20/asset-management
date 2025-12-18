@@ -1,6 +1,9 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
+
+import 'package:equatable/equatable.dart';
 
 enum ExceptionType { network, auth, validation, server, unknown, cache, permission }
-class AppException implements Exception {
+class AppException with EquatableMixin implements Exception {
   final ExceptionType type;       // misalnya: network, unauthorized, server, validation, etc.
   final String message;
   final String? code;         // opsional: HTTP status code, kode lokal
@@ -15,4 +18,8 @@ class AppException implements Exception {
 
   @override
   String toString() => '[${type.name}] $message (code: $code)';
+
+  @override
+  List<Object> get props => [type, message, ?code, ?stackTrace];
 }
+

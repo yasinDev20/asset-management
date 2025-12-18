@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:computer_lab_inventory_application/core/error/exception.dart';
 import 'package:computer_lab_inventory_application/core/error/failure.dart';
-import 'package:computer_lab_inventory_application/core/utils/error_utils.dart';
+import 'package:computer_lab_inventory_application/core/utils/run_catching.dart';
 import 'package:computer_lab_inventory_application/features/authentication/data/models/user_model.dart';
 import 'package:computer_lab_inventory_application/features/authentication/domain/entities/user_entity.dart';
 import 'package:computer_lab_inventory_application/features/user/data/models/user_pagination.dart';
@@ -36,7 +36,6 @@ class UserRepositoryImpl implements UserRepository {
       final userModel = UserModel.fromEntity(
         userData.copyWith(
           id: Uuid().v7(),
-          role: 'Member',
           createdAt: DateTime.now().toUtc(),
         ),
       );

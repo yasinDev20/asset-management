@@ -8,7 +8,6 @@ import 'package:computer_lab_inventory_application/features/user/presentation/wi
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 
 class UsersPage extends StatefulWidget {
   const UsersPage({super.key});
@@ -246,20 +245,12 @@ class _UsersPageState extends State<UsersPage> {
                                                   RouteNames.userDetail,
                                                   extra: user,
                                                   pathParameters: {
-                                                    'userId': user.id!,
+                                                    'userId': user.id,
                                                   },
                                                 )
                                               // : null
                                               ,
                                           name: user.name,
-                                          identitynumber: user.identityNumber,
-                                          termStart: DateFormat(
-                                            'd MMM y',
-                                          ).format(user.termStart),
-                                          termEnd: DateFormat(
-                                            'd MMM y',
-                                          ).format(user.termEnd),
-                                          location: user.locations,
                                         );
                                       } else if (state.isLoadingMore) {
                                         return Center(

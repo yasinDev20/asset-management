@@ -1,4 +1,3 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:equatable/equatable.dart';
 
 import 'package:computer_lab_inventory_application/features/authentication/domain/entities/user_entity.dart';

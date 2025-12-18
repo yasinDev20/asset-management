@@ -13,23 +13,22 @@ class RootPage extends StatelessWidget {
   // final List<Widget> _pages = [ProductsPage()];
   @override
   Widget build(BuildContext context) {
-
     // int _currentIndex = 0;
+
     return Scaffold(
       body: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
           switch (state) {
-            case AuthUnauthenticatedState(message: final message) ||
-                AuthErrorState(message: final message):
+            case FailureState(message: final message):
               ScaffoldMessenger.of(
                 context,
               ).showSnackBar(SnackBar(content: Text(message)));
               context.goNamed(RouteNames.login);
-            case AuthInitial():
+
+            case UnAuthenticatedState():
               ScaffoldMessenger.of(
                 context,
               ).showSnackBar(const SnackBar(content: Text('Please login')));
-              context.goNamed(RouteNames.login);
           }
         },
         child: SelectionArea(child: SafeArea(child: child)),

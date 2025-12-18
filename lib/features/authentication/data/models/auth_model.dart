@@ -4,10 +4,12 @@
 //fields model boleh diubah sesuai api atau database
 import 'dart:convert';
 
+import 'package:equatable/equatable.dart';
+
 import 'package:computer_lab_inventory_application/features/authentication/data/models/user_model.dart';
 import 'package:computer_lab_inventory_application/features/authentication/domain/entities/auth_entity.dart';
 
-class AuthModel {
+class AuthModel extends Equatable {
   final UserModel user;
   final String accessToken;
   final String tokenType;
@@ -15,7 +17,7 @@ class AuthModel {
   final DateTime expiresIn;
   final DateTime refreshExpiresAt;
 
-  AuthModel({
+  const AuthModel({
     required this.user,
     required this.accessToken,
     required this.tokenType,
@@ -72,4 +74,16 @@ class AuthModel {
 
   factory AuthModel.fromJson(String source) =>
       AuthModel.fromMap(json.decode(source) as Map<String, dynamic>);
+
+  @override
+  List<Object> get props {
+    return [
+      user,
+      accessToken,
+      tokenType,
+      refreshToken,
+      expiresIn,
+      refreshExpiresAt,
+    ];
+  }
 }

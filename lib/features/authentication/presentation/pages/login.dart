@@ -1,25 +1,17 @@
+import 'package:computer_lab_inventory_application/config/routes/route_names.dart';
 import 'package:computer_lab_inventory_application/core/constant/Icon_assets.dart';
 import 'package:computer_lab_inventory_application/core/constant/image_assets.dart';
 import 'package:computer_lab_inventory_application/core/common/widgets/button.dart';
 import 'package:computer_lab_inventory_application/core/common/widgets/text_form_field.dart';
-import 'package:computer_lab_inventory_application/core/utils/error_utils.dart';
-import 'package:computer_lab_inventory_application/features/authentication/data/datasources/remote_datasource.dart';
 import 'package:computer_lab_inventory_application/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
-import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import '../../../../core/platform/web/web_wrapper.dart' as web;
-
-/// The scopes required by this application.
-// #docregion CheckAuthorization
-// const List<String> scopes = <String>[
-//   'https://www.googleapis.com/auth/contacts.readonly',
-// ];
-// #enddocregion CheckAuthorization
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -35,16 +27,6 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
-
-    if (kIsWeb) {
-      final authbloc = context.read<AuthBloc>();
-
-      runCatching(() async {
-        await GetIt.I<AuthRemoteDatasource>().googleInitialize();
-
-        GetIt.I<AuthRemoteDatasource>().googleSignInEventListener(authbloc);
-      });
-    }
   }
 
   @override
@@ -52,10 +34,6 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
     emailController.dispose();
     passwordController.dispose();
-
-    if (kIsWeb) {
-      GetIt.I<AuthRemoteDatasource>().disposeGoogleSignInEventListener();
-    }
   }
 
   @override
@@ -113,7 +91,7 @@ class _LoginPageState extends State<LoginPage> {
                       // Email and Password sign Button
                       BlocConsumer<AuthBloc, AuthState>(
                         listener: (context, state) {
-                          if (state is AuthErrorState) {
+                          if (state is FailureState) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text(
@@ -124,6 +102,8 @@ class _LoginPageState extends State<LoginPage> {
                           }
                         },
                         builder: (context, state) {
+                          final googleSignIn = GoogleSignIn.instance;
+
                           String text = '';
                           if (state is AuthLoadingState) {
                             text = 'Loading';
@@ -136,8 +116,8 @@ class _LoginPageState extends State<LoginPage> {
                             children: [
                               BlocListener<AuthBloc, AuthState>(
                                 listener: (context, state) {
-                                  if (state is AuthAuthenticatedState) {
-                                    return context.go('/');
+                                  if (state is AuthenticatedState) {
+                                    return context.goNamed(RouteNames.products);
                                   }
                                 },
                                 child: CommonButton(
@@ -146,7 +126,7 @@ class _LoginPageState extends State<LoginPage> {
                                     if (_formKey.currentState?.validate() ??
                                         false) {
                                       context.read<AuthBloc>().add(
-                                        AuthLoginEvent(
+                                        EmailPasswordSignEvent(
                                           email: emailController.text,
                                           password: passwordController.text,
                                         ),
@@ -156,28 +136,40 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                               ),
 
-                              if (!kIsWeb)
+                              if (googleSignIn.supportsAuthenticate())
                                 CommonButton(
                                   icon: SvgPicture.asset(
                                     IconAssets.google,
                                     width: 18,
                                     height: 18,
                                   ),
-                                  text: 'Masuk dengan google (khusus admin)',
-                                  onPressed: () {
-                                    context.read<AuthBloc>().add(
-                                      GoogleSignInEvent(),
+                                  text: 'Masuk dengan google',
+                                  onPressed: () async {
+                                    final messenger = ScaffoldMessenger.of(
+                                      context,
                                     );
+                                    try {
+                                      await googleSignIn.authenticate();
+                                    } on GoogleSignInException catch (e) {
+                                      messenger.showSnackBar(
+                                        SnackBar(
+                                          content: Text(
+                                            e.description ??
+                                                'failed authentication',
+                                          ),
+                                        ),
+                                      );
+                                    }
                                   },
-                                ),
-
-                              if (kIsWeb) web.renderButton(),
+                                )
+                              else ...<Widget>[
+                                if (kIsWeb) web.renderButton(),
+                                // ···
+                              ],
                             ],
                           );
                         },
                       ),
-                      if (kIsWeb)
-                        Text('Daftar dengan akun google (khusus admin)'),
                     ],
                   ),
                 ],

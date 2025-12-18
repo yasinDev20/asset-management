@@ -3,10 +3,11 @@ import 'package:computer_lab_inventory_application/features/authentication/data/
 import 'package:computer_lab_inventory_application/features/authentication/data/repositories/auth_repository_impl.dart';
 import 'package:computer_lab_inventory_application/features/authentication/domain/repositories/auth_repository.dart';
 import 'package:computer_lab_inventory_application/features/authentication/domain/usecases/get_current_user.dart';
-import 'package:computer_lab_inventory_application/features/authentication/domain/usecases/sign_in_with_google.dart';
-import 'package:computer_lab_inventory_application/features/authentication/domain/usecases/login.dart';
+import 'package:computer_lab_inventory_application/features/authentication/domain/usecases/google_sign_in.dart';
+import 'package:computer_lab_inventory_application/features/authentication/domain/usecases/email_password_sign_in.dart';
 import 'package:computer_lab_inventory_application/features/authentication/domain/usecases/sign_out.dart';
 import 'package:computer_lab_inventory_application/features/authentication/presentation/bloc/auth_bloc.dart';
+import 'package:computer_lab_inventory_application/features/authentication/presentation/bloc/auth_event_listener.dart';
 import 'package:computer_lab_inventory_application/features/user/data/repositories/user_repository_impl.dart';
 import 'package:computer_lab_inventory_application/features/user/domain/repositories/user_repository.dart';
 import 'package:computer_lab_inventory_application/features/user/domain/usecases/add_user.dart';
@@ -15,6 +16,7 @@ import 'package:computer_lab_inventory_application/features/user/domain/usecases
 import 'package:computer_lab_inventory_application/features/user/domain/usecases/get_user.dart';
 import 'package:computer_lab_inventory_application/features/user/presentation/bloc/user_bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 // import 'package:google_sign_in/google_sign_in.dart';
@@ -27,6 +29,9 @@ Future<void> injectionInit() async {
   //Google SignIn
   myInjection.registerLazySingleton(() => GoogleSignIn.instance);
 
+  //Google Provider
+  myInjection.registerLazySingleton<GoogleAuthProvider>(() => GoogleAuthProvider());
+
   // Register FirebaseAuth
   myInjection.registerLazySingleton<FirebaseAuth>(() => FirebaseAuth.instance);
 
@@ -35,9 +40,11 @@ Future<void> injectionInit() async {
     () => FirebaseFirestore.instance,
   );
 
+  myInjection.registerLazySingleton<AuthEventListener>(() => AuthEventListenerImpl(),);
+
   //Bloc
   myInjection.registerFactory(
-    () => AuthBloc(myInjection(), myInjection(), myInjection(), myInjection()),
+    () => AuthBloc(myInjection(), myInjection(), myInjection(), myInjection(), myInjection()),
   ); //diisi usecase
   myInjection.registerFactory(
     () => UserBloc(
@@ -61,7 +68,7 @@ Future<void> injectionInit() async {
     ), //diisi AuthRepositoryImpl
   );
   myInjection.registerLazySingleton(
-    () => GetCurrentUserUsecase(
+    () => GetUserUsecase(
       authRepository: myInjection(),
     ), //diisi AuthRepositoryImpl
   );
@@ -96,9 +103,7 @@ Future<void> injectionInit() async {
   //Repository
   myInjection.registerLazySingleton<AuthRepository>(
     () => AuthRepositoryImpl(
-      firebaseAuth: myInjection(),
-      googleSignIn: myInjection(),
-      authRemoteDatasource: myInjection(),
+      authRemoteDataSource: myInjection(),
     ), //diisi AuthRemoteDatasourceImpl()
   );
   myInjection.registerLazySingleton<UserRepository>(
@@ -112,7 +117,9 @@ Future<void> injectionInit() async {
   // myInjection.registerLazySingleton<ProfileRemoteDataSource>(() => ProfileRemoteDataSourcesImplementation(client: myInjection()));
   myInjection.registerLazySingleton<AuthRemoteDatasource>(
     () => AuthRemoteDatasourceImpl(
-      googleSignIn: myInjection(),
+      isWeb: kIsWeb,
+      googleSignInPackage: myInjection(),
+      googleAuthProvider: myInjection(),
       firebaseAuth: myInjection(),
       firestore: myInjection(),
     ),
