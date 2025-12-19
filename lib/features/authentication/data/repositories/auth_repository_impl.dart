@@ -1,11 +1,11 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 
-import 'package:computer_lab_inventory_application/core/utils/run_catching.dart';
+import 'package:assetmanagement/core/utils/run_catching.dart';
 import 'package:dartz/dartz.dart';
-import 'package:computer_lab_inventory_application/core/error/failure.dart';
-import 'package:computer_lab_inventory_application/features/authentication/data/datasources/remote_datasource.dart';
-import 'package:computer_lab_inventory_application/features/authentication/domain/entities/auth_entity.dart';
-import 'package:computer_lab_inventory_application/features/authentication/domain/repositories/auth_repository.dart';
+import 'package:assetmanagement/core/error/failure.dart';
+import 'package:assetmanagement/features/authentication/data/datasources/remote_datasource.dart';
+import 'package:assetmanagement/features/authentication/domain/entities/auth_entity.dart';
+import 'package:assetmanagement/features/authentication/domain/repositories/auth_repository.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthRepositoryImpl implements AuthRepository {

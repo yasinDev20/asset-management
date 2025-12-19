@@ -1,6 +1,6 @@
 {
-    "name": "computer_lab_inventory_application",
-    "short_name": "computer_lab_inventory_application",
+    "name": "assetmanagement",
+    "short_name": "assetmanagement",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

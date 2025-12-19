@@ -1,6 +1,6 @@
 
-import 'package:computer_lab_inventory_application/core/constant/icon_assets.dart';
-import 'package:computer_lab_inventory_application/features/product/presentation/widgets/products_product_card.dart';
+import 'package:assetmanagement/core/constant/icon_assets.dart';
+import 'package:assetmanagement/features/product/presentation/widgets/products_product_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 

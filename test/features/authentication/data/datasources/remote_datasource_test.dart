@@ -1,8 +1,8 @@
 // ignore_for_file: subtype_of_sealed_class
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:computer_lab_inventory_application/core/error/exception.dart';
-import 'package:computer_lab_inventory_application/features/authentication/data/datasources/remote_datasource.dart';
+import 'package:assetmanagement/core/error/exception.dart';
+import 'package:assetmanagement/features/authentication/data/datasources/remote_datasource.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_sign_in/google_sign_in.dart';

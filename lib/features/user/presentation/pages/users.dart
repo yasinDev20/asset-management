@@ -1,10 +1,10 @@
-import 'package:computer_lab_inventory_application/config/routes/route_names.dart';
-import 'package:computer_lab_inventory_application/core/common/widgets/bottom_sheet_filter.dart';
-import 'package:computer_lab_inventory_application/features/authentication/domain/entities/user_entity.dart';
-import 'package:computer_lab_inventory_application/features/authentication/presentation/bloc/auth_bloc.dart';
-import 'package:computer_lab_inventory_application/features/user/domain/params/user_filter.dart';
-import 'package:computer_lab_inventory_application/features/user/presentation/bloc/user_bloc.dart';
-import 'package:computer_lab_inventory_application/features/user/presentation/widgets/user_card.dart';
+import 'package:assetmanagement/config/routes/route_names.dart';
+import 'package:assetmanagement/core/common/widgets/bottom_sheet_filter.dart';
+import 'package:assetmanagement/features/authentication/domain/entities/user_entity.dart';
+import 'package:assetmanagement/features/authentication/presentation/bloc/auth_bloc.dart';
+import 'package:assetmanagement/features/user/domain/params/user_filter.dart';
+import 'package:assetmanagement/features/user/presentation/bloc/user_bloc.dart';
+import 'package:assetmanagement/features/user/presentation/widgets/user_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';

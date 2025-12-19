@@ -1,7 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:equatable/equatable.dart';
 
-import 'package:computer_lab_inventory_application/core/error/exception.dart';
+import 'package:assetmanagement/core/error/exception.dart';
 
 class ExceptionToFailureMapper {
   static Failure map(AppException e) {

@@ -1,5 +1,5 @@
-import 'package:computer_lab_inventory_application/features/authentication/data/models/user_model.dart';
-import 'package:computer_lab_inventory_application/features/authentication/domain/entities/user_entity.dart';
+import 'package:assetmanagement/features/authentication/data/models/user_model.dart';
+import 'package:assetmanagement/features/authentication/domain/entities/user_entity.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

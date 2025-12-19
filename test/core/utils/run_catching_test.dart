@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:computer_lab_inventory_application/core/error/exception.dart';
-import 'package:computer_lab_inventory_application/core/error/failure.dart';
-import 'package:computer_lab_inventory_application/core/utils/run_catching.dart';
+import 'package:assetmanagement/core/error/exception.dart';
+import 'package:assetmanagement/core/error/failure.dart';
+import 'package:assetmanagement/core/utils/run_catching.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';

@@ -1,4 +1,4 @@
-# computer_lab_inventory_application
+# assetmanagement
 
 A new Flutter project.
 

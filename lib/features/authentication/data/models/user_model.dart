@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:equatable/equatable.dart';
 
-import 'package:computer_lab_inventory_application/features/authentication/domain/entities/user_entity.dart';
+import 'package:assetmanagement/features/authentication/domain/entities/user_entity.dart';
 
 class UserModel extends Equatable {
   final String id;

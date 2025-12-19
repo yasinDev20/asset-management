@@ -20,7 +20,7 @@
             "type": "chrome",
             "request": "launch",
             "name": "Open index.html",
-            "file": "c:\\flutter project\\clean_architecture\\computer_lab_inventory_application\\web\\index.html"
+            "file": "c:\\flutter project\\clean_architecture\\assetmanagement\\web\\index.html"
         }
     ]
 }

@@ -1,13 +1,13 @@
 import 'package:bloc/bloc.dart';
-import 'package:computer_lab_inventory_application/features/authentication/domain/entities/auth_entity.dart';
-import 'package:computer_lab_inventory_application/features/authentication/domain/usecases/get_current_user.dart';
-import 'package:computer_lab_inventory_application/features/authentication/domain/usecases/email_password_sign_in.dart';
-import 'package:computer_lab_inventory_application/features/authentication/domain/usecases/google_sign_in.dart';
-import 'package:computer_lab_inventory_application/features/authentication/domain/usecases/sign_out.dart';
-import 'package:computer_lab_inventory_application/features/authentication/presentation/bloc/auth_event_listener.dart';
+import 'package:assetmanagement/features/authentication/domain/entities/auth_entity.dart';
+import 'package:assetmanagement/features/authentication/domain/usecases/get_current_user.dart';
+import 'package:assetmanagement/features/authentication/domain/usecases/email_password_sign_in.dart';
+import 'package:assetmanagement/features/authentication/domain/usecases/google_sign_in.dart';
+import 'package:assetmanagement/features/authentication/domain/usecases/sign_out.dart';
+import 'package:assetmanagement/features/authentication/presentation/bloc/auth_event_listener.dart';
 import 'package:dartz/dartz.dart';
 import 'package:equatable/equatable.dart';
-import 'package:computer_lab_inventory_application/core/error/failure.dart';
+import 'package:assetmanagement/core/error/failure.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 part 'auth_event.dart';

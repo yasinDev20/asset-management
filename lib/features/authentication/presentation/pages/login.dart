@@ -1,9 +1,9 @@
-import 'package:computer_lab_inventory_application/config/routes/route_names.dart';
-import 'package:computer_lab_inventory_application/core/constant/Icon_assets.dart';
-import 'package:computer_lab_inventory_application/core/constant/image_assets.dart';
-import 'package:computer_lab_inventory_application/core/common/widgets/button.dart';
-import 'package:computer_lab_inventory_application/core/common/widgets/text_form_field.dart';
-import 'package:computer_lab_inventory_application/features/authentication/presentation/bloc/auth_bloc.dart';
+import 'package:assetmanagement/config/routes/route_names.dart';
+import 'package:assetmanagement/core/constant/Icon_assets.dart';
+import 'package:assetmanagement/core/constant/image_assets.dart';
+import 'package:assetmanagement/core/common/widgets/button.dart';
+import 'package:assetmanagement/core/common/widgets/text_form_field.dart';
+import 'package:assetmanagement/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

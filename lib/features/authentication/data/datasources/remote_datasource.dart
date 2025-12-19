@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:computer_lab_inventory_application/core/error/exception.dart';
-import 'package:computer_lab_inventory_application/features/authentication/data/models/auth_model.dart';
-import 'package:computer_lab_inventory_application/features/authentication/data/models/user_model.dart';
+import 'package:assetmanagement/core/error/exception.dart';
+import 'package:assetmanagement/features/authentication/data/models/auth_model.dart';
+import 'package:assetmanagement/features/authentication/data/models/user_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 

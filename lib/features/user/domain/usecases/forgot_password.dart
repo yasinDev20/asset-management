@@ -1,5 +1,5 @@
-import 'package:computer_lab_inventory_application/core/error/failure.dart';
-import 'package:computer_lab_inventory_application/features/user/domain/repositories/user_repository.dart';
+import 'package:assetmanagement/core/error/failure.dart';
+import 'package:assetmanagement/features/user/domain/repositories/user_repository.dart';
 import 'package:dartz/dartz.dart';
 
 class ForgotPasswordUseCase {

@@ -1,14 +1,14 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
-import 'package:computer_lab_inventory_application/features/authentication/presentation/bloc/auth_bloc.dart';
+import 'package:assetmanagement/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:computer_lab_inventory_application/core/common/widgets/button.dart';
-import 'package:computer_lab_inventory_application/core/common/widgets/text_form_field.dart';
-import 'package:computer_lab_inventory_application/features/authentication/domain/entities/user_entity.dart';
-import 'package:computer_lab_inventory_application/features/user/presentation/bloc/user_bloc.dart';
+import 'package:assetmanagement/core/common/widgets/button.dart';
+import 'package:assetmanagement/core/common/widgets/text_form_field.dart';
+import 'package:assetmanagement/features/authentication/domain/entities/user_entity.dart';
+import 'package:assetmanagement/features/user/presentation/bloc/user_bloc.dart';
 
 class UserDetailPage extends StatefulWidget {
   final String? userId;

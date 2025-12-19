@@ -1,14 +1,14 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:bloc/bloc.dart';
-import 'package:computer_lab_inventory_application/features/user/domain/params/user_filter.dart';
-import 'package:computer_lab_inventory_application/features/user/domain/usecases/add_user.dart';
-import 'package:computer_lab_inventory_application/features/user/domain/usecases/get_user.dart';
+import 'package:assetmanagement/features/user/domain/params/user_filter.dart';
+import 'package:assetmanagement/features/user/domain/usecases/add_user.dart';
+import 'package:assetmanagement/features/user/domain/usecases/get_user.dart';
 import 'package:equatable/equatable.dart';
 
-import 'package:computer_lab_inventory_application/core/error/failure.dart';
-import 'package:computer_lab_inventory_application/features/authentication/domain/entities/user_entity.dart';
-import 'package:computer_lab_inventory_application/features/user/domain/usecases/forgot_password.dart';
-import 'package:computer_lab_inventory_application/features/user/domain/usecases/get_all_user.dart';
+import 'package:assetmanagement/core/error/failure.dart';
+import 'package:assetmanagement/features/authentication/domain/entities/user_entity.dart';
+import 'package:assetmanagement/features/user/domain/usecases/forgot_password.dart';
+import 'package:assetmanagement/features/user/domain/usecases/get_all_user.dart';
 
 part 'user_event.dart';
 part 'user_state.dart';

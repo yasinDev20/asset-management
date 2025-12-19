@@ -1,10 +1,10 @@
-import 'package:computer_lab_inventory_application/core/error/exception.dart';
-import 'package:computer_lab_inventory_application/core/error/failure.dart';
-import 'package:computer_lab_inventory_application/features/authentication/data/datasources/remote_datasource.dart';
-import 'package:computer_lab_inventory_application/features/authentication/data/models/auth_model.dart';
-import 'package:computer_lab_inventory_application/features/authentication/data/models/user_model.dart';
-import 'package:computer_lab_inventory_application/features/authentication/data/repositories/auth_repository_impl.dart';
-import 'package:computer_lab_inventory_application/features/authentication/domain/entities/auth_entity.dart';
+import 'package:assetmanagement/core/error/exception.dart';
+import 'package:assetmanagement/core/error/failure.dart';
+import 'package:assetmanagement/features/authentication/data/datasources/remote_datasource.dart';
+import 'package:assetmanagement/features/authentication/data/models/auth_model.dart';
+import 'package:assetmanagement/features/authentication/data/models/user_model.dart';
+import 'package:assetmanagement/features/authentication/data/repositories/auth_repository_impl.dart';
+import 'package:assetmanagement/features/authentication/domain/entities/auth_entity.dart';
 import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';

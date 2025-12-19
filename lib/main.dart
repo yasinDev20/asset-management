@@ -1,10 +1,10 @@
-import 'package:computer_lab_inventory_application/config/routes/routes.dart';
-import 'package:computer_lab_inventory_application/core/common/bloc/app_bloc_observer.dart';
-import 'package:computer_lab_inventory_application/core/theme/theme.dart';
-import 'package:computer_lab_inventory_application/core/common/injection/injection.dart';
-import 'package:computer_lab_inventory_application/features/authentication/presentation/bloc/auth_bloc.dart';
-import 'package:computer_lab_inventory_application/features/user/presentation/bloc/user_bloc.dart';
-import 'package:computer_lab_inventory_application/firebase_options.dart';
+import 'package:assetmanagement/config/routes/routes.dart';
+import 'package:assetmanagement/core/common/bloc/app_bloc_observer.dart';
+import 'package:assetmanagement/core/theme/theme.dart';
+import 'package:assetmanagement/core/common/injection/injection.dart';
+import 'package:assetmanagement/features/authentication/presentation/bloc/auth_bloc.dart';
+import 'package:assetmanagement/features/user/presentation/bloc/user_bloc.dart';
+import 'package:assetmanagement/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';

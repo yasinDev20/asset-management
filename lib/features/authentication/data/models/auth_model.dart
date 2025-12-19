@@ -6,8 +6,8 @@ import 'dart:convert';
 
 import 'package:equatable/equatable.dart';
 
-import 'package:computer_lab_inventory_application/features/authentication/data/models/user_model.dart';
-import 'package:computer_lab_inventory_application/features/authentication/domain/entities/auth_entity.dart';
+import 'package:assetmanagement/features/authentication/data/models/user_model.dart';
+import 'package:assetmanagement/features/authentication/domain/entities/auth_entity.dart';
 
 class AuthModel extends Equatable {
   final UserModel user;

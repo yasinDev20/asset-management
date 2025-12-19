@@ -1,5 +1,5 @@
-import 'package:computer_lab_inventory_application/core/error/exception.dart';
-import 'package:computer_lab_inventory_application/core/error/failure.dart';
+import 'package:assetmanagement/core/error/exception.dart';
+import 'package:assetmanagement/core/error/failure.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {

@@ -1,4 +1,4 @@
-import 'package:computer_lab_inventory_application/features/authentication/presentation/bloc/auth_bloc.dart';
+import 'package:assetmanagement/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 

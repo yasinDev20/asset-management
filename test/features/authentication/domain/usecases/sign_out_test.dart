@@ -1,6 +1,6 @@
-import 'package:computer_lab_inventory_application/core/error/failure.dart';
-import 'package:computer_lab_inventory_application/features/authentication/domain/repositories/auth_repository.dart';
-import 'package:computer_lab_inventory_application/features/authentication/domain/usecases/sign_out.dart';
+import 'package:assetmanagement/core/error/failure.dart';
+import 'package:assetmanagement/features/authentication/domain/repositories/auth_repository.dart';
+import 'package:assetmanagement/features/authentication/domain/usecases/sign_out.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';

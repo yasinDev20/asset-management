@@ -1,5 +1,5 @@
-import 'package:computer_lab_inventory_application/core/constant/Icon_assets.dart';
-import 'package:computer_lab_inventory_application/core/constant/image_assets.dart';
+import 'package:assetmanagement/core/constant/Icon_assets.dart';
+import 'package:assetmanagement/core/constant/image_assets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 

@@ -1,4 +1,4 @@
-package com.example.computer_lab_inventory_application
+package com.example.assetmanagement
 
 import io.flutter.embedding.android.FlutterActivity
 
