@@ -29,7 +29,9 @@ class MyRouter {
       // debugPrint(authState.toString());
 
       // 1️⃣ Biarkan auth proses dulu (ex: auto login)
-      
+      if (authState is AuthInitialState) {
+        return null;
+      }
 
       // 2️⃣ Sudah login → jangan ke login page
       if (authState is AuthenticatedState && currentPath == loginPath) {
