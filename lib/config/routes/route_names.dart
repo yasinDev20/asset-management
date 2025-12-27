@@ -1,5 +1,6 @@
 abstract class RouteNames {
   static const splash = 'splash';
+  static const emailRegister = 'emailRegister';
   static const login = 'login';
   //home
   static const products = 'products';

@@ -14,9 +14,18 @@ class AuthRepositoryImpl implements AuthRepository {
   AuthRepositoryImpl({required this.authRemoteDataSource});
 
   @override
+  Future<Either<Failure, Unit>> emailRegister({required String email, required String password}) async {
+    return runCatching(() async {
+       await authRemoteDataSource.emailRegister(email: email, password: password);
+       return unit;
+    },);
+   
+  }
+
+  @override
   Future<Either<Failure, AuthEntity>> emailPasswordSignIn(
-    String email,
-    String password,
+    {required String email,
+   required String password,}
   ) async {
     return runCatching(() async {
       final result = await authRemoteDataSource.emailPasswordSignIn(
@@ -53,4 +62,5 @@ class AuthRepositoryImpl implements AuthRepository {
       return authModel.toEntity();
     });
   }
+  
 }

@@ -32,28 +32,28 @@ void main() {
     );
 
     when(
-      () => authRepository.emailPasswordSignIn(email, password),
+      () => authRepository.emailPasswordSignIn(email: email, password: password),
     ).thenAnswer((_) async => Right(authEntity));
 
     // final result = await usecase(email, password);
     final result = await usecase.call(email, password);
 
     expect(result, equals(Right(authEntity)));
-    verify(() => authRepository.emailPasswordSignIn(email, password)).called(1);
+    verify(() => authRepository.emailPasswordSignIn(email: email, password: password)).called(1);
   });
 
   test('should return Failure when login fails', () async {
     const email = 'test@email.com';
     const password = 'wrong';
 
-    when(() => authRepository.emailPasswordSignIn(email, password)).thenAnswer(
+    when(() => authRepository.emailPasswordSignIn(email: email, password: password)).thenAnswer(
       (_) async => Left(AuthFailure(message: 'user not found', code: '404')),
     );
 
     final result = await usecase(email, password);
 
     expect(result, Left(AuthFailure(message: 'user not found', code: '404')));
-    verify(() => authRepository.emailPasswordSignIn(email, password)).called(1);
+    verify(() => authRepository.emailPasswordSignIn(email: email, password: password)).called(1);
 
     result.fold(
       (failure) {

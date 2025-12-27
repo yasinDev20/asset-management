@@ -13,6 +13,8 @@ class AuthInitialState extends AuthState {
 }
 class AuthLoadingState extends AuthState {}
 
+class EmailRegisterSuccessState extends AuthState {}
+
 class AuthenticatedState extends AuthState {
   final AuthEntity authEntity;
 
@@ -21,6 +23,7 @@ class AuthenticatedState extends AuthState {
   @override
   List<Object> get props => [authEntity];
 }
+
 class UnAuthenticatedState extends AuthState {
   
 
@@ -29,10 +32,6 @@ class UnAuthenticatedState extends AuthState {
   @override
   List<Object> get props => [];
 }
-
-
-
-class CheckEventLoadingState extends AuthState {}
 
 class FailureState extends AuthState {
   final Failure failure;

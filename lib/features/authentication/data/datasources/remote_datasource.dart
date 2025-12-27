@@ -8,6 +8,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 abstract class AuthRemoteDatasource {
+  Future<void> emailRegister({required String email, required String password});
   Future<AuthModel> emailPasswordSignIn({
     required String email,
     required String password,
@@ -35,6 +36,28 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   });
 
   @override
+  Future<void> emailRegister({
+    required String email,
+    required String password,
+  }) async {
+    final userCredential = await firebaseAuth.createUserWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+
+    final uid = userCredential.user!.uid;
+    final usersRef = firestore.collection('users').doc(uid);
+
+    final user = userCredential.user!;
+    await usersRef.set({
+      'id': user.uid,
+      'name': user.displayName ?? 'name',
+      'email': user.email,
+      'createdAt': DateTime.now().toIso8601String(),
+    });
+  }
+
+  @override
   Future<AuthModel> emailPasswordSignIn({
     required String email,
     required String password,
@@ -57,7 +80,11 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
     final docSnap = await firestore.collection('users').doc(user.uid).get();
 
     if (!docSnap.exists || docSnap.data() == null) {
-      throw AppException(type: ExceptionType.server, code: 'DATA_NOT_FOUND', message: 'user data not found');
+      throw AppException(
+        type: ExceptionType.server,
+        code: 'DATA_NOT_FOUND',
+        message: 'user data not found',
+      );
     }
 
     return AuthModel(

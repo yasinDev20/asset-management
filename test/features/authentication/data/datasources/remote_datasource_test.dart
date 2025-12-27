@@ -93,6 +93,124 @@ void main() {
     password = '123456';
   });
 
+  group('emailRegister', () {
+    test('should call firebaseAuth and firestore when success', () async {
+      // Mock Firebase User
+      when(() => mockUser.uid).thenReturn(id);
+      // when(() => mockUser.email).thenReturn(email);
+      // when(() => mockUser.displayName).thenReturn(name);
+      when(() => mockUserCredential.user).thenReturn(mockUser);
+
+      // Mock FirebaseAuth login
+      when(
+        () => mockFirebaseAuth.createUserWithEmailAndPassword(
+          email: email,
+          password: password,
+        ),
+      ).thenAnswer((_) async => mockUserCredential);
+
+      // Mock Firestore chain: collection → doc → get
+      when(() => mockFirestore.collection('users')).thenReturn(mockCollection);
+
+      when(() => mockCollection.doc(id)).thenReturn(mockDocumentReference);
+
+      when(
+        () => mockDocumentReference.set(any()),
+      ).thenAnswer((_) async {});
+
+      // ==== RUN =====
+      await authRemoteDatasourceImpl.emailRegister(
+        email: email,
+        password: password,
+      );
+
+      // ==== ASSERT =====
+
+      verify(
+        () => mockFirebaseAuth.createUserWithEmailAndPassword(
+          email: email,
+          password: password,
+        ),
+      ).called(1);
+      verify(() => mockFirestore.collection('users')).called(1);
+    });
+
+    test(
+      'should throw AppException when userCredential.user is null',
+      () async {
+        when(
+          () => mockFirebaseAuth.signInWithEmailAndPassword(
+            email: email,
+            password: password,
+          ),
+        ).thenAnswer((_) async => mockUserCredential);
+
+        when(() => mockUserCredential.user).thenReturn(null);
+
+        try {
+          await authRemoteDatasourceImpl.emailPasswordSignIn(
+            email: email,
+            password: password,
+          );
+        } catch (e) {
+          expect(
+            e,
+            AppException(
+              type: ExceptionType.auth,
+              code: "null-user",
+              message: "User data is null",
+            ),
+          );
+        }
+      },
+    );
+
+    test(
+      'should throw AppException when docSnapshot is not exists or docSnapshot data is null ',
+      () async {
+        // Mock FirebaseAuth
+        when(
+          () => mockFirebaseAuth.signInWithEmailAndPassword(
+            email: email,
+            password: password,
+          ),
+        ).thenAnswer((_) async => mockUserCredential);
+
+        // Mock User
+        when(() => mockUserCredential.user).thenReturn(mockUser);
+        when(() => mockUser.uid).thenReturn(id); // pastikan ada UID valid
+
+        // Mock Firestore
+        when(
+          () => mockFirestore.collection('users'),
+        ).thenReturn(mockCollection);
+        when(() => mockCollection.doc(id)).thenReturn(mockDocumentReference);
+        when(
+          () => mockDocumentReference.get(),
+        ).thenAnswer((_) async => mockDocumentSnapshot);
+        when(() => mockDocumentSnapshot.exists).thenReturn(false);
+        when(() => mockDocumentSnapshot.data()).thenReturn(null);
+
+        // Test AppException
+
+        try {
+          await authRemoteDatasourceImpl.emailPasswordSignIn(
+            email: email,
+            password: password,
+          );
+        } catch (e) {
+          expect(
+            e,
+            AppException(
+              type: ExceptionType.server,
+              code: 'DATA_NOT_FOUND',
+              message: 'user data not found',
+            ),
+          );
+        }
+      },
+    );
+  });
   group('emailPasswordSignIn', () {
     test('should return AuthModel when FirebaseAuth signIn success', () async {
       // Mock Firebase User
@@ -515,7 +633,7 @@ void main() {
   });
 
   group('signOut', () {
-    test('should no return when signOut succses', () async {
+    test('should call firebaseAuth and googleSignIn when succses', () async {
       when(() => mockGoogleSignIn.initialize()).thenAnswer((_) async => {});
       when(() => mockFirebaseAuth.signOut()).thenAnswer((_) async => {});
       when(() => mockGoogleSignIn.signOut()).thenAnswer((_) async => {});

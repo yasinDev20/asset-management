@@ -9,7 +9,7 @@ class EmailPasswordSignUsecase {
   EmailPasswordSignUsecase({required this.authRepository});
 
   Future<Either<Failure, AuthEntity>> call(String email, String password) async {
-    return await authRepository.emailPasswordSignIn(email, password);
+    return await authRepository.emailPasswordSignIn(email: email, password: password);
   }
   
 }

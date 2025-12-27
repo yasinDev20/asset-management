@@ -2,6 +2,7 @@ import 'package:assetmanagement/config/routes/route_names.dart';
 import 'package:assetmanagement/core/common/pages/not_found.dart';
 import 'package:assetmanagement/features/authentication/domain/entities/user_entity.dart';
 import 'package:assetmanagement/features/authentication/presentation/bloc/auth_bloc.dart';
+import 'package:assetmanagement/features/authentication/presentation/pages/email_register.dart';
 import 'package:assetmanagement/features/authentication/presentation/pages/login.dart';
 import 'package:assetmanagement/features/product/presentation/pages/root_page.dart';
 import 'package:assetmanagement/features/product/presentation/pages/products.dart';
@@ -19,17 +20,19 @@ class MyRouter {
     errorPageBuilder: (context, state) {
       return const MaterialPage(child: NotFoundPage());
     },
-    
 
     redirect: (context, state) {
       final authState = context.read<AuthBloc>().state;
       final currentPath = state.uri.path;
       final loginPath = '/${RouteNames.login}';
+      final emailRegisterPath =
+          '/${RouteNames.login}/${RouteNames.emailRegister}';
+      final publicPath = [loginPath, emailRegisterPath];
 
       // debugPrint(authState.toString());
 
       // 1️⃣ Biarkan auth proses dulu (ex: auto login)
-      if (authState is AuthInitialState) {
+      if (authState is AuthInitialState || authState is AuthLoadingState) {
         return null;
       }
 
@@ -39,7 +42,8 @@ class MyRouter {
       }
 
       // 3️⃣ Belum login → arahkan ke login
-      if (authState is! AuthenticatedState && currentPath != loginPath) {
+      if (authState is! AuthenticatedState &&
+          !publicPath.contains(currentPath)) {
         return loginPath;
       }
 
@@ -52,6 +56,14 @@ class MyRouter {
         path: '/${RouteNames.login}',
         name: RouteNames.login,
         pageBuilder: (context, state) => const MaterialPage(child: LoginPage()),
+        routes: [
+          GoRoute(
+            path: RouteNames.emailRegister,
+            name: RouteNames.emailRegister,
+            pageBuilder: (context, state) =>
+                const MaterialPage(child: EmailRegisterPage()),
+          ),
+        ],
       ),
 
       ShellRoute(

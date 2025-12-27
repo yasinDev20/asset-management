@@ -1,8 +1,9 @@
+import 'package:assetmanagement/features/authentication/domain/usecases/email_register.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:assetmanagement/features/authentication/data/datasources/remote_datasource.dart';
 import 'package:assetmanagement/features/authentication/data/repositories/auth_repository_impl.dart';
 import 'package:assetmanagement/features/authentication/domain/repositories/auth_repository.dart';
-import 'package:assetmanagement/features/authentication/domain/usecases/get_current_user.dart';
+import 'package:assetmanagement/features/authentication/domain/usecases/get_user.dart';
 import 'package:assetmanagement/features/authentication/domain/usecases/google_sign_in.dart';
 import 'package:assetmanagement/features/authentication/domain/usecases/email_password_sign_in.dart';
 import 'package:assetmanagement/features/authentication/domain/usecases/sign_out.dart';
@@ -30,7 +31,9 @@ Future<void> injectionInit() async {
   myInjection.registerLazySingleton(() => GoogleSignIn.instance);
 
   //Google Provider
-  myInjection.registerLazySingleton<GoogleAuthProvider>(() => GoogleAuthProvider());
+  myInjection.registerLazySingleton<GoogleAuthProvider>(
+    () => GoogleAuthProvider(),
+  );
 
   // Register FirebaseAuth
   myInjection.registerLazySingleton<FirebaseAuth>(() => FirebaseAuth.instance);
@@ -40,11 +43,20 @@ Future<void> injectionInit() async {
     () => FirebaseFirestore.instance,
   );
 
-  myInjection.registerLazySingleton<AuthEventListener>(() => AuthEventListenerImpl(),);
+  myInjection.registerLazySingleton<AuthEventListener>(
+    () => AuthEventListenerImpl(),
+  );
 
   //Bloc
   myInjection.registerFactory(
-    () => AuthBloc(myInjection(), myInjection(), myInjection(), myInjection(), myInjection()),
+    () => AuthBloc(
+      authEventListener: myInjection(),
+      emailRegisterUsecase: myInjection(),
+      getUserUseCase: myInjection(),
+      emailPasswordSignUsecase: myInjection(),
+      googleSignInUsecase: myInjection(),
+      signOutUsecase: myInjection(),
+    ),
   ); //diisi usecase
   myInjection.registerFactory(
     () => UserBloc(
@@ -57,6 +69,9 @@ Future<void> injectionInit() async {
 
   //Usecase
   //Auth Feature Usecase
+  myInjection.registerLazySingleton(
+    () => EmailRegisterUsecase(myInjection()), //diisi AuthRepositoryImpl
+  );
   myInjection.registerLazySingleton(
     () => EmailPasswordSignUsecase(
       authRepository: myInjection(),

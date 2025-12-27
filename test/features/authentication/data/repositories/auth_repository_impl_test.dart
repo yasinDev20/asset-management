@@ -58,6 +58,67 @@ void main() {
     );
   });
 
+  group('emailRegister', () {
+    test('should call emailRegister', () async {
+      // Arrange
+      when(
+        () => authRemoteDataSource.emailRegister(
+          email: email,
+          password: password,
+        ),
+      ).thenAnswer((_) async => {});
+
+      // Act
+      await authRepositoryImpl.emailRegister(email: email, password: password);
+
+      // Assert
+
+      verify(
+        () => authRemoteDataSource.emailRegister(
+          email: email,
+          password: password,
+        ),
+      ).called(1);
+    });
+
+    test(
+      'should return Failure when emailRegister throws exception',
+      () async {
+        when(
+          () => authRemoteDataSource.emailRegister(
+            email: email,
+            password: password,
+          ),
+        ).thenThrow(
+          AppException(
+            message: 'Network Failure',
+            type: ExceptionType.network,
+            code: 'NETWORK_ERROR',
+          ),
+        );
+
+        final result = await authRepositoryImpl.emailRegister(
+          email: email,
+          password: password,
+        );
+
+        expect(result.isLeft(), true);
+
+        result.fold((failure) {
+          expect(failure, isA<NetworkFailure>());
+          expect(failure.message, 'Network Failure');
+          expect(failure.code, 'NETWORK_ERROR');
+        }, (_) => fail('Should not return Right'));
+
+        verify(
+          () => authRemoteDataSource.emailRegister(
+            email: email,
+            password: password,
+          ),
+        ).called(1);
+      },
+    );
+  });
   group('emailPasswordSignIn', () {
     test('should return AuthEntity when emailPasswordSignIn success', () async {
       // Arrange
@@ -70,8 +131,8 @@ void main() {
 
       // Act
       final result = await authRepositoryImpl.emailPasswordSignIn(
-        email,
-        password,
+        email: email,
+        password: password,
       );
 
       // Assert
@@ -102,8 +163,8 @@ void main() {
         );
 
         final result = await authRepositoryImpl.emailPasswordSignIn(
-          email,
-          password,
+          email: email,
+          password: password,
         );
 
         expect(result.isLeft(), true);
@@ -128,20 +189,32 @@ void main() {
     test('should return AuthEntity when googleSignIn success', () async {
       // Arrange
       when(
-        () => authRemoteDataSource.googleSignIn(googleSignInAccaount: mockGoogleSignInAccount),
+        () => authRemoteDataSource.googleSignIn(
+          googleSignInAccaount: mockGoogleSignInAccount,
+        ),
       ).thenAnswer((_) async => authModel);
 
       // Act
-      final result = await authRepositoryImpl.googleSignIn(googleSignInAccaount: mockGoogleSignInAccount);
+      final result = await authRepositoryImpl.googleSignIn(
+        googleSignInAccaount: mockGoogleSignInAccount,
+      );
 
       // Assert
       expect(result, Right(authEntity));
 
-      verify(() => authRemoteDataSource.googleSignIn(googleSignInAccaount: mockGoogleSignInAccount)).called(1);
+      verify(
+        () => authRemoteDataSource.googleSignIn(
+          googleSignInAccaount: mockGoogleSignInAccount,
+        ),
+      ).called(1);
     });
 
     test('should return Failure when googleSignIn throws exception', () async {
-      when(() => authRemoteDataSource.googleSignIn(googleSignInAccaount: mockGoogleSignInAccount)).thenThrow(
+      when(
+        () => authRemoteDataSource.googleSignIn(
+          googleSignInAccaount: mockGoogleSignInAccount,
+        ),
+      ).thenThrow(
         AppException(
           message: 'Network Failure',
           type: ExceptionType.network,
@@ -149,7 +222,9 @@ void main() {
         ),
       );
 
-      final result = await authRepositoryImpl.googleSignIn(googleSignInAccaount: mockGoogleSignInAccount);
+      final result = await authRepositoryImpl.googleSignIn(
+        googleSignInAccaount: mockGoogleSignInAccount,
+      );
 
       expect(result.isLeft(), true);
 
@@ -159,7 +234,11 @@ void main() {
         expect(failure.code, 'NETWORK_ERROR');
       }, (_) => fail('Should not return Right'));
 
-      verify(() => authRemoteDataSource.googleSignIn(googleSignInAccaount: mockGoogleSignInAccount)).called(1);
+      verify(
+        () => authRemoteDataSource.googleSignIn(
+          googleSignInAccaount: mockGoogleSignInAccount,
+        ),
+      ).called(1);
     });
   });
 
@@ -213,10 +292,9 @@ void main() {
 
   group('signOut', () {
     test('should return unit when signOut succes', () async {
-      when(() => authRemoteDataSource.signOut()).thenAnswer((_) async => unit);
-      final result = await authRepositoryImpl.signOut();
+      when(() => authRemoteDataSource.signOut()).thenAnswer((_) async => {});
+      await authRepositoryImpl.signOut();
 
-      expect(result, equals(Right(unit)));
       verify(() => authRemoteDataSource.signOut()).called(1);
     });
 

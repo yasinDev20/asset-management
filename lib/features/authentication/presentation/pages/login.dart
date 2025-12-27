@@ -38,6 +38,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final googleSignIn = GoogleSignIn.instance;
     return Scaffold(
       appBar: AppBar(title: const Text('Login')),
       body: Center(
@@ -47,7 +48,7 @@ class _LoginPageState extends State<LoginPage> {
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
-                spacing: 24, // Spacing between logo and textfields + buttons
+                spacing: 24,
 
                 children: <Widget>[
                   // Logo
@@ -56,65 +57,65 @@ class _LoginPageState extends State<LoginPage> {
                     height: 156,
                     width: 210,
                   ),
-                  //Textfields and Buttons
+
+                  //Email sign in + other button
                   Column(
                     mainAxisSize: MainAxisSize.min,
-                    spacing: 24,
+                    spacing: 38,
                     children: [
-                      Form(
-                        key: _formKey,
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          spacing: 16,
-                          children: [
-                            CommonTextFormField(
-                              labelText: 'Email',
-                              controller: emailController,
-                              keyboardType: TextInputType.emailAddress,
-                              validator: FormBuilderValidators.email(),
-                            ),
-
-                            CommonTextFormField(
-                              labelText: 'Password',
-
-                              controller: passwordController,
-                              obscureText: true,
-                              validator: FormBuilderValidators.compose([
-                                FormBuilderValidators.required(),
-                                FormBuilderValidators.minLength(8),
-                              ]),
-                            ),
-                          ],
-                        ),
-                      ),
-
-                      // Email and Password sign Button
-                      BlocConsumer<AuthBloc, AuthState>(
-                        listener: (context, state) {
-                          if (state is FailureState) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  '[${state.failure.code ?? ''}] ${state.failure.message}',
+                      //Email sigin in
+                      Column(
+                        spacing: 24,
+                        children: [
+                          Form(
+                            key: _formKey,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              spacing: 16,
+                              children: [
+                                CommonTextFormField(
+                                  labelText: 'Email',
+                                  controller: emailController,
+                                  keyboardType: TextInputType.emailAddress,
+                                  validator: FormBuilderValidators.email(),
                                 ),
-                              ),
-                            );
-                          }
-                        },
-                        builder: (context, state) {
-                          final googleSignIn = GoogleSignIn.instance;
 
-                          String text = '';
-                          if (state is AuthLoadingState) {
-                            text = 'Loading';
-                          } else {
-                            text = 'Masuk';
-                          }
+                                CommonTextFormField(
+                                  labelText: 'Password',
 
-                          return Column(
-                            spacing: 24,
-                            children: [
-                              BlocListener<AuthBloc, AuthState>(
+                                  controller: passwordController,
+                                  obscureText: true,
+                                  validator: FormBuilderValidators.compose([
+                                    FormBuilderValidators.required(),
+                                    FormBuilderValidators.minLength(8),
+                                  ]),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          // Email sign button
+                          BlocConsumer<AuthBloc, AuthState>(
+                            listener: (context, state) {
+                              if (state is FailureState) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      '[${state.failure.code ?? ''}] ${state.failure.message}',
+                                    ),
+                                  ),
+                                );
+                              }
+                            },
+                            builder: (context, state) {
+                              String text = '';
+                              if (state is AuthLoadingState) {
+                                text = 'Loading';
+                              } else {
+                                text = 'Masuk';
+                              }
+
+                              return BlocListener<AuthBloc, AuthState>(
                                 listener: (context, state) {
                                   if (state is AuthenticatedState) {
                                     return context.goNamed(RouteNames.products);
@@ -134,41 +135,50 @@ class _LoginPageState extends State<LoginPage> {
                                     }
                                   },
                                 ),
-                              ),
+                              );
+                            },
+                          ),
+                        ],
+                      ),
 
-                              if (googleSignIn.supportsAuthenticate())
-                                CommonButton(
-                                  icon: SvgPicture.asset(
-                                    IconAssets.google,
-                                    width: 18,
-                                    height: 18,
-                                  ),
-                                  text: 'Masuk dengan google',
-                                  onPressed: () async {
-                                    final messenger = ScaffoldMessenger.of(
-                                      context,
-                                    );
-                                    try {
-                                      await googleSignIn.authenticate();
-                                    } on GoogleSignInException catch (e) {
-                                      messenger.showSnackBar(
-                                        SnackBar(
-                                          content: Text(
-                                            e.description ??
-                                                'failed authentication',
-                                          ),
-                                        ),
-                                      );
-                                    }
-                                  },
-                                )
-                              else ...<Widget>[
-                                if (kIsWeb) web.renderButton(),
-                                // ···
-                              ],
-                            ],
-                          );
-                        },
+                      //other button
+                      Column(
+                        spacing: 24,
+                        children: [
+                          //google sign in
+                          if (googleSignIn.supportsAuthenticate())
+                            CommonButton(
+                              icon: SvgPicture.asset(
+                                IconAssets.google,
+                                width: 18,
+                                height: 18,
+                              ),
+                              text: 'Lanjutkan dengan akun google',
+                              onPressed: () async {
+                                final messenger = ScaffoldMessenger.of(context);
+                                try {
+                                  await googleSignIn.authenticate();
+                                } on GoogleSignInException catch (e) {
+                                  messenger.showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                        e.description ??
+                                            'failed authentication',
+                                      ),
+                                    ),
+                                  );
+                                }
+                              },
+                            )
+                          else ...<Widget>[
+                            if (kIsWeb) web.renderButton(),
+                          ],
+
+                          //register account with email
+                          CommonButton(text: 'Buat akun dengan email', onPressed: () {
+                            context.goNamed(RouteNames.emailRegister);
+                          },)
+                        ],
                       ),
                     ],
                   ),
