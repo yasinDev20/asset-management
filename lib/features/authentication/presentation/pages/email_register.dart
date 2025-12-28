@@ -66,6 +66,7 @@ class _EmailRegisterState extends State<EmailRegisterPage> {
                         if (value != passwordController.text) {
                           return 'Password tidak sama';
                         }
+                        return null;
                       },
                     ]),
                     labelText: 'Konfirmasi kata sandi',
@@ -74,9 +75,15 @@ class _EmailRegisterState extends State<EmailRegisterPage> {
 
                   BlocListener<AuthBloc, AuthState>(
                     listener: (context, state) {
-                     if(state is EmailRegisterSuccessState){
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Akun berhasil terdaftar. Silahkan login')));
-                     }
+                      if (state is EmailRegisterSuccessState) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'Akun berhasil terdaftar. Silahkan login',
+                            ),
+                          ),
+                        );
+                      }
                     },
                     child: CommonButton(
                       text: 'Buat akun',

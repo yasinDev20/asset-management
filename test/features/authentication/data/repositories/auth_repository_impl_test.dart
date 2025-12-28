@@ -81,43 +81,40 @@ void main() {
       ).called(1);
     });
 
-    test(
-      'should return Failure when emailRegister throws exception',
-      () async {
-        when(
-          () => authRemoteDataSource.emailRegister(
-            email: email,
-            password: password,
-          ),
-        ).thenThrow(
-          AppException(
-            message: 'Network Failure',
-            type: ExceptionType.network,
-            code: 'NETWORK_ERROR',
-          ),
-        );
-
-        final result = await authRepositoryImpl.emailRegister(
+    test('should return Failure when emailRegister throws exception', () async {
+      when(
+        () => authRemoteDataSource.emailRegister(
           email: email,
           password: password,
-        );
+        ),
+      ).thenThrow(
+        AppException(
+          message: 'Network Failure',
+          type: ExceptionType.network,
+          code: 'NETWORK_ERROR',
+        ),
+      );
 
-        expect(result.isLeft(), true);
+      final result = await authRepositoryImpl.emailRegister(
+        email: email,
+        password: password,
+      );
 
-        result.fold((failure) {
-          expect(failure, isA<NetworkFailure>());
-          expect(failure.message, 'Network Failure');
-          expect(failure.code, 'NETWORK_ERROR');
-        }, (_) => fail('Should not return Right'));
+      expect(result.isLeft(), true);
 
-        verify(
-          () => authRemoteDataSource.emailRegister(
-            email: email,
-            password: password,
-          ),
-        ).called(1);
-      },
-    );
+      result.fold((failure) {
+        expect(failure, isA<NetworkFailure>());
+        expect(failure.message, 'Network Failure');
+        expect(failure.code, 'NETWORK_ERROR');
+      }, (_) => fail('Should not return Right'));
+
+      verify(
+        () => authRemoteDataSource.emailRegister(
+          email: email,
+          password: password,
+        ),
+      ).called(1);
+    });
   });
   group('emailPasswordSignIn', () {
     test('should return AuthEntity when emailPasswordSignIn success', () async {
@@ -245,7 +242,7 @@ void main() {
   group('getCurrentUser', () {
     test('should return AuthEntity when getCurrentUser success', () async {
       when(
-        () => authRemoteDataSource.getCurrentUser(id: authEntity.user.id),
+        () => authRemoteDataSource.getCurrentUser(authEntity.user.id),
       ).thenAnswer((_) async => authModel);
 
       final result = await authRepositoryImpl.getCurrentUser(
@@ -254,7 +251,7 @@ void main() {
 
       expect(result, equals(Right(authEntity)));
       verify(
-        () => authRemoteDataSource.getCurrentUser(id: authEntity.user.id),
+        () => authRemoteDataSource.getCurrentUser(authEntity.user.id),
       ).called(1);
     });
 
@@ -262,7 +259,7 @@ void main() {
       'should return Failure when getCurrentUser throws exception',
       () async {
         when(
-          () => authRemoteDataSource.getCurrentUser(id: authEntity.user.id),
+          () => authRemoteDataSource.getCurrentUser(authEntity.user.id),
         ).thenThrow(
           AppException(
             type: ExceptionType.network,
@@ -284,8 +281,49 @@ void main() {
         }, (_) => fail('Should not return Right'));
 
         verify(
-          () => authRemoteDataSource.getCurrentUser(id: authEntity.user.id),
+          () => authRemoteDataSource.getCurrentUser(authEntity.user.id),
         ).called(1);
+      },
+    );
+  });
+
+  group('forgotPassword', () {
+    test('should call forgotPassword', () async {
+      // Arrange
+      when(
+        () => authRemoteDataSource.forgotPassword(email),
+      ).thenAnswer((_) async => {});
+
+      // Act
+      await authRepositoryImpl.forgotPassword(email);
+
+      // Assert
+
+      verify(() => authRemoteDataSource.forgotPassword(email)).called(1);
+    });
+
+    test(
+      'should return Failure when forgotPassword throws exception',
+      () async {
+        when(() => authRemoteDataSource.forgotPassword(email)).thenThrow(
+          AppException(
+            message: 'Network Failure',
+            type: ExceptionType.network,
+            code: 'NETWORK_ERROR',
+          ),
+        );
+
+        final result = await authRepositoryImpl.forgotPassword(email);
+
+        expect(result.isLeft(), true);
+
+        result.fold((failure) {
+          expect(failure, isA<NetworkFailure>());
+          expect(failure.message, 'Network Failure');
+          expect(failure.code, 'NETWORK_ERROR');
+        }, (_) => fail('Should not return Right'));
+
+        verify(() => authRemoteDataSource.forgotPassword(email)).called(1);
       },
     );
   });

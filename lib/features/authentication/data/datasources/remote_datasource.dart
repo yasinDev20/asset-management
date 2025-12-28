@@ -16,7 +16,8 @@ abstract class AuthRemoteDatasource {
   Future<AuthModel> googleSignIn({
     required GoogleSignInAccount googleSignInAccaount,
   });
-  Future<AuthModel> getCurrentUser({required String id});
+  Future<AuthModel> getCurrentUser(String id);
+  Future<void> forgotPassword(String email);
   Future<void> signOut();
 }
 
@@ -177,7 +178,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   }
 
   @override
-  Future<AuthModel> getCurrentUser({required String id}) async {
+  Future<AuthModel> getCurrentUser(String id) async {
     final docSnapshot = await firestore.collection('users').doc(id).get();
 
     if (!docSnapshot.exists || docSnapshot.data() == null) {
@@ -198,6 +199,13 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
       expiresIn: DateTime(2025),
       refreshExpiresAt: DateTime(2025),
     );
+  }
+
+  
+  
+  @override
+  Future<void> forgotPassword(String email) async{
+    await firebaseAuth.sendPasswordResetEmail(email: email);
   }
 
   @override

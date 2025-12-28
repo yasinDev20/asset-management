@@ -170,14 +170,22 @@ class _LoginPageState extends State<LoginPage> {
                                 }
                               },
                             )
-                          else ...<Widget>[
-                            if (kIsWeb) web.renderButton(),
-                          ],
+                          else ...<Widget>[if (kIsWeb) web.renderButton()],
 
                           //register account with email
-                          CommonButton(text: 'Buat akun dengan email', onPressed: () {
-                            context.goNamed(RouteNames.emailRegister);
-                          },)
+                          CommonButton(
+                            text: 'Buat akun dengan email',
+                            onPressed: () {
+                              context.goNamed(RouteNames.emailRegister);
+                            },
+                          ),
+
+                          TextButton(
+                            onPressed: () {
+                              context.goNamed(RouteNames.forgotPassword);
+                            },
+                            child: Text('Lupa Password'),
+                          ),
                         ],
                       ),
                     ],

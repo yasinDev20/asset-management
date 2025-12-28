@@ -56,6 +56,16 @@ class EmailPasswordSignEvent extends AuthEvent {
   @override
   List<Object> get props => [email, password];
 }
+class ForgotPassworEvent extends AuthEvent {
+  final String email;
+
+  const ForgotPassworEvent(
+  this.email,
+  );
+
+  @override
+  List<Object> get props => [email];
+}
 
 class  AuthSignOutEvent extends AuthEvent{
   @override

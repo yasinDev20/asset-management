@@ -579,7 +579,7 @@ void main() {
         'updatedAt': updatedAt,
       });
 
-      final result = await authRemoteDatasourceImpl.getCurrentUser(id: id);
+      final result = await authRemoteDatasourceImpl.getCurrentUser(id);
 
       expect(result.user.id, id);
       expect(result.user.email, email);
@@ -612,7 +612,7 @@ void main() {
         when(() => mockDocumentSnapshot.data()).thenReturn(null);
 
         try {
-          await authRemoteDatasourceImpl.getCurrentUser(id: id);
+          await authRemoteDatasourceImpl.getCurrentUser(id);
           fail('Expected AppException');
         } on AppException catch (e) {
           expect(
@@ -634,7 +634,18 @@ void main() {
 
   group('signOut', () {
     test('should call firebaseAuth and googleSignIn when succses', () async {
-      when(() => mockGoogleSignIn.initialize()).thenAnswer((_) async => {});
+      when(() => mockFirebaseAuth.sendPasswordResetEmail(email: email)).thenAnswer((_) async => {});
+      
+      await authRemoteDatasourceImpl.forgotPassword(email);
+
+      verify(() => mockFirebaseAuth.sendPasswordResetEmail(email: email)).called(1);
+     
+    });
+  });
+
+
+  group('signOut', () {
+    test('should call firebaseAuth and googleSignIn when succses', () async {
       when(() => mockFirebaseAuth.signOut()).thenAnswer((_) async => {});
       when(() => mockGoogleSignIn.signOut()).thenAnswer((_) async => {});
       await authRemoteDatasourceImpl.signOut();

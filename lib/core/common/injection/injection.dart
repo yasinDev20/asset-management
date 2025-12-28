@@ -1,4 +1,5 @@
 import 'package:assetmanagement/features/authentication/domain/usecases/email_register.dart';
+import 'package:assetmanagement/features/authentication/domain/usecases/forgot_password.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:assetmanagement/features/authentication/data/datasources/remote_datasource.dart';
 import 'package:assetmanagement/features/authentication/data/repositories/auth_repository_impl.dart';
@@ -12,7 +13,6 @@ import 'package:assetmanagement/features/authentication/presentation/bloc/auth_e
 import 'package:assetmanagement/features/user/data/repositories/user_repository_impl.dart';
 import 'package:assetmanagement/features/user/domain/repositories/user_repository.dart';
 import 'package:assetmanagement/features/user/domain/usecases/add_user.dart';
-import 'package:assetmanagement/features/user/domain/usecases/forgot_password.dart';
 import 'package:assetmanagement/features/user/domain/usecases/get_all_user.dart';
 import 'package:assetmanagement/features/user/domain/usecases/get_user.dart';
 import 'package:assetmanagement/features/user/presentation/bloc/user_bloc.dart';
@@ -55,13 +55,14 @@ Future<void> injectionInit() async {
       getUserUseCase: myInjection(),
       emailPasswordSignUsecase: myInjection(),
       googleSignInUsecase: myInjection(),
+      forgotPasswordUseCase: myInjection(),
       signOutUsecase: myInjection(),
     ),
   ); //diisi usecase
   myInjection.registerFactory(
     () => UserBloc(
       addUserUsecase: myInjection(),
-      forgotPasswordUseCase: myInjection(),
+
       getAllUserUseCase: myInjection(),
       getUserUseCase: myInjection(),
     ),
@@ -88,17 +89,15 @@ Future<void> injectionInit() async {
     ), //diisi AuthRepositoryImpl
   );
   myInjection.registerLazySingleton(
+    () => ForgotPasswordUsecase(myInjection()), //diisi AuthRepositoryImpl
+  );
+  myInjection.registerLazySingleton(
     () => SignOutUsecase(
       authRepository: myInjection(),
     ), //diisi AuthRepositoryImpl
   );
 
   //User Feature Usecase
-  myInjection.registerLazySingleton(
-    () => ForgotPasswordUseCase(
-      userRepository: myInjection(),
-    ), //diisi AuthRepositoryImpl
-  );
   myInjection.registerLazySingleton(
     () => GetAllUserUseCase(
       userRepository: myInjection(),

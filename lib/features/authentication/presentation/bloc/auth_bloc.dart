@@ -1,4 +1,5 @@
 import 'package:assetmanagement/features/authentication/domain/usecases/email_register.dart';
+import 'package:assetmanagement/features/authentication/domain/usecases/forgot_password.dart';
 import 'package:bloc/bloc.dart';
 import 'package:assetmanagement/features/authentication/domain/entities/auth_entity.dart';
 import 'package:assetmanagement/features/authentication/domain/usecases/get_user.dart';
@@ -20,6 +21,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   late final GetUserUsecase _getUserUsacase;
   late final EmailPasswordSignUsecase _emailPasswordSignUsecase;
   late final GoogleSignInUsecase _googleSignInUsecase;
+  late final ForgotPasswordUsecase _forgotPasswordUsecase;
   late final SignOutUsecase _signOutUsecase;
 
   AuthBloc({
@@ -28,6 +30,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     required GetUserUsecase getUserUseCase,
     required EmailPasswordSignUsecase emailPasswordSignUsecase,
     required GoogleSignInUsecase googleSignInUsecase,
+    required ForgotPasswordUsecase forgotPasswordUseCase,
     required SignOutUsecase signOutUsecase,
   }) : super(AuthInitialState()) {
     _authEventListener = authEventListener;
@@ -36,6 +39,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     _emailPasswordSignUsecase = emailPasswordSignUsecase;
     _googleSignInUsecase = googleSignInUsecase;
     _signOutUsecase = signOutUsecase;
+    _forgotPasswordUsecase = forgotPasswordUseCase;
 
     //ini diperlukan untuk mentrigger event bloc yang tidak bisa dilakukan oleh webrender button langsung
     _authEventListener.firebaseAuthEventListener(add);
@@ -95,6 +99,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         (succses) {
           emit(AuthenticatedState(authEntity: succses));
         },
+      );
+    });
+
+    on<ForgotPassworEvent>((event, emit) async {
+      emit(AuthLoadingState());
+      final result = await _forgotPasswordUsecase.call(event.email);
+
+      result.fold(
+        (l) => emit(FailureState(failure: l)),
+        (r) => emit(ForgotPasswordSuccessState()),
       );
     });
 

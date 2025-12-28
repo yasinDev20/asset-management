@@ -7,7 +7,7 @@ import 'package:assetmanagement/features/authentication/presentation/pages/login
 import 'package:assetmanagement/features/product/presentation/pages/root_page.dart';
 import 'package:assetmanagement/features/product/presentation/pages/products.dart';
 import 'package:assetmanagement/features/user/presentation/pages/user_detail.dart';
-import 'package:assetmanagement/features/user/presentation/pages/forgot_password.dart';
+import 'package:assetmanagement/features/authentication/presentation/pages/forgot_password.dart';
 import 'package:assetmanagement/features/user/presentation/pages/users.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -25,9 +25,10 @@ class MyRouter {
       final authState = context.read<AuthBloc>().state;
       final currentPath = state.uri.path;
       final loginPath = '/${RouteNames.login}';
+      final forgotPasswordPath = '/${RouteNames.login}/${RouteNames.forgotPassword}';
       final emailRegisterPath =
           '/${RouteNames.login}/${RouteNames.emailRegister}';
-      final publicPath = [loginPath, emailRegisterPath];
+      final publicPath = [loginPath, emailRegisterPath, forgotPasswordPath];
 
       // debugPrint(authState.toString());
 
@@ -63,6 +64,12 @@ class MyRouter {
             pageBuilder: (context, state) =>
                 const MaterialPage(child: EmailRegisterPage()),
           ),
+          GoRoute(
+            path: RouteNames.forgotPassword,
+            name: RouteNames.forgotPassword,
+            pageBuilder: (context, state) =>
+                const MaterialPage(child: ForgotPasswordPage()),
+          ),
         ],
       ),
 
@@ -85,6 +92,8 @@ class MyRouter {
                 pageBuilder: (context, state) =>
                     const MaterialPage(child: UsersPage()),
                 routes: [
+                  //TODO: Pisahkan karena ini harus menggunakan scaffold. kemudian buat rootpage menjadi appshell dan pindahkan di folder route
+
                   //UserDetail
                   GoRoute(
                     path: '${RouteNames.userDetail}/:userId',
@@ -106,14 +115,6 @@ class MyRouter {
                       //untuk menghemat query tambahkan extra karena extra tidak perlu query user lagi
                       child: UserDetailPage(),
                     ),
-                  ),
-
-                  //ForgotPassword
-                  GoRoute(
-                    path: RouteNames.forgotPassword,
-                    name: RouteNames.forgotPassword,
-                    pageBuilder: (context, state) =>
-                        const MaterialPage(child: ForgotPasswordPage()),
                   ),
                 ],
               ),

@@ -1,4 +1,5 @@
 import 'package:assetmanagement/features/authentication/domain/usecases/email_register.dart';
+import 'package:assetmanagement/features/authentication/domain/usecases/forgot_password.dart';
 import 'package:bloc_test/bloc_test.dart';
 import 'package:assetmanagement/core/error/failure.dart';
 import 'package:assetmanagement/features/authentication/domain/entities/auth_entity.dart';
@@ -20,9 +21,11 @@ class MockEmailRegisterUsecase extends Mock implements EmailRegisterUsecase {}
 
 class MockGoogleSignInUsecase extends Mock implements GoogleSignInUsecase {}
 
-class MockSignOutUsecase extends Mock implements SignOutUsecase {}
-
 class MockGetUserUsecase extends Mock implements GetUserUsecase {}
+
+class MockForgotPasswordUsecase extends Mock implements ForgotPasswordUsecase {}
+
+class MockSignOutUsecase extends Mock implements SignOutUsecase {}
 
 class MockAuthEvenListener extends Mock implements AuthEventListener {}
 
@@ -30,8 +33,9 @@ void main() {
   late MockEmailRegisterUsecase mockEmailRegisterUsecase;
   late MockEmailPasswordSignUsecase mockEmailPasswordSignUsecase;
   late MockGoogleSignInUsecase mockGoogleSignInUsecase;
-  late MockSignOutUsecase mockSignOutUsecase;
   late MockGetUserUsecase mockGetUserUsecase;
+  late MockForgotPasswordUsecase mockForgotPasswordUsecase;
+  late MockSignOutUsecase mockSignOutUsecase;
   late AuthBloc authBloc;
   late MockAuthEvenListener mockAuthEvenListener;
 
@@ -39,8 +43,9 @@ void main() {
     mockEmailRegisterUsecase = MockEmailRegisterUsecase();
     mockEmailPasswordSignUsecase = MockEmailPasswordSignUsecase();
     mockGoogleSignInUsecase = MockGoogleSignInUsecase();
-    mockSignOutUsecase = MockSignOutUsecase();
     mockGetUserUsecase = MockGetUserUsecase();
+    mockSignOutUsecase = MockSignOutUsecase();
+    mockForgotPasswordUsecase = MockForgotPasswordUsecase();
     mockAuthEvenListener = MockAuthEvenListener();
     authBloc = AuthBloc(
       authEventListener: mockAuthEvenListener,
@@ -48,6 +53,7 @@ void main() {
       getUserUseCase: mockGetUserUsecase,
       emailPasswordSignUsecase: mockEmailPasswordSignUsecase,
       googleSignInUsecase: mockGoogleSignInUsecase,
+      forgotPasswordUseCase: mockForgotPasswordUsecase,
       signOutUsecase: mockSignOutUsecase,
     );
 
@@ -111,7 +117,7 @@ void main() {
   );
 
   blocTest<AuthBloc, AuthState>(
-    'emits [EmailPasswordSignLoadingState, ErrorState] when EmailPasswordSignUsecase fails',
+    'emits [AuthLoadingState, ErrorState] when fails',
     build: () {
       // stub usecase.call(...) -> Left(Failure)
       when(() => mockEmailPasswordSignUsecase(email, password)).thenAnswer(
@@ -136,4 +142,47 @@ void main() {
       verify(() => mockEmailPasswordSignUsecase(email, password)).called(1);
     },
   );
+
+  group('ForgotPasswortEvent handler test', () {
+    blocTest<AuthBloc, AuthState>(
+      'emits [AuthLoadingState, ForgotPasswordSuccessState] when EmailRegisterEvent is added.',
+      build: () {
+        when(
+          () => mockForgotPasswordUsecase.call(email),
+        ).thenAnswer((_) async => Right(unit));
+        return authBloc;
+      },
+      act: (bloc) => bloc.add(ForgotPassworEvent(email)),
+      expect: () => <AuthState>[
+        AuthLoadingState(),
+        ForgotPasswordSuccessState(),
+      ],
+    );
+
+    blocTest<AuthBloc, AuthState>(
+      'emits [AuthLoadingState, ErrorState] when ForgotPassworEvent handler fails',
+      build: () {
+        // stub usecase.call(...) -> Left(Failure)
+        when(() => mockForgotPasswordUsecase.call(email)).thenAnswer(
+          (_) async => Left(
+            AuthFailure(message: 'AUTH FAILURE', code: 'AUTH FAILURE CODE'),
+          ),
+        );
+        return authBloc;
+      },
+      act: (bloc) => bloc.add(ForgotPassworEvent(email)),
+      expect: () => [
+        AuthLoadingState(),
+        FailureState(
+          failure: AuthFailure(
+            message: 'AUTH FAILURE',
+            code: 'AUTH FAILURE CODE',
+          ),
+        ),
+      ],
+      verify: (_) {
+        verify(() => mockForgotPasswordUsecase(email)).called(1);
+      },
+    );
+  });
 }

@@ -1,7 +1,9 @@
 abstract class RouteNames {
   static const splash = 'splash';
+  //authentication
   static const emailRegister = 'emailRegister';
   static const login = 'login';
+  static const forgotPassword = 'forgotPassword';
   //home
   static const products = 'products';
   static const listOfProducts = 'listOfProducts';
@@ -12,7 +14,6 @@ abstract class RouteNames {
   static const user = 'user';
   static const userDetail = 'userDetail';
   static const addUser = 'addUser';
-  static const forgotPassword = 'forgotPassword';
   //user
   static const addProduct = 'addProduct';
 }
