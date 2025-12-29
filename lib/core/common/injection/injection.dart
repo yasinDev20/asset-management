@@ -74,18 +74,16 @@ Future<void> injectionInit() async {
     () => EmailRegisterUsecase(myInjection()), //diisi AuthRepositoryImpl
   );
   myInjection.registerLazySingleton(
-    () => EmailPasswordSignUsecase(
-      authRepository: myInjection(),
-    ), //diisi AuthRepositoryImpl
+    () => EmailPasswordSignUsecase(myInjection()), //diisi AuthRepositoryImpl
   );
   myInjection.registerLazySingleton(
     () => GoogleSignInUsecase(
-      authRepository: myInjection(),
+      myInjection(),
     ), //diisi AuthRepositoryImpl
   );
   myInjection.registerLazySingleton(
     () => GetUserUsecase(
-      authRepository: myInjection(),
+       myInjection(),
     ), //diisi AuthRepositoryImpl
   );
   myInjection.registerLazySingleton(
@@ -93,7 +91,7 @@ Future<void> injectionInit() async {
   );
   myInjection.registerLazySingleton(
     () => SignOutUsecase(
-      authRepository: myInjection(),
+    myInjection(),
     ), //diisi AuthRepositoryImpl
   );
 

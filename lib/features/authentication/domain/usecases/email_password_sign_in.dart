@@ -4,12 +4,12 @@ import 'package:assetmanagement/features/authentication/domain/repositories/auth
 import 'package:dartz/dartz.dart';
 
 class EmailPasswordSignUsecase {
-  final AuthRepository authRepository;
+  final AuthRepository _authRepository;
 
-  EmailPasswordSignUsecase({required this.authRepository});
+  EmailPasswordSignUsecase(this._authRepository);
 
   Future<Either<Failure, AuthEntity>> call(String email, String password) async {
-    return await authRepository.emailPasswordSignIn(email: email, password: password);
+    return await _authRepository.emailPasswordSignIn(email: email, password: password);
   }
   
 }

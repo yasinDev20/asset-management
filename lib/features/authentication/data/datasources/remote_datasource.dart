@@ -16,7 +16,7 @@ abstract class AuthRemoteDatasource {
   Future<AuthModel> googleSignIn({
     required GoogleSignInAccount googleSignInAccaount,
   });
-  Future<AuthModel> getCurrentUser(String id);
+  Future<AuthModel> getUser(String id);
   Future<void> forgotPassword(String email);
   Future<void> signOut();
 }
@@ -157,7 +157,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
       doc = await usersRef.get();
     }
 
-    if (doc.data() == null) {
+    if (!doc.exists || doc.data() == null) {
       throw AppException(
         type: ExceptionType.server,
         code: 'DATA_NOT_FOUND',
@@ -178,7 +178,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   }
 
   @override
-  Future<AuthModel> getCurrentUser(String id) async {
+  Future<AuthModel> getUser(String id) async {
     final docSnapshot = await firestore.collection('users').doc(id).get();
 
     if (!docSnapshot.exists || docSnapshot.data() == null) {

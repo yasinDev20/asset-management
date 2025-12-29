@@ -10,15 +10,15 @@ import 'package:mocktail/mocktail.dart';
 class MockAuthRepository extends Mock implements AuthRepository {}
 
 void main() {
-  late EmailPasswordSignUsecase usecase;
-  late MockAuthRepository authRepository;
+  late EmailPasswordSignUsecase emailPasswordSignUsecase;
+  late MockAuthRepository mockAuthRepository;
 
   setUp(() {
-    authRepository = MockAuthRepository();
-    usecase = EmailPasswordSignUsecase(authRepository: authRepository);
+    mockAuthRepository = MockAuthRepository();
+    emailPasswordSignUsecase = EmailPasswordSignUsecase(mockAuthRepository);
   });
 
-  test('should login and return User', () async {
+  test('should return AuthEntity when email and password are valid', () async {
     const email = 'test@email.com';
     const password = '123456';
     
@@ -32,28 +32,28 @@ void main() {
     );
 
     when(
-      () => authRepository.emailPasswordSignIn(email: email, password: password),
+      () => mockAuthRepository.emailPasswordSignIn(email: email, password: password),
     ).thenAnswer((_) async => Right(authEntity));
 
     // final result = await usecase(email, password);
-    final result = await usecase.call(email, password);
+    final result = await emailPasswordSignUsecase.call(email, password);
 
     expect(result, equals(Right(authEntity)));
-    verify(() => authRepository.emailPasswordSignIn(email: email, password: password)).called(1);
+    verify(() => mockAuthRepository.emailPasswordSignIn(email: email, password: password)).called(1);
   });
 
-  test('should return Failure when login fails', () async {
+  test('should return Failure when sign in fails', () async {
     const email = 'test@email.com';
     const password = 'wrong';
 
-    when(() => authRepository.emailPasswordSignIn(email: email, password: password)).thenAnswer(
+    when(() => mockAuthRepository.emailPasswordSignIn(email: email, password: password)).thenAnswer(
       (_) async => Left(AuthFailure(message: 'user not found', code: '404')),
     );
 
-    final result = await usecase(email, password);
+    final result = await emailPasswordSignUsecase(email, password);
 
     expect(result, Left(AuthFailure(message: 'user not found', code: '404')));
-    verify(() => authRepository.emailPasswordSignIn(email: email, password: password)).called(1);
+    verify(() => mockAuthRepository.emailPasswordSignIn(email: email, password: password)).called(1);
 
     result.fold(
       (failure) {

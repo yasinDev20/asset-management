@@ -16,11 +16,11 @@ void main() {
   setUp(() {
     authRepository = MockAuthRepository();
     getUserUsecase = GetUserUsecase(
-      authRepository: authRepository,
+      authRepository,
     );
   });
 
-  test('should return user', () async {
+  test('should return AuthEntity when get user succeeds', () async {
     final authEntity = AuthEntity(
       user: UserEntity(
         id: 'test',
@@ -36,18 +36,18 @@ void main() {
     );
 
     when(
-      () => authRepository.getCurrentUser(id: authEntity.user.id),
+      () => authRepository.getUser(id: authEntity.user.id),
     ).thenAnswer((_) async => Right(authEntity));
 
     final result = await getUserUsecase.call(id: authEntity.user.id);
 
     expect(result, equals(Right(authEntity)));
     verify(
-      () => authRepository.getCurrentUser(id: authEntity.user.id),
+      () => authRepository.getUser(id: authEntity.user.id),
     ).called(1);
   });
 
-  test('should return Failure when getuser fails', () async {
+  test('should return Failure when get user fails', () async {
     final authEntity = AuthEntity(
       user: UserEntity(
         id: 'test',
@@ -63,7 +63,7 @@ void main() {
     );
 
     when(
-      () => authRepository.getCurrentUser(id: authEntity.user.id),
+      () => authRepository.getUser(id: authEntity.user.id),
     ).thenAnswer(
       (_) async => Left(
         NetworkFailure(message: 'NETWORK FAILURE', code: 'NETWORK_FAILURE'),

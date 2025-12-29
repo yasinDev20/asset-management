@@ -15,7 +15,7 @@ abstract class AuthRepository {
   Future<Either<Failure, AuthEntity>> googleSignIn({
     required GoogleSignInAccount googleSignInAccaount,
   });
-  Future<Either<Failure, AuthEntity>> getCurrentUser({required String id});
+  Future<Either<Failure, AuthEntity>> getUser({required String id});
   Future<Either<Failure, Unit>> forgotPassword(String email);
   Future<Either<Failure, Unit>> signOut();
 

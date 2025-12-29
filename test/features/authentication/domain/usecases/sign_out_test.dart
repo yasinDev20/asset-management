@@ -13,10 +13,10 @@ void main() {
 
   setUp(() {
     mockAuthRepository = MockAuthRepository();
-    signOutUsecase = SignOutUsecase(authRepository: mockAuthRepository);
+    signOutUsecase = SignOutUsecase(mockAuthRepository);
   });
 
-  test('should return Unit when sign out success', () async {
+  test('should return Unit when sign out succeeds', () async {
     when(
       () => mockAuthRepository.signOut(),
     ).thenAnswer((_) async => Right(unit));
@@ -25,7 +25,7 @@ void main() {
     expect(result, equals(Right(unit)));
   });
 
-  test('should return Failure when sign out fail', () async {
+  test('should return Failure when sign out fails', () async {
     when(() => mockAuthRepository.signOut()).thenAnswer(
       (_) async => Left(
         NetworkFailure(message: 'Network Failure', code: 'NETWORK_FAILURE'),

@@ -4,12 +4,12 @@ import 'package:assetmanagement/features/authentication/domain/repositories/auth
 import 'package:dartz/dartz.dart';
 
 class GetUserUsecase {
-  final AuthRepository authRepository;
+  final AuthRepository _authRepository;
 
-  GetUserUsecase({required this.authRepository});
+  GetUserUsecase(this._authRepository);
 
   Future<Either<Failure, AuthEntity>> call({required String id}) async {
-    return await authRepository.getCurrentUser(id: id);
+    return await _authRepository.getUser(id: id);
   }
   
 }

@@ -59,7 +59,7 @@ void main() {
   });
 
   group('emailRegister', () {
-    test('should call emailRegister', () async {
+    test('should return unit when email register suceeds', () async {
       // Arrange
       when(
         () => authRemoteDataSource.emailRegister(
@@ -69,10 +69,10 @@ void main() {
       ).thenAnswer((_) async => {});
 
       // Act
-      await authRepositoryImpl.emailRegister(email: email, password: password);
+      final result = await authRepositoryImpl.emailRegister(email: email, password: password);
 
       // Assert
-
+      expect(result, Right(unit));
       verify(
         () => authRemoteDataSource.emailRegister(
           email: email,
@@ -81,7 +81,7 @@ void main() {
       ).called(1);
     });
 
-    test('should return Failure when emailRegister throws exception', () async {
+    test('should return Failure when email register throws exception', () async {
       when(
         () => authRemoteDataSource.emailRegister(
           email: email,
@@ -117,7 +117,7 @@ void main() {
     });
   });
   group('emailPasswordSignIn', () {
-    test('should return AuthEntity when emailPasswordSignIn success', () async {
+    test('should return AuthEntity when email and password sign in succeeds', () async {
       // Arrange
       when(
         () => authRemoteDataSource.emailPasswordSignIn(
@@ -144,7 +144,7 @@ void main() {
     });
 
     test(
-      'should return Failure when emailPasswordSignIn throws exception',
+      'should return Failure when email and password sign in throws exception',
       () async {
         when(
           () => authRemoteDataSource.emailPasswordSignIn(
@@ -183,7 +183,7 @@ void main() {
   });
 
   group('googleSignIn', () {
-    test('should return AuthEntity when googleSignIn success', () async {
+    test('should return AuthEntity when google sign in succeeds', () async {
       // Arrange
       when(
         () => authRemoteDataSource.googleSignIn(
@@ -206,7 +206,7 @@ void main() {
       ).called(1);
     });
 
-    test('should return Failure when googleSignIn throws exception', () async {
+    test('should return Failure when google sign in throws exception', () async {
       when(
         () => authRemoteDataSource.googleSignIn(
           googleSignInAccaount: mockGoogleSignInAccount,
@@ -239,27 +239,27 @@ void main() {
     });
   });
 
-  group('getCurrentUser', () {
-    test('should return AuthEntity when getCurrentUser success', () async {
+  group('getUser', () {
+    test('should return AuthEntity when get user succeeds', () async {
       when(
-        () => authRemoteDataSource.getCurrentUser(authEntity.user.id),
+        () => authRemoteDataSource.getUser(authEntity.user.id),
       ).thenAnswer((_) async => authModel);
 
-      final result = await authRepositoryImpl.getCurrentUser(
+      final result = await authRepositoryImpl.getUser(
         id: authEntity.user.id,
       );
 
       expect(result, equals(Right(authEntity)));
       verify(
-        () => authRemoteDataSource.getCurrentUser(authEntity.user.id),
+        () => authRemoteDataSource.getUser(authEntity.user.id),
       ).called(1);
     });
 
     test(
-      'should return Failure when getCurrentUser throws exception',
+      'should return Failure when get user throws exception',
       () async {
         when(
-          () => authRemoteDataSource.getCurrentUser(authEntity.user.id),
+          () => authRemoteDataSource.getUser(authEntity.user.id),
         ).thenThrow(
           AppException(
             type: ExceptionType.network,
@@ -268,7 +268,7 @@ void main() {
           ),
         );
 
-        final result = await authRepositoryImpl.getCurrentUser(
+        final result = await authRepositoryImpl.getUser(
           id: authEntity.user.id,
         );
 
@@ -281,29 +281,29 @@ void main() {
         }, (_) => fail('Should not return Right'));
 
         verify(
-          () => authRemoteDataSource.getCurrentUser(authEntity.user.id),
+          () => authRemoteDataSource.getUser(authEntity.user.id),
         ).called(1);
       },
     );
   });
 
   group('forgotPassword', () {
-    test('should call forgotPassword', () async {
+    test('should return unit when forgot password succeeds', () async {
       // Arrange
       when(
         () => authRemoteDataSource.forgotPassword(email),
       ).thenAnswer((_) async => {});
 
       // Act
-      await authRepositoryImpl.forgotPassword(email);
+     final result  = await authRepositoryImpl.forgotPassword(email);
 
       // Assert
-
+      expect(result, Right(unit));
       verify(() => authRemoteDataSource.forgotPassword(email)).called(1);
     });
 
     test(
-      'should return Failure when forgotPassword throws exception',
+      'should return Failure when forgot password throws exception',
       () async {
         when(() => authRemoteDataSource.forgotPassword(email)).thenThrow(
           AppException(
@@ -329,14 +329,16 @@ void main() {
   });
 
   group('signOut', () {
-    test('should return unit when signOut succes', () async {
+    test('should return unit when sign out succeeds', () async {
       when(() => authRemoteDataSource.signOut()).thenAnswer((_) async => {});
-      await authRepositoryImpl.signOut();
+      final result = await authRepositoryImpl.signOut();
+
+      expect(result, Right(unit));
 
       verify(() => authRemoteDataSource.signOut()).called(1);
     });
 
-    test('should return Failure when signOut throws exception', () async {
+    test('should return Failure when sign out throws exception', () async {
       when(() => authRemoteDataSource.signOut()).thenThrow(
         AppException(
           type: ExceptionType.network,

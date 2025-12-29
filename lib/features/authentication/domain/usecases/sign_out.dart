@@ -4,12 +4,12 @@ import 'package:assetmanagement/features/authentication/domain/repositories/auth
 import 'package:dartz/dartz.dart';
 
 class SignOutUsecase {
-  final AuthRepository authRepository;
+  final AuthRepository _authRepository;
 
-  SignOutUsecase({required this.authRepository});
+  SignOutUsecase(this._authRepository);
 
   Future<Either<Failure, Unit>> call() async {
-    return await authRepository.signOut();
+    return await _authRepository.signOut();
   }
   
 }

@@ -17,7 +17,7 @@ void main() {
     forgotPasswordUsecase = ForgotPasswordUsecase(mockAuthRepository);
   });
 
-  test('should return unit when ForgotPasswordUsecase success', () async {
+  test('should return unit when forgot password request succeeds', () async {
     const String email = 'email@gmail.com';
 
     when(
@@ -29,7 +29,7 @@ void main() {
     expect(result, Right(unit));
   });
 
-  test('should return Failure when ForgotPasswordUsecase fail', () async {
+  test('should return Failure when forgot password request fails', () async {
      const String email = 'email@gmail.com';
     when(() => mockAuthRepository.forgotPassword(email)).thenAnswer(
       (_) async =>

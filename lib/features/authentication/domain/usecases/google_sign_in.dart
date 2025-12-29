@@ -5,12 +5,12 @@ import 'package:dartz/dartz.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class GoogleSignInUsecase {
-  final AuthRepository authRepository;
-  GoogleSignInUsecase({required this.authRepository});
+  final AuthRepository _authRepository;
+  GoogleSignInUsecase(this._authRepository);
 
   Future<Either<Failure, AuthEntity>> call({
     required GoogleSignInAccount googleSignInAccaount,
   }) async {
-    return await authRepository.googleSignIn(googleSignInAccaount: googleSignInAccaount);
+    return await _authRepository.googleSignIn(googleSignInAccaount: googleSignInAccaount);
   }
 }

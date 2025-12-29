@@ -20,11 +20,11 @@ void main() {
     mockGoogleSignInAccount =  MockGoogleSignInAccount();
     mockAuthRepository = MockAuthRepository();
     googleSignInUsecase = GoogleSignInUsecase(
-      authRepository: mockAuthRepository,
+       mockAuthRepository,
     );
   });
 
-  test('should return AuthEntity when googleSignIn success', () async {
+  test('should return AuthEntity when googleSignIn succeeds', () async {
     final authEntity = AuthEntity(
       user: UserEntity(
         id: 'test',
@@ -48,7 +48,7 @@ void main() {
     expect(result, equals(Right(authEntity)));
   });
 
-  test('should return Failure when googleSignIn fail', () async {
+  test('should return Failure when googleSignIn fails', () async {
     when(() => mockAuthRepository.googleSignIn(googleSignInAccaount: mockGoogleSignInAccount )).thenAnswer(
       (_) async =>
           Left(AuthFailure(code: 'user_not_found', message: 'user not found')),

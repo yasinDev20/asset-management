@@ -55,9 +55,9 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, AuthEntity>> getCurrentUser({required String id}) {
+  Future<Either<Failure, AuthEntity>> getUser({required String id}) {
     return runCatching(() async {
-      final authModel = await authRemoteDataSource.getCurrentUser(id);
+      final authModel = await authRemoteDataSource.getUser(id);
 
       return authModel.toEntity();
     });

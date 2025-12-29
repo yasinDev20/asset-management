@@ -3,10 +3,10 @@ import 'package:assetmanagement/features/authentication/domain/repositories/auth
 import 'package:dartz/dartz.dart';
 
 class EmailRegisterUsecase {
-  final AuthRepository authRepository;
-  EmailRegisterUsecase(this.authRepository);
+  final AuthRepository _authRepository;
+  EmailRegisterUsecase(this._authRepository);
 
   Future<Either<Failure, Unit>> call({required String email, required String password}) async{
-   return await authRepository.emailRegister(email: email, password: password);
+   return await _authRepository.emailRegister(email: email, password: password);
   }
 }
