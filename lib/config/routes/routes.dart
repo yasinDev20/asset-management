@@ -4,8 +4,8 @@ import 'package:assetmanagement/features/authentication/domain/entities/user_ent
 import 'package:assetmanagement/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:assetmanagement/features/authentication/presentation/pages/email_register.dart';
 import 'package:assetmanagement/features/authentication/presentation/pages/login.dart';
-import 'package:assetmanagement/features/product/presentation/pages/root_page.dart';
-import 'package:assetmanagement/features/product/presentation/pages/products.dart';
+import 'package:assetmanagement/features/home/presentation/pages/home.dart';
+import 'package:assetmanagement/config/routes/app_shell.dart';
 import 'package:assetmanagement/features/user/presentation/pages/user_detail.dart';
 import 'package:assetmanagement/features/authentication/presentation/pages/forgot_password.dart';
 import 'package:assetmanagement/features/user/presentation/pages/users.dart';
@@ -25,7 +25,8 @@ class MyRouter {
       final authState = context.read<AuthBloc>().state;
       final currentPath = state.uri.path;
       final loginPath = '/${RouteNames.login}';
-      final forgotPasswordPath = '/${RouteNames.login}/${RouteNames.forgotPassword}';
+      final forgotPasswordPath =
+          '/${RouteNames.login}/${RouteNames.forgotPassword}';
       final emailRegisterPath =
           '/${RouteNames.login}/${RouteNames.emailRegister}';
       final publicPath = [loginPath, emailRegisterPath, forgotPasswordPath];
@@ -75,15 +76,15 @@ class MyRouter {
 
       ShellRoute(
         builder: (context, state, child) {
-          return RootPage(child: child);
+          return AppShell(child: child);
         },
         routes: [
           //home
           GoRoute(
             path: '/',
-            name: RouteNames.products,
+            name: RouteNames.home,
             pageBuilder: (context, state) =>
-                const MaterialPage(child: ProductsPage()),
+                const MaterialPage(child: HomePage()),
             routes: [
               //User
               GoRoute(
@@ -107,45 +108,13 @@ class MyRouter {
                     ),
                   ),
 
-                  //Add user
-                  GoRoute(
-                    path: RouteNames.addUser,
-                    name: RouteNames.addUser,
-                    pageBuilder: (context, state) => MaterialPage(
-                      //untuk menghemat query tambahkan extra karena extra tidak perlu query user lagi
-                      child: UserDetailPage(),
-                    ),
-                  ),
+                 
                 ],
               ),
-
-              // //listOfProduct
-              // GoRoute(
-              //   path: RouteNames.listOfProducts,
-              //   name: RouteNames.listOfProducts,
-              //   pageBuilder: (context, state) =>
-              //       const MaterialPage(child: HomePage()),
-              // ),
-
-              // //productDetail
-              // GoRoute(
-              //   path: RouteNames.productDetail,
-              //   name: RouteNames.productDetail,
-              //   pageBuilder: (context, state) =>
-              //       const MaterialPage(child: HomePage()),
-              // ),
             ],
           ),
         ],
       ),
-
-      // //Add product
-      // GoRoute(
-      //   path: '/${RouteNames.productDetail}',
-      //   name: RouteNames.productDetail,
-      //   pageBuilder: (context, state) =>
-      //       const MaterialPage(child: HomePage()),
-      // ),
     ],
   );
 }

@@ -4,11 +4,16 @@ abstract class RouteNames {
   static const emailRegister = 'emailRegister';
   static const login = 'login';
   static const forgotPassword = 'forgotPassword';
+
   //home
-  static const products = 'products';
+  static const home ='/';
+  //home
+
+  //asset
+  // static const products = 'products';
   static const listOfProducts = 'listOfProducts';
   static const productDetail = 'productDetail';
-  //home
+  //asset
 
   //user
   static const user = 'user';

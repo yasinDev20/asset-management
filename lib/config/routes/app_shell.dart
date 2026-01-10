@@ -6,15 +6,12 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:assetmanagement/core/constant/Icon_assets.dart';
 import 'package:go_router/go_router.dart';
 
-class RootPage extends StatelessWidget {
+class AppShell extends StatelessWidget {
   final Widget child;
-  const RootPage({super.key, required this.child});
+  const AppShell({super.key, required this.child});
 
-  // final List<Widget> _pages = [ProductsPage()];
   @override
   Widget build(BuildContext context) {
-    // int _currentIndex = 0;
-
     return Scaffold(
       body: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
@@ -76,7 +73,7 @@ class RootPage extends StatelessWidget {
   void _onItemTapped(int index, BuildContext context) {
     switch (index) {
       case 0:
-        GoRouter.of(context).goNamed(RouteNames.products);
+        GoRouter.of(context).goNamed(RouteNames.home);
       case 1:
         GoRouter.of(context).goNamed('/');
       case 2:

@@ -118,7 +118,7 @@ class _LoginPageState extends State<LoginPage> {
                               return BlocListener<AuthBloc, AuthState>(
                                 listener: (context, state) {
                                   if (state is AuthenticatedState) {
-                                    return context.goNamed(RouteNames.products);
+                                    return context.goNamed(RouteNames.home);
                                   }
                                 },
                                 child: CommonButton(
