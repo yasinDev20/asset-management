@@ -71,7 +71,7 @@ class AssetCard extends StatelessWidget {
                           Icon(Icons.qr_code, size: 16, ),
                           Flexible(
                             child: Text(
-                              'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+                              '123456789111315171921',
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: Theme.of(context).textTheme.bodySmall

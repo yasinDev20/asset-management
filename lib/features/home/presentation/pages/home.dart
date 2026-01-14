@@ -16,33 +16,36 @@ class HomePage extends StatelessWidget {
       child: Column(
         spacing: 16,
         children: [
-          SizedBox(height: 8),
+          SizedBox(height: 0),
           //Username and setting
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             spacing: 4,
             children: [
               // name
-              BlocSelector<AuthBloc, AuthState, String?>(
-                selector: (state) {
-                  if (state is AuthenticatedState) {
-                    return state.authEntity.user.name;
-                  }
-                  return null;
-                },
-                builder: (context, name) {
-                  return Text(
-                    style: Theme.of(context).textTheme.labelLarge,
-                    'Halo, $name',
-                  );
-                },
+              Flexible(
+                child: BlocSelector<AuthBloc, AuthState, String?>(
+                  selector: (state) {
+                    if (state is AuthenticatedState) {
+                      return state.authEntity.user.name;
+                    }
+                    return null;
+                  },
+                  builder: (context, name) {
+                    return Text(
+                      style: Theme.of(context).textTheme.labelLarge,
+                      'Halo, $name',
+                    );
+                  },
+                ),
               ),
 
               //Search bar non mobile
               (getDevicesize(context) != ResponsiveDevice.mobile)
                   ? Flexible(
+                    flex: 3,
                       child: SearchBar(
-                        hintText: 'Cari barang',
+                        hintText: 'Cari qr code',
 
                         trailing: [
                           Stack(
@@ -69,11 +72,13 @@ class HomePage extends StatelessWidget {
                   : SizedBox(),
 
               //settings
-              IconButton(
-                icon: Icon(Icons.settings, size: 32),
-                onPressed: () {
-                  context.goNamed(RouteNames.user);
-                },
+              Flexible(
+                child: IconButton(
+                  icon: Icon(Icons.settings, size: 32),
+                  onPressed: () {
+                    context.goNamed(RouteNames.user);
+                  },
+                ),
               ),
             ],
           ),
@@ -81,42 +86,52 @@ class HomePage extends StatelessWidget {
           //Search bar on mobile
           (getDevicesize(context) == ResponsiveDevice.mobile)
               ? SearchBar(
-                hintText: 'Cari barang',
-              
-                trailing: [
-                  Stack(
-                    alignment: AlignmentGeometry.topRight,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: IconButton(
-                          icon: Icon(Icons.filter_list, size: 24),
-                          onPressed: () {},
+                  hintText: 'Cari barang',
+
+                  trailing: [
+                    Stack(
+                      alignment: AlignmentGeometry.topRight,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: IconButton(
+                            icon: Icon(Icons.filter_list, size: 24),
+                            onPressed: () {},
+                          ),
                         ),
-                      ),
-                      Badge(
-                        label: Text('+5'),
-                        backgroundColor: Theme.of(
-                          context,
-                        ).colorScheme.primary,
-                      ),
-                    ],
-                  ),
-                ],
-              )
+                        Badge(
+                          label: Text('+5'),
+                          backgroundColor: Theme.of(
+                            context,
+                          ).colorScheme.primary,
+                        ),
+                      ],
+                    ),
+                  ],
+                )
               : SizedBox(),
+
           //Asset grid
           Expanded(
-            child: GridView.builder(
-              itemCount: 20,
-              gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                maxCrossAxisExtent: 186,
-                mainAxisExtent: 290,
-                mainAxisSpacing: 6,
-                crossAxisSpacing: 6,
-              ),
-              itemBuilder: (context, index) =>
-                  AssetCard(labelVariant: 'available'),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                const minItemWidth = 148;
+                final count = (constraints.maxWidth / minItemWidth)
+                    .floor()
+                    .clamp(1, 10);
+
+                return GridView.builder(
+                  itemCount: 30,
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: count,
+                    mainAxisExtent: 290,
+                    mainAxisSpacing: 6,
+                    crossAxisSpacing: 6,
+                  ),
+                  itemBuilder: (context, index) =>
+                      AssetCard(labelVariant: 'available'),
+                );
+              },
             ),
           ),
         ],
