@@ -32,6 +32,7 @@ class UnAuthenticatedState extends AuthState {
   List<Object> get props => [];
 }
 
+//Todo: refactor AuthFailureState
 class FailureState extends AuthState {
   final Failure failure;
 

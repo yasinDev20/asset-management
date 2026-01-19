@@ -81,6 +81,7 @@ void main() {
     refreshExpiresAt: DateTime(2025),
   );
 
+  //TODO : grouping test
   blocTest<AuthBloc, AuthState>(
     'emits [AuthLoadingState, EmailRegisterSuccessState] when EmailRegisterEvent is added.',
     build: () {

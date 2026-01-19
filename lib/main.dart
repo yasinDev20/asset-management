@@ -13,6 +13,8 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:intl/intl.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:assetmanagement/features/asset/presentation/bloc/asset_bloc.dart';
 
 void main() async {
   if (kDebugMode) {
@@ -20,6 +22,10 @@ void main() async {
   }
   WidgetsFlutterBinding.ensureInitialized();
   Intl.defaultLocale = 'id_ID';
+  await Supabase.initialize(
+    url: 'https://uzzuacawolizquuqylev.supabase.co',
+    anonKey: 'sb_publishable_D5bcN2CFRoD9ihmEGwACsg_2Es-7dSz',
+  );
   await injectionInit();
   await GoogleSignIn.instance.initialize();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -33,11 +39,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final materialTheme = MaterialTheme(Typography.material2021().black);
 
-    
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => myInjection<AuthBloc>()),
         BlocProvider(create: (context) => myInjection<UserBloc>()),
+        BlocProvider(create: (context) => myInjection<AssetBloc>()),
       ],
 
       child: MaterialApp.router(
