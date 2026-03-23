@@ -1,7 +1,7 @@
 import 'package:assetmanagement/core/error/failure.dart';
-import 'package:assetmanagement/features/asset/domain/entities/asset_summary_entity.dart';
+import 'package:assetmanagement/features/asset/domain/entities/asset_lite_entity.dart';
 import 'package:assetmanagement/features/asset/domain/repositories/asset_repository.dart';
-import 'package:assetmanagement/features/asset/domain/usecases/get_assets.dart';
+import 'package:assetmanagement/features/asset/domain/usecases/get_assets_lite.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -9,17 +9,17 @@ import 'package:mocktail/mocktail.dart';
 class MockAssetRepository extends Mock implements AssetRepository {}
 
 void main() {
-  late GetAssetsUsecase getAssetsUsecase;
+  late GetAssetsLiteUsecase getAssetsUsecase;
   late MockAssetRepository mockAssetRepository;
-  late List<AssetSummaryEntity> allAssetsSummaryEntity;
-  late AssetSummaryEntity assetSummaryEntity;
+  late List<AssetLiteEntity> allAssetsSummaryEntity;
+  late AssetLiteEntity assetSummaryEntity;
   late List<Map<String, String>> filter;
 
   setUp(() {
     mockAssetRepository = MockAssetRepository();
-    getAssetsUsecase = GetAssetsUsecase(mockAssetRepository);
+    getAssetsUsecase = GetAssetsLiteUsecase(mockAssetRepository);
     filter = [];
-    assetSummaryEntity = AssetSummaryEntity(
+    assetSummaryEntity = AssetLiteEntity(
       id: 'id',
       status: 'status',
       image: 'image',
@@ -28,14 +28,14 @@ void main() {
       brandName: 'brandName',
       name: 'name',
       location: 'location',
-      nextServiceSchedule: 'nextServiceSchedule',
+      nextServiceSchedule: DateTime(2000),
     );
     allAssetsSummaryEntity = [assetSummaryEntity, assetSummaryEntity];
   });
 
   test('should return List<AssetEntity> when get assets succeeds', () async {
     when(
-      () => mockAssetRepository.getAssets(filter),
+      () => mockAssetRepository.getAssetsLite(filter),
     ).thenAnswer((_) async => Right(allAssetsSummaryEntity));
     final result = await getAssetsUsecase.call(filter);
 
@@ -43,7 +43,7 @@ void main() {
   });
 
   test('should return Failure when get assets fails', () async {
-    when(() => mockAssetRepository.getAssets(filter)).thenAnswer(
+    when(() => mockAssetRepository.getAssetsLite(filter)).thenAnswer(
       (_) async => Left(
         NetworkFailure(message: 'Network Failure', code: 'NETWORK_FAILURE'),
       ),

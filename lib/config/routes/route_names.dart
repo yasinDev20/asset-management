@@ -12,7 +12,7 @@ abstract class RouteNames {
   //asset
   // static const products = 'products';
   static const listOfProducts = 'listOfProducts';
-  static const productDetail = 'productDetail';
+  static const assetDetail = 'assetDetail';
   //asset
 
   //user
@@ -20,5 +20,5 @@ abstract class RouteNames {
   static const userDetail = 'userDetail';
   static const addUser = 'addUser';
   //user
-  static const addProduct = 'addProduct';
+  static const addAsset = 'addAsset';
 }

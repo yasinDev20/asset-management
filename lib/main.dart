@@ -12,7 +12,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:assetmanagement/features/asset/presentation/bloc/asset_bloc.dart';
 
@@ -21,6 +23,16 @@ void main() async {
     Bloc.observer = AppBlocObserver();
   }
   WidgetsFlutterBinding.ensureInitialized();
+
+  if (!kIsWeb) {
+  var dir = await getApplicationDocumentsDirectory();
+    Hive.init(dir.path);
+  }
+  
+  await Hive.openBox('recentCategorySelections');
+  await Hive.openBox('recentBrandSelections');
+  await Hive.openBox('recentLocationSelections');
+
   Intl.defaultLocale = 'id_ID';
   await Supabase.initialize(
     url: 'https://uzzuacawolizquuqylev.supabase.co',
@@ -29,6 +41,7 @@ void main() async {
   await injectionInit();
   await GoogleSignIn.instance.initialize();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
   runApp(const MyApp());
 }
 
@@ -56,6 +69,26 @@ class MyApp extends StatelessWidget {
           ...GlobalMaterialLocalizations.delegates,
           FormBuilderLocalizations.delegate,
         ],
+        builder: (context, child) {
+          return MultiBlocListener(
+            listeners: [
+              BlocListener<AssetBloc, AssetState>(
+                listenWhen: (previous, current) => current is AssetFailureState,
+                listener: (context, state) {
+                  if (state is AssetFailureState) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(state.message),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                },
+              ),
+            ],
+            child: child!,
+          );
+        },
       ),
     );
   }

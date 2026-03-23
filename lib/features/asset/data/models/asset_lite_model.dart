@@ -2,9 +2,9 @@ import 'dart:convert';
 
 import 'package:equatable/equatable.dart';
 
-import 'package:assetmanagement/features/asset/domain/entities/asset_summary_entity.dart';
+import 'package:assetmanagement/features/asset/domain/entities/asset_lite_entity.dart';
 
-class AssetSummaryModel extends Equatable {
+class AssetLiteModel extends Equatable {
   final String id;
   final String status;
   final String image;
@@ -13,8 +13,8 @@ class AssetSummaryModel extends Equatable {
   final String brandName;
   final String name;
   final String location;
-  final String? nextServiceSchedule;
-  const AssetSummaryModel({
+  final DateTime? nextServiceSchedule;
+  const AssetLiteModel({
     required this.id,
     required this.status,
     required this.image,
@@ -41,11 +41,11 @@ class AssetSummaryModel extends Equatable {
     ];
   }
 
-  AssetSummaryEntity toEntity() {
-    return AssetSummaryEntity(
+  AssetLiteEntity toEntity({required String imageUrl}) {
+    return AssetLiteEntity(
       id: id,
       status: status,
-      image: image,
+      image: imageUrl,
       categoryName: categoryName,
       qrCode: qrCode,
       brandName: brandName,
@@ -69,24 +69,43 @@ class AssetSummaryModel extends Equatable {
     };
   }
 
-  factory AssetSummaryModel.fromMap(Map<String, dynamic> map) {
+  factory AssetLiteModel.fromMap(Map<String, dynamic> map) {
     final serviceSchedules = (map['serviceSchedules'] as List);
-    final now = DateTime(2026, 1, 24, 24);
-    String? nextServiceScheduleChose;
+    final now = DateTime.now().toUtc();
+    final today = DateTime(now.year, now.month, now.day);
+    DateTime? nextSchedule;
 
-    //kalau sama  pilih
-    //kalau lebih besar pilih dan stop
-    for (var element in serviceSchedules) {
-      final schedule = DateTime.parse(element);
+    for (final element in serviceSchedules) {
+      final raw = DateTime.parse(element['time']).toUtc();
+      DateTime candidate;
 
-      if (now.isBefore(schedule)) {
-        nextServiceScheduleChose = element;
+      // Feb 29 will be auto-normalized to Mar 1 on non-leap years (intended behavior)
+      if (element['type'] == 'yearly') {
+        candidate = DateTime(today.year, raw.month, raw.day);
 
-        break;
+        //!candidate.isAfter(today) same with "<="
+        if (!candidate.isAfter(today)) {
+          candidate = DateTime(today.year + 1, raw.month, raw.day);
+        }
+      } else if (element['type'] == 'monthly') {
+        candidate = DateTime(today.year, today.month, raw.day);
+
+        if (!candidate.isAfter(today)) {
+          candidate = DateTime(today.year, today.month + 1, raw.day);
+        }
+      } else {
+        continue;
+      }
+
+      //compare for the nearest date
+      if (nextSchedule == null || candidate.isBefore(nextSchedule)) {
+        nextSchedule = candidate;
       }
     }
 
-    return AssetSummaryModel(
+    final nextServiceScheduleChose = nextSchedule;
+
+    return AssetLiteModel(
       id: map['id'] as String,
       status: map['status'] as String,
       image: map['image'] as String,
@@ -101,6 +120,6 @@ class AssetSummaryModel extends Equatable {
 
   String toJson() => json.encode(toMap());
 
-  factory AssetSummaryModel.fromJson(String source) =>
-      AssetSummaryModel.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory AssetLiteModel.fromJson(String source) =>
+      AssetLiteModel.fromMap(json.decode(source) as Map<String, dynamic>);
 }

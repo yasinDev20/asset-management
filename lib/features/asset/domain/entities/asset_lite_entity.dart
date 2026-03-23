@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-class AssetSummaryEntity extends Equatable {
+class AssetLiteEntity extends Equatable {
   final String id;
   final String status;
   final String image;
@@ -9,8 +9,8 @@ class AssetSummaryEntity extends Equatable {
   final String brandName;
   final String name;
   final String location;
-  final String? nextServiceSchedule;
-  const AssetSummaryEntity({
+  final DateTime? nextServiceSchedule;
+  const AssetLiteEntity({
     required this.id,
     required this.status,
     required this.image,

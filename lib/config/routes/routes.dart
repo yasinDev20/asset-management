@@ -1,5 +1,6 @@
 import 'package:assetmanagement/config/routes/route_names.dart';
 import 'package:assetmanagement/core/common/pages/not_found.dart';
+import 'package:assetmanagement/features/asset/presentation/pages/asset_detail.dart';
 import 'package:assetmanagement/features/authentication/domain/entities/user_entity.dart';
 import 'package:assetmanagement/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:assetmanagement/features/authentication/presentation/pages/email_register.dart';
@@ -15,7 +16,7 @@ import 'package:go_router/go_router.dart';
 
 class MyRouter {
   GoRouter get router => GoRouter(
-    initialLocation: '/${RouteNames.login}',
+    initialLocation: '/${RouteNames.assetDetail}',
 
     errorPageBuilder: (context, state) {
       return const MaterialPage(child: NotFoundPage());
@@ -107,13 +108,19 @@ class MyRouter {
                       ),
                     ),
                   ),
-
-                 
                 ],
               ),
             ],
           ),
         ],
+      ),
+
+      //Detail asset
+      GoRoute(
+        path: '/${RouteNames.assetDetail}',
+        name: RouteNames.assetDetail,
+        pageBuilder:(context, state) => MaterialPage(child: AssetDetailPage(id: 'id', mode: AssetFormMode.detail,))
+       
       ),
     ],
   );

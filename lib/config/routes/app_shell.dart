@@ -64,7 +64,7 @@ class AppShell extends StatelessWidget {
     if (location.startsWith('/')) {
       return 1;
     }
-    if (location.startsWith('/${RouteNames.addProduct}')) {
+    if (location.startsWith('/${RouteNames.addAsset}')) {
       return 2;
     }
     return 0;

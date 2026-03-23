@@ -1,7 +1,9 @@
+import 'package:assetmanagement/features/asset/data/datasources/local_datasource.dart';
 import 'package:assetmanagement/features/asset/data/datasources/remote_datasource.dart';
 import 'package:assetmanagement/features/asset/data/repositories/asset_repository_impl.dart';
 import 'package:assetmanagement/features/asset/domain/repositories/asset_repository.dart';
-import 'package:assetmanagement/features/asset/domain/usecases/get_assets.dart';
+import 'package:assetmanagement/features/asset/domain/usecases/get_asset_detail.dart';
+import 'package:assetmanagement/features/asset/domain/usecases/get_assets_lite.dart';
 import 'package:assetmanagement/features/asset/presentation/bloc/asset_bloc.dart';
 import 'package:assetmanagement/features/authentication/domain/usecases/email_register.dart';
 import 'package:assetmanagement/features/authentication/domain/usecases/forgot_password.dart';
@@ -48,7 +50,7 @@ Future<void> injectionInit() async {
   myInjection.registerLazySingleton<FirebaseFirestore>(
     () => FirebaseFirestore.instance,
   );
-  // Register FirebaseFirestore
+  // Register supabase
   myInjection.registerLazySingleton<SupabaseClient>(
     () => Supabase.instance.client,
   );
@@ -78,7 +80,13 @@ Future<void> injectionInit() async {
     ),
   ); //diisi usecase
 
-  myInjection.registerFactory(() => AssetBloc(getAssetsUsecase: myInjection()));
+  myInjection.registerFactory(
+    () => AssetBloc(
+      assetRepository: myInjection(),
+      getAssetsUsecase: myInjection(),
+      getAssetDetailUsecase: myInjection(),
+    ),
+  );
 
   //Usecase
   //Auth Usecase
@@ -119,7 +127,8 @@ Future<void> injectionInit() async {
   );
 
   //Asset Usecase
-  myInjection.registerLazySingleton(() => GetAssetsUsecase(myInjection()));
+  myInjection.registerLazySingleton(() => GetAssetsLiteUsecase(myInjection()));
+  myInjection.registerLazySingleton(() => GetAssetDetailUsecase(myInjection()));
 
   //Repository
   myInjection.registerLazySingleton<AuthRepository>(
@@ -134,11 +143,14 @@ Future<void> injectionInit() async {
     ),
   );
   myInjection.registerLazySingleton<AssetRepository>(
-    () => AssetRepositoryImpl(myInjection())
+    () => AssetRepositoryImpl(
+      assetLocalDatasource: myInjection(),
+      assetRemoteDataSource: myInjection(),
+      supabaseClient: myInjection(),
+    ),
   );
 
   //Data Source
-  // myInjection.registerLazySingleton<ProfileRemoteDataSource>(() => ProfileRemoteDataSourcesImplementation(client: myInjection()));
   myInjection.registerLazySingleton<AuthRemoteDatasource>(
     () => AuthRemoteDatasourceImpl(
       isWeb: kIsWeb,
@@ -149,5 +161,11 @@ Future<void> injectionInit() async {
     ),
   );
 
-   myInjection.registerLazySingleton<AssetRemoteDataSource>(() => AssetRemoteDataSourceImpl(supabaseClient: myInjection()),);
+  myInjection.registerLazySingleton<AssetLocalDataSource>(
+    () => AssetLocalDatasourceImpl(),
+  );
+
+  myInjection.registerLazySingleton<AssetRemoteDataSource>(
+    () => AssetRemoteDataSourceImpl(supabaseClient: myInjection()),
+  );
 }

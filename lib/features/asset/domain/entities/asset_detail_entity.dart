@@ -1,4 +1,5 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:assetmanagement/features/asset/domain/entities/asset_ref_entity.dart';
 import 'package:equatable/equatable.dart';
 
 import 'package:assetmanagement/features/asset/domain/entities/brand_entity.dart';
@@ -6,11 +7,11 @@ import 'package:assetmanagement/features/asset/domain/entities/category_entity.d
 import 'package:assetmanagement/features/asset/domain/entities/location_entity.dart';
 import 'package:assetmanagement/features/authentication/domain/entities/user_entity.dart';
 
-class AssetEntity extends Equatable {
-   final String id;
+class AssetDetailEntity extends Equatable {
+  final String id;
   final String ownerId;
   final UserEntity owner;
-  final String image;
+  final String imagePath;
   final String qrCode;
   final String? serialNumber;
   final String name;
@@ -26,18 +27,18 @@ class AssetEntity extends Equatable {
   final String vendor;
   final int purchaseYear;
   final int? warrantyEndYear;
-  final List<String>? serviceSchedules;
-  final String? assetParent;
-  final List<String>? assetChild;
-  final String? invoice;
+  final List<Map<String,dynamic>>? serviceSchedules;
+  final AssetRefEntity? assetParent;
+  final List<AssetRefEntity>? assetChilds;
+  final String? invoicePath;
   final String? notes;
   final String createdAt;
   final String? updatedAt;
 
-  const AssetEntity({
+  const AssetDetailEntity({
     required this.id,
     required this.ownerId,
-    required this.image,
+    required this.imagePath,
     required this.qrCode,
     required this.serialNumber,
     required this.name,
@@ -52,8 +53,8 @@ class AssetEntity extends Equatable {
     required this.warrantyEndYear,
     required this.serviceSchedules,
     required this.assetParent,
-    required this.assetChild,
-    required this.invoice,
+    required this.assetChilds,
+    required this.invoicePath,
     required this.notes,
     required this.createdAt,
     required this.updatedAt, required this.owner, required this.brand, required this.category, required this.location,
@@ -69,7 +70,7 @@ class AssetEntity extends Equatable {
       id,
       ownerId,
       owner,
-      image,
+      imagePath,
       qrCode,
       ?serialNumber,
       name,
@@ -87,8 +88,8 @@ class AssetEntity extends Equatable {
       ?warrantyEndYear,
       ?serviceSchedules,
       ?assetParent,
-      ?assetChild,
-      ?invoice,
+      ?assetChilds,
+      ?invoicePath,
       ?notes,
       createdAt,
       ?updatedAt,

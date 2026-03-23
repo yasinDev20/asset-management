@@ -1,13 +1,25 @@
 import 'package:assetmanagement/config/routes/route_names.dart';
 import 'package:assetmanagement/core/utils/responsive_device_utils.dart';
+import 'package:assetmanagement/features/asset/presentation/bloc/asset_bloc.dart';
 import 'package:assetmanagement/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:assetmanagement/features/home/presentation/widgets/asset_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  @override
+  void initState() {
+    context.read<AssetBloc>().add(GetAssetsLiteEvent([]));
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +55,7 @@ class HomePage extends StatelessWidget {
               //Search bar non mobile
               (getDevicesize(context) != ResponsiveDevice.mobile)
                   ? Flexible(
-                    flex: 3,
+                      flex: 3,
                       child: SearchBar(
                         hintText: 'Cari qr code',
 
@@ -120,16 +132,36 @@ class HomePage extends StatelessWidget {
                     .floor()
                     .clamp(1, 10);
 
-                return GridView.builder(
-                  itemCount: 30,
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: count,
-                    mainAxisExtent: 290,
-                    mainAxisSpacing: 6,
-                    crossAxisSpacing: 6,
-                  ),
-                  itemBuilder: (context, index) =>
-                      AssetCard(labelVariant: 'available'),
+                return BlocBuilder<AssetBloc, AssetState>(
+                  builder: (context, state) {
+                    if (state is GetAssetsLiteSuccsessState) {
+                      final allAsset = state.allAsset;
+                      return GridView.builder(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: count,
+                          mainAxisExtent: 290,
+                          mainAxisSpacing: 6,
+                          crossAxisSpacing: 6,
+                        ),
+                        itemCount: allAsset.length,
+                        itemBuilder: (context, index) {
+                          final asset = allAsset[index];
+                          return AssetCard(
+                            id : asset.id,
+                            image: asset.image,
+                            status: asset.status,
+                            category: asset.categoryName,
+                            brand: asset.brandName,
+                            name: asset.name,
+                            qrCode: asset.qrCode,
+                            location: asset.location,
+                            nextSchedule: asset.nextServiceSchedule,
+                          );
+                        },
+                      );
+                    }
+                    return SizedBox();
+                  },
                 );
               },
             ),
