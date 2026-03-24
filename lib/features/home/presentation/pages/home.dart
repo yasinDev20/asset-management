@@ -146,7 +146,7 @@ class _HomePageState extends State<HomePage> {
                         itemCount: allAsset.length,
                         itemBuilder: (context, index) {
                           final asset = allAsset[index];
-                          return AssetCard(
+                          return AssetLiteCard(
                             id : asset.id,
                             image: asset.image,
                             status: asset.status,

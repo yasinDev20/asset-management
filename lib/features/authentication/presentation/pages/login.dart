@@ -36,9 +36,9 @@ class _LoginPageState extends State<LoginPage> {
     passwordController.dispose();
   }
 
+  final googleSignIn = GoogleSignIn.instance;
   @override
   Widget build(BuildContext context) {
-    final googleSignIn = GoogleSignIn.instance;
     return Scaffold(
       appBar: AppBar(title: const Text('Login')),
       body: Center(

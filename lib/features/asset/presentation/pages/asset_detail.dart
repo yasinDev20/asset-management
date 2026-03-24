@@ -25,7 +25,7 @@ import 'package:open_filex/open_filex.dart';
 enum AssetFormMode { add, template, detail }
 
 class AssetDetailPage extends StatefulWidget {
-  final String id;
+  final String? id;
   final AssetFormMode mode;
   const AssetDetailPage({super.key, required this.id, required this.mode});
 
@@ -69,9 +69,8 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
 
   @override
   void initState() {
-    // context.read<AssetBloc>().add(
-    //   GetAssetDetailEvent('235c7ea0-9134-4c6f-be8d-219bfed90049'),
-    // );
+    if (widget.id?.isNotEmpty == true) {}
+    context.read<AssetBloc>().add(GetAssetDetailEvent(widget.id!));
 
     super.initState();
   }

@@ -13,17 +13,17 @@ extension ServiceTypeLanguageX on String {
 extension StatusLanguageX on String {
   String statusTypeToBahasa() {
    switch (this) {
-    case 'service':
+    case 'Service':
       return 'Service';
-    case 'inUse':
+    case 'In Use':
       return 'Digunakan';
-    case 'available':
+    case 'Available':
       return 'Tersedia';
-    case 'maintenance':
+    case 'Maintenance':
       return 'Diperbaiki';
-    case 'damaged':
+    case 'Damaged':
       return 'Rusak';
-    case 'deleted':
+    case 'Deleted':
       return 'Dihapus';
     default:
       return 'Status tidak dikenal';

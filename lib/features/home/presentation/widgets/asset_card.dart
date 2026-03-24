@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
-class AssetCard extends StatelessWidget {
+class AssetLiteCard extends StatelessWidget {
   final String id;
   final String image;
   final String status;
@@ -14,7 +14,7 @@ class AssetCard extends StatelessWidget {
   final String location;
   final DateTime? nextSchedule;
 
-  const AssetCard({
+  const AssetLiteCard({
     super.key,
     required this.id,
     required this.image,
@@ -188,21 +188,21 @@ class Status extends StatelessWidget {
           ? Text(
               'Digunakan',
               style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                color: Theme.of(context).colorScheme.error,
+                color: Colors.green[400],
               ),
             )
           : (status == 'Maintenance')
           ? Text(
               'Diperbaiki',
               style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                color: Theme.of(context).colorScheme.error,
+                color: Colors.blue,
               ),
             )
           : (status == 'Damaged')
           ? Text(
               'Rusak',
               style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                color: Theme.of(context).colorScheme.error,
+                color: Colors.red[400],
               ),
             )
           : (status == 'Deleted')
@@ -216,7 +216,7 @@ class Status extends StatelessWidget {
           ? Text(
               'Tersedia',
               style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                color: Theme.of(context).colorScheme.error,
+                color: Colors.red,
               ),
             )
           : Text(

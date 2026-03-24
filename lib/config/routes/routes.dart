@@ -16,8 +16,6 @@ import 'package:go_router/go_router.dart';
 
 class MyRouter {
   GoRouter get router => GoRouter(
-    initialLocation: '/${RouteNames.assetDetail}',
-
     errorPageBuilder: (context, state) {
       return const MaterialPage(child: NotFoundPage());
     },
@@ -94,8 +92,6 @@ class MyRouter {
                 pageBuilder: (context, state) =>
                     const MaterialPage(child: UsersPage()),
                 routes: [
-                  //TODO: Pisahkan karena ini harus menggunakan scaffold. kemudian buat rootpage menjadi appshell dan pindahkan di folder route
-
                   //UserDetail
                   GoRoute(
                     path: '${RouteNames.userDetail}/:userId',
@@ -117,10 +113,14 @@ class MyRouter {
 
       //Detail asset
       GoRoute(
-        path: '/${RouteNames.assetDetail}',
+        path: '/${RouteNames.assetDetail}:id',
         name: RouteNames.assetDetail,
-        pageBuilder:(context, state) => MaterialPage(child: AssetDetailPage(id: 'id', mode: AssetFormMode.detail,))
-       
+        pageBuilder: (context, state) => MaterialPage(
+          child: AssetDetailPage(
+            id: state.pathParameters['id'],
+            mode: AssetFormMode.detail,
+          ),
+        ),
       ),
     ],
   );
