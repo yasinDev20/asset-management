@@ -18,8 +18,8 @@ class GetAssetDetailEvent extends AssetEvent {
 }
 
 class DownloadFileEvent extends AssetEvent {
-  final String path;
-  const DownloadFileEvent(this.path);
+  final String url;
+  const DownloadFileEvent(this.url);
 }
 
 class GetAssetRefEvent extends AssetEvent {
@@ -84,4 +84,36 @@ class AddRecentLocationSelectionEvent extends AssetEvent {
 
 class GetRecentLocationSelectionsEvent extends AssetEvent {
   const GetRecentLocationSelectionsEvent();
+}
+
+class EditAssetEvent extends AssetEvent {
+  final EditAssetEntity originalAssetEntity;
+  final EditAssetEntity editAssetEntity;
+
+  const EditAssetEvent({
+    required this.editAssetEntity,
+    required this.originalAssetEntity,
+  });
+}
+
+class AddAssetEvent extends AssetEvent {
+  final AddAssetEntity addAssetEntity;
+
+  const AddAssetEvent({required this.addAssetEntity});
+}
+
+class AddToTemplateEvent extends AssetEvent {
+  final AssetTemplateEntity assetTemplateEntity;
+
+  const AddToTemplateEvent({required this.assetTemplateEntity});
+}
+class GetTemplatesEvent extends AssetEvent {
+  final String value;
+
+  const GetTemplatesEvent({required this.value});
+}
+class DeleteTemplateEvent extends AssetEvent {
+  final String id;
+
+  const DeleteTemplateEvent({required this.id});
 }

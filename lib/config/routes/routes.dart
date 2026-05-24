@@ -16,6 +16,7 @@ import 'package:go_router/go_router.dart';
 
 class MyRouter {
   GoRouter get router => GoRouter(
+    initialLocation: '/${RouteNames.assetDetail}',
     errorPageBuilder: (context, state) {
       return const MaterialPage(child: NotFoundPage());
     },
@@ -23,7 +24,7 @@ class MyRouter {
     redirect: (context, state) {
       final authState = context.read<AuthBloc>().state;
       final currentPath = state.uri.path;
-      final loginPath = '/${RouteNames.login}';
+      final loginPath = '/${RouteNames.assetDetail}'; //ubah ini untuk ke page sedang di develop
       final forgotPasswordPath =
           '/${RouteNames.login}/${RouteNames.forgotPassword}';
       final emailRegisterPath =
@@ -113,12 +114,13 @@ class MyRouter {
 
       //Detail asset
       GoRoute(
-        path: '/${RouteNames.assetDetail}:id',
+        // path: '/${RouteNames.assetDetail}/:id',
+        path: '/${RouteNames.assetDetail}',
         name: RouteNames.assetDetail,
         pageBuilder: (context, state) => MaterialPage(
           child: AssetDetailPage(
             id: state.pathParameters['id'],
-            mode: AssetFormMode.detail,
+            mode: AssetFormMode.add,
           ),
         ),
       ),

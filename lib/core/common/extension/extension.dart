@@ -10,23 +10,36 @@ extension ServiceTypeLanguageX on String {
     }
   }
 }
+
 extension StatusLanguageX on String {
   String statusTypeToBahasa() {
-   switch (this) {
-    case 'Service':
-      return 'Service';
-    case 'In Use':
-      return 'Digunakan';
-    case 'Available':
-      return 'Tersedia';
-    case 'Maintenance':
-      return 'Diperbaiki';
-    case 'Damaged':
-      return 'Rusak';
-    case 'Deleted':
-      return 'Dihapus';
-    default:
-      return 'Status tidak dikenal';
+    switch (this) {
+      case 'Service':
+        return 'Service';
+      case 'In Use':
+        return 'Digunakan';
+      case 'Available':
+        return 'Tersedia';
+      case 'Maintenance':
+        return 'Diperbaiki';
+      case 'Damaged':
+        return 'Rusak';
+      case 'Deleted':
+        return 'Dihapus';
+      default:
+        return 'Status tidak dikenal';
+    }
   }
+}
+
+extension BrandLanguageX on String {
+  String brandToBahasa() {
+    switch (this) {
+      case 'No Brand':
+        return 'Tidak ada merek';
+
+      default:
+        return this;
+    }
   }
 }

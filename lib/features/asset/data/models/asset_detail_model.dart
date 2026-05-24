@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:assetmanagement/features/asset/data/models/brand_model.dart';
 import 'package:assetmanagement/features/asset/data/models/category_model.dart';
 import 'package:assetmanagement/features/asset/data/models/location_model.dart';
+import 'package:assetmanagement/features/asset/data/models/service_schedule_model.dart';
 import 'package:assetmanagement/features/asset/domain/entities/asset_detail_entity.dart';
 import 'package:assetmanagement/features/asset/domain/entities/asset_ref_entity.dart';
 import 'package:assetmanagement/features/authentication/data/models/user_model.dart';
@@ -28,8 +29,8 @@ class AssetDetailModel extends Equatable {
   final String vendor;
   final int purchaseYear;
   final int? warrantyEndYear;
-  final List<Map<String, dynamic>>? serviceSchedules;
-  final String? assetParent;
+  final List<ServiceScheduleModel>? serviceSchedules;
+  final String? assetParentId;
   final List<String>? assetChildIds;
   final String? invoicePath;
   final String? notes;
@@ -53,7 +54,7 @@ class AssetDetailModel extends Equatable {
     required this.purchaseYear,
     required this.warrantyEndYear,
     required this.serviceSchedules,
-    required this.assetParent,
+    required this.assetParentId,
     required this.assetChildIds,
     required this.invoicePath,
     required this.notes,
@@ -84,7 +85,7 @@ class AssetDetailModel extends Equatable {
       purchaseYear,
       ?warrantyEndYear,
       ?serviceSchedules,
-      ?assetParent,
+      ?assetParentId,
       ?assetChildIds,
       ?invoicePath,
       ?notes,
@@ -117,7 +118,7 @@ class AssetDetailModel extends Equatable {
       vendor: vendor,
       purchaseYear: purchaseYear,
       warrantyEndYear: warrantyEndYear,
-      serviceSchedules: serviceSchedules,
+      serviceSchedules: serviceSchedules?.map((e) => e.toEntity()).toList(),
       assetParent: assetParentData,
       assetChilds: assetChildData,
       invoicePath: invoicePath,
@@ -148,8 +149,10 @@ class AssetDetailModel extends Equatable {
       vendor: entity.vendor,
       purchaseYear: entity.purchaseYear,
       warrantyEndYear: entity.warrantyEndYear,
-      serviceSchedules: entity.serviceSchedules,
-      assetParent: entity.assetParent?.id,
+      serviceSchedules: entity.serviceSchedules
+          ?.map((e) => ServiceScheduleModel.fromEntity(e))
+          .toList(),
+      assetParentId: entity.assetParent?.id,
       assetChildIds: entity.assetChilds?.map((e) => e.id).toList(),
       invoicePath: entity.invoicePath,
       notes: entity.notes,
@@ -161,76 +164,74 @@ class AssetDetailModel extends Equatable {
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'id': id,
-      'ownerId': ownerId,
-      'image': imagePath,
-      'qrCode': qrCode,
-      'serialNumber': serialNumber,
+      'owner_id': ownerId,
+      'image_path': imagePath,
+      'qr_code': qrCode,
+      'serial_number': serialNumber,
       'name': name,
-      'brandId': brandId,
-      'categoryId': categoryId,
+      'brand_id': brandId,
+      'category_id': categoryId,
       'price': price,
-      'productionYear': productionYear,
-      'locationId': locationId,
+      'production_year': productionYear,
+      'location_id': locationId,
       'status': status,
       'vendor': vendor,
-      'purchaseYear': purchaseYear,
-      'warrantyEndYear': warrantyEndYear,
-      'serviceSchedules': serviceSchedules,
-      'assetParent': assetParent,
-      'assetChild': assetChildIds,
-      'invoice': invoicePath,
+      'purchase_year': purchaseYear,
+      'warranty_end_year': warrantyEndYear,
+      'service_schedules': serviceSchedules?.map((e) => e.toMap()).toList(),
+      'asset_parent_id': assetParentId,
+      'asset_child_ids': assetChildIds,
+      'invoice_path': invoicePath,
       'notes': notes,
-      'createdAt': createdAt,
-      'updatedAt': updatedAt,
+      'created_at': createdAt,
+      'updated_at': updatedAt,
     };
   }
 
   factory AssetDetailModel.fromMap(Map<String, dynamic> map) {
     return AssetDetailModel(
       id: map['id'] as String,
-      ownerId: map['ownerId'] as String,
+      ownerId: map['owner_id'] as String,
       owner: UserModel.fromMap(map['owner']),
-      imagePath: map['image'] as String,
-      qrCode: map['qrCode'] as String,
-      serialNumber: map['serialNumber'] != null
-          ? map['serialNumber'] as String
+      imagePath: map['image_path'] as String,
+      qrCode: map['qr_code'] as String,
+      serialNumber: map['serial_number'] != null
+          ? map['serial_number'] as String
           : null,
       name: map['name'] as String,
-      brandId: map['brandId'] as String,
+      brandId: map['brand_id'] as String,
       brand: BrandModel.fromMap(map['brand']),
-      categoryId: map['categoryId'] as String,
+      categoryId: map['category_id'] as String,
       category: CategoryModel.fromMap(map['category']),
       price: map['price'] as int,
-      productionYear: map['productionYear'] as int,
-      locationId: map['locationId'] as String,
+      productionYear: map['production_year'] as int,
+      locationId: map['location_id'] as String,
       location: LocationModel.fromMap(map['location']),
       status: map['status'] as String,
       vendor: map['vendor'] as String,
-      purchaseYear: map['purchaseYear'] as int,
-      warrantyEndYear: map['warrantyEndYear'] != null
-          ? map['warrantyEndYear'] as int
+      purchaseYear: map['purchase_year'] as int,
+      warrantyEndYear: map['warranty_end_year'] != null
+          ? map['warranty_end_year'] as int
           : null,
-      serviceSchedules: map['serviceSchedules'] != null
-          ? List<Map<String, dynamic>>.from(
-              (map['serviceSchedules'] as List).map(
-                (e) => {
-                  'time': DateTime.parse(e['time'] as String).toLocal(),
-                  'type': e['type'] as String,
-                  'title': e['title'] as String,
-                },
+      serviceSchedules: map['service_schedules'] != null
+          ? List.from(
+              (map['service_schedules'] as List).map(
+                (e) => ServiceScheduleModel.fromMap(e),
               ),
             )
           : null,
-      assetParent: map['assetParent'] != null
-          ? map['assetParent'] as String
+      assetParentId: map['asset_parent_id'] != null
+          ? map['asset_parent_id'] as String
           : null,
-      assetChildIds: map['assetChilds'] != null
-          ? List.from((map['assetChilds'] as List))
+      assetChildIds: map['asset_child_ids'] != null
+          ? List.from((map['asset_child_ids'] as List))
           : null,
-      invoicePath: map['invoice'] != null ? map['invoice'] as String : null,
+      invoicePath: map['invoice_path'] != null
+          ? map['invoice_path'] as String
+          : null,
       notes: map['notes'] != null ? map['notes'] as String : null,
-      createdAt: map['createdAt'] as String,
-      updatedAt: map['updatedAt'] != null ? map['updatedAt'] as String : null,
+      createdAt: map['created_at'] as String,
+      updatedAt: map['updated_at'] != null ? map['updated_at'] as String : null,
     );
   }
 
@@ -239,5 +240,3 @@ class AssetDetailModel extends Equatable {
   factory AssetDetailModel.fromJson(String source) =>
       AssetDetailModel.fromMap(json.decode(source) as Map<String, dynamic>);
 }
-
-

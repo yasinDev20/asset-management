@@ -28,13 +28,13 @@ class LocationModel extends Equatable {
   }
 
   Map<String, dynamic> toMap() {
-    return <String, dynamic>{'id': id, 'ownerId': ownerId, 'name': name};
+    return <String, dynamic>{'id': id, 'owner_id': ownerId, 'name': name};
   }
 
   factory LocationModel.fromMap(Map<String, dynamic> map) {
     return LocationModel(
       id: map['id'] as String,
-      ownerId: map['ownerId'] as String,
+      ownerId: map['owner_id'] as String,
       name: map['name'] as String,
     );
   }

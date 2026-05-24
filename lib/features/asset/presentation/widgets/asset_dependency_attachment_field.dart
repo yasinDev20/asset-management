@@ -7,7 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class AssetDependencyAttachmentField extends StatefulWidget {
   final String labelText;
   final void Function(AssetRefEntity newItem) onAddItem;
-  final void Function() onDeletedChip;
+  final void Function(String id) onDeletedChip;
   final List<AssetRefEntity?>? selections;
   const AssetDependencyAttachmentField({
     super.key,
@@ -45,7 +45,7 @@ class _AssetDependencyAttachmentFieldState
             label: Text(
               '${e.qrCode} ${e.categoryName}${e.brandName.isNotEmpty ? ' ${e.brandName}' : ''} ${e.name}',
             ),
-            onDeleted: widget.onDeletedChip,
+            onDeleted: () => widget.onDeletedChip(e.id),
           );
         }
         return SizedBox();

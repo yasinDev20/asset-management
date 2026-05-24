@@ -1,4 +1,5 @@
 import 'package:assetmanagement/core/common/widgets/text_form_field.dart';
+import 'package:assetmanagement/features/asset/domain/entities/location_entity.dart';
 import 'package:assetmanagement/features/asset/presentation/bloc/asset_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -7,14 +8,16 @@ import 'package:go_router/go_router.dart';
 
 Future showLocationDialog({
   required BuildContext context,
-  required void Function(String selectedLocationId) onSelected,
-  required String? locationId,
+  required void Function(LocationEntity selectedLocation) onSelected,
+  required LocationEntity? initialValue,
   required TextEditingController locationController,
 }) async {
   TextEditingController searchController = TextEditingController();
   TextEditingController newLocationController = TextEditingController();
 
   context.read<AssetBloc>().add(GetRecentLocationSelectionsEvent());
+
+  
 
   return await showDialog(
     context: context,
@@ -105,7 +108,7 @@ Future showLocationDialog({
                                             context,
                                           ).colorScheme.surface,
                                           onTap: () {
-                                            onSelected(location.id);
+                                            onSelected(location);
                                             locationController.text =
                                                 location.name;
 

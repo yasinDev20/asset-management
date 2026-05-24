@@ -20,6 +20,7 @@ class AssetLocalDatasourceImpl extends AssetLocalDataSource {
   @override
   Future<List<BrandModel>> getRecentBrandSelections() async {
     var box = Hive.box('recentBrandSelections');
+    
 
     final result =
         await box.get('recentBrandSelections', defaultValue: []) as List;

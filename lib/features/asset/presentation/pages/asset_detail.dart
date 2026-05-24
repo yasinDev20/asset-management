@@ -1,28 +1,36 @@
-import 'dart:io';
-import 'package:assetmanagement/core/common/extension/extension.dart';
+import 'package:assetmanagement/core/common/widgets/button.dart';
 import 'package:assetmanagement/core/common/widgets/text_form_field.dart';
-import 'package:assetmanagement/core/platform/web/web_wrapper.dart';
 import 'package:assetmanagement/features/asset/domain/entities/asset_detail_entity.dart';
 import 'package:assetmanagement/features/asset/domain/entities/asset_ref_entity.dart';
+import 'package:assetmanagement/features/asset/domain/entities/asset_template_entity.dart';
+import 'package:assetmanagement/features/asset/domain/entities/brand_entity.dart';
+import 'package:assetmanagement/features/asset/domain/entities/category_entity.dart';
+import 'package:assetmanagement/features/asset/domain/entities/add_asset_entity.dart';
+import 'package:assetmanagement/features/asset/domain/entities/edit_asset_entity.dart';
 import 'package:assetmanagement/features/asset/domain/entities/file_entity.dart';
+import 'package:assetmanagement/features/asset/domain/entities/location_entity.dart';
+import 'package:assetmanagement/features/asset/domain/entities/service_schedule_entity.dart';
 import 'package:assetmanagement/features/asset/domain/models/asset_detail_model.dart';
 import 'package:assetmanagement/features/asset/presentation/bloc/asset_bloc.dart';
 import 'package:assetmanagement/features/asset/presentation/widgets/asset_dependency_attachment_field.dart';
-import 'package:assetmanagement/features/asset/presentation/widgets/attachment_field.dart';
+import 'package:assetmanagement/features/asset/presentation/widgets/image_form_field.dart';
+import 'package:assetmanagement/features/asset/presentation/widgets/invoice_field.dart';
 import 'package:assetmanagement/features/asset/presentation/widgets/service_schedule_attachment_field.dart';
 import 'package:assetmanagement/features/asset/presentation/widgets/show_brand_dialog.dart';
 import 'package:assetmanagement/features/asset/presentation/widgets/show_category_dialog.dart';
 import 'package:assetmanagement/features/asset/presentation/widgets/show_location_dialog.dart';
 import 'package:assetmanagement/features/asset/presentation/widgets/show_status_dialog.dart';
-import 'package:file_picker/file_picker.dart';
-import 'package:flutter/foundation.dart';
+import 'package:assetmanagement/features/asset/presentation/widgets/show_template_dialog.dart';
+import 'package:assetmanagement/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:open_filex/open_filex.dart';
+import 'package:form_builder_validators/form_builder_validators.dart';
+// import 'package:open_filex/open_filex.dart';
+import 'package:collection/collection.dart';
+import 'package:go_router/go_router.dart';
 
-enum AssetFormMode { add, template, detail }
+enum AssetFormMode { add, template, edit }
 
 class AssetDetailPage extends StatefulWidget {
   final String? id;
@@ -45,32 +53,36 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
   final locationController = TextEditingController();
   final statusController = TextEditingController();
   final vendorController = TextEditingController();
-  final purchaseController = TextEditingController();
+  final purchaseYearController = TextEditingController();
   final warrantyEndYearController = TextEditingController();
   final notesController = TextEditingController();
 
   TextEditingController searchController = TextEditingController();
   TextEditingController newBrandController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
 
-  List<Map<String, dynamic>>? serviceSchedules;
-
+  String? id;
+  List<ServiceScheduleEntity>? serviceSchedules;
   List<AssetRefEntity>? assetChilds;
-  List<AssetRefEntity?>? assetParents;
+  List<AssetRefEntity?>? assetParent;
   FileEntity? invoiceFile;
+  String? invoiceUrl;
   List<Map<String, dynamic>>? assetChildQrCode;
   String? imageUrl;
-  XFile? imageNonWeb;
-  Uint8List? imageAtWeb;
-  String? brandSelectedId;
-  String? categoryId;
-  String? categoryCode;
-  String? locationId;
-  String? statusSelectedValue;
+  String? imagePath;
+  String? invoicePath;
+  FileEntity? imageFile;
+  BrandEntity? brand;
+  CategoryEntity? category;
+  LocationEntity? location;
+  EditAssetEntity? oldData;
 
   @override
   void initState() {
-    if (widget.id?.isNotEmpty == true) {}
-    context.read<AssetBloc>().add(GetAssetDetailEvent(widget.id!));
+    // if (widget.id?.isNotEmpty == true) {}
+    // context.read<AssetBloc>().add(
+    //   GetAssetDetailEvent('feb8f337-a93a-41ed-b8a5-4572a16d168c'),
+    // );
 
     super.initState();
   }
@@ -87,7 +99,7 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
     locationController.dispose();
     statusController.dispose();
     vendorController.dispose();
-    purchaseController.dispose();
+    purchaseYearController.dispose();
     warrantyEndYearController.dispose();
     notesController.dispose();
     super.dispose();
@@ -102,110 +114,136 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
           child: SizedBox(
             width: 500,
             child: Padding(
-              padding: EdgeInsetsGeometry.all(16),
-              child: Column(
-                children: [
-                  //Fields
-                  BlocConsumer<AssetBloc, AssetState>(
-                    listener: (context, state) {
-                      if (state is AssetSuccesState) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(state.message),
-                            backgroundColor: Theme.of(
-                              context,
-                            ).colorScheme.primary,
-                          ),
-                        );
-                      }
-                    },
-                    builder: (context, state) {
-                      final AssetDetail assetDetail;
-                      AssetDetailEntity? assetDetailEntity;
-                      if (state is GetAssetDetailSuccsessState) {
-                        assetDetail = state.assetDetail;
-                        assetDetailEntity = assetDetail.assetDetailEntity;
-                        qrCodeController.text = assetDetailEntity.qrCode;
-                        templateController.text = assetDetailEntity.qrCode;
-                        serialNumberController.text =
-                            assetDetailEntity.serialNumber ?? '';
-                        brandController.text =
-                            assetDetailEntity.brand.name.isEmpty
-                            ? 'Tidak ada merek'
-                            : assetDetailEntity.brand.name;
-                        categoryController.text =
-                            assetDetailEntity.category.name;
-                        nameController.text = assetDetailEntity.name;
-                        priceController.text = assetDetailEntity.price
-                            .toString();
-                        productionYearController.text = assetDetailEntity
-                            .productionYear
-                            .toString();
-                        locationController.text =
-                            assetDetailEntity.location.name;
-                        statusController.text = assetDetailEntity.status
-                            .statusTypeToBahasa();
-                        vendorController.text = assetDetailEntity.vendor;
-                        purchaseController.text = assetDetailEntity.purchaseYear
-                            .toString();
-                        warrantyEndYearController.text = assetDetailEntity
-                            .warrantyEndYear
-                            .toString();
-                        notesController.text = assetDetailEntity.notes ?? '';
+              padding: EdgeInsetsGeometry.directional(
+                start: 16,
+                end: 16,
+                bottom: 52,
+              ),
+              child: BlocConsumer<AssetBloc, AssetState>(
+                listener: (context, state) {
+                  final AssetDetail assetDetailViewModel;
+                  final AssetDetailEntity assetDetailEntity;
 
-                        serviceSchedules = assetDetailEntity.serviceSchedules;
+                  if (state is GetAssetDetailSuccsessState) {
+                    assetDetailViewModel = state.assetDetail;
+                    assetDetailEntity = assetDetailViewModel.assetDetailEntity;
 
-                        assetChilds = assetDetailEntity.assetChilds;
-                        assetParents = [assetDetailEntity.assetParent];
-                        imageUrl = assetDetail.imageUrl;
-                        invoiceFile = assetDetail.invoiceFile;
-                      }
-                      return Form(
+                    oldData = EditAssetEntity(
+                      id: '',
+                      imageFile: null,
+                      serialNumber: assetDetailEntity.serialNumber,
+                      name: assetDetailEntity.name,
+                      brand: assetDetailEntity.brand,
+                      category: assetDetailEntity.category,
+                      price: assetDetailEntity.price,
+                      productionYear: assetDetailEntity.productionYear,
+                      location: assetDetailEntity.location,
+                      status: assetDetailEntity.status,
+                      vendor: assetDetailEntity.vendor,
+                      purchaseYear: assetDetailEntity.purchaseYear,
+                      warrantyEndYear: assetDetailEntity.warrantyEndYear,
+                      serviceSchedules: assetDetailEntity.serviceSchedules,
+                      assetParent: assetDetailEntity.assetParent,
+                      assetChilds: assetDetailEntity.assetChilds?.toList(),
+                      invoiceFile: null,
+                      notes: assetDetailEntity.notes,
+                    );
+
+                    id = assetDetailViewModel.assetDetailEntity.id;
+                    imagePath =
+                        assetDetailViewModel.assetDetailEntity.imagePath;
+                    invoicePath =
+                        assetDetailViewModel.assetDetailEntity.invoicePath;
+                    qrCodeController.text = assetDetailEntity.qrCode;
+                    serialNumberController.text =
+                        assetDetailEntity.serialNumber ?? '';
+
+                    brand = assetDetailEntity.brand;
+                    brandController.text = assetDetailEntity.brand.name;
+
+                    category = assetDetailEntity.category;
+                    categoryController.text =
+                        '${assetDetailEntity.category.name} (${assetDetailEntity.category.code})';
+                    nameController.text = assetDetailEntity.name;
+                    priceController.text = assetDetailEntity.price.toString();
+                    productionYearController.text = assetDetailEntity
+                        .productionYear
+                        .toString();
+                    location = assetDetailEntity.location;
+                    locationController.text = assetDetailEntity.location.name;
+
+                    statusController.text = assetDetailEntity.status;
+
+                    vendorController.text = assetDetailEntity.vendor;
+                    purchaseYearController.text = assetDetailEntity.purchaseYear
+                        .toString();
+                    warrantyEndYearController.text = assetDetailEntity
+                        .warrantyEndYear
+                        .toString();
+                    imageUrl = assetDetailViewModel.imageUrl;
+                    serviceSchedules = assetDetailEntity.serviceSchedules
+                        ?.toList();
+                    assetParent = [assetDetailEntity.assetParent];
+                    assetChilds = assetDetailEntity.assetChilds?.toList();
+                    invoiceUrl = assetDetailViewModel.invoiceUrl;
+                    notesController.text = assetDetailEntity.notes ?? '';
+                  }
+                  if (state is AddAssetSuccessState) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(state.message),
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                      ),
+                    );
+                  }
+                  if (state is EditAssetSuccessState) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(state.message),
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                      ),
+                    );
+                  }
+                  if (state is AddToTemplateSuccessState) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(state.message),
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                      ),
+                    );
+                  }
+                  if (state is AssetFailureState) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(state.message),
+                        backgroundColor: Theme.of(context).colorScheme.error,
+                      ),
+                    );
+                  }
+                },
+
+                builder: (context, state) {
+                  return Column(
+                    spacing: 52,
+                    children: [
+                      //Fields
+                      Form(
+                        key: _formKey,
                         child: Column(
                           spacing: 16,
                           children: [
                             //Image
                             if (widget.mode != AssetFormMode.template)
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                spacing: 8,
-                                children: [
-                                  InkWell(
-                                    onTap: () async {
-                                      buildLargeImagePreview() != null
-                                          ? showDialog(
-                                              context: context,
-                                              barrierDismissible: true,
-
-                                              builder: (context) {
-                                                return Dialog(
-                                                  child:
-                                                      buildLargeImagePreview(),
-                                                );
-                                              },
-                                            )
-                                          : null;
-                                    },
-                                    child: buildSmallImagePreview(),
-                                  ),
-                                  IconButton(
-                                    icon: Icon(Icons.edit),
-                                    onPressed: () async {
-                                      imageNonWeb = await ImagePicker()
-                                          .pickImage(
-                                            source: ImageSource.gallery,
-                                          );
-                                      if (kIsWeb && imageNonWeb != null) {
-                                        imageAtWeb = await imageNonWeb!
-                                            .readAsBytes();
-                                      }
-                                      setState(() {});
-                                    },
-                                  ),
-                                ],
+                              ImageFormField(
+                                selectedImageFile: imageFile,
+                                imageUrl: imageUrl,
+                                onImagePicked: (image) {
+                                  setState(() {
+                                    imageFile = image;
+                                  });
+                                },
+                                validator: FormBuilderValidators.required(),
                               ),
-
                             //Qr code
                             CommonTextFormField(
                               suffixIcon: Icon(Icons.edit_off_outlined),
@@ -215,14 +253,63 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
                             ),
 
                             //Template
-                            if (widget.mode == AssetFormMode.template)
+                            if (widget.mode == AssetFormMode.add)
                               CommonTextFormField(
                                 controller: templateController,
                                 labelText: '*Template',
-                                suffixIcon: IconButton(
-                                  icon: Icon(Icons.arrow_drop_down),
-                                  onPressed: () {},
-                                ),
+                                suffixIcon: Icon(Icons.arrow_drop_down),
+                                onTap: () {
+                                  context.read<AssetBloc>().add(
+                                    GetTemplatesEvent(value: ''),
+                                  );
+                                  showTemplateDialog(
+                                    context: context,
+                                    onSelected: (selectedTemplate) {
+                                      setState(() {
+                                        brand = selectedTemplate.brand;
+                                        brandController.text =
+                                            selectedTemplate.brand?.name ?? '';
+
+                                        category = selectedTemplate.category;
+                                        categoryController.text =
+                                            '${selectedTemplate.category?.name} (${selectedTemplate.category?.code})';
+                                        nameController.text =
+                                            selectedTemplate.name ?? '';
+                                        priceController.text = selectedTemplate
+                                            .price
+                                            .toString();
+                                        productionYearController.text =
+                                            selectedTemplate.productionYear
+                                                .toString();
+                                        location = selectedTemplate.location;
+                                        locationController.text =
+                                            selectedTemplate.location?.name ??
+                                            '';
+
+                                        statusController.text =
+                                            selectedTemplate.status ?? '';
+
+                                        vendorController.text =
+                                            selectedTemplate.vendor ?? '';
+                                        purchaseYearController.text =
+                                            selectedTemplate.purchaseYear
+                                                .toString();
+                                        warrantyEndYearController.text =
+                                            selectedTemplate.warrantyEndYear
+                                                .toString();
+
+                                        serviceSchedules = selectedTemplate
+                                            .serviceSchedules
+                                            ?.toList();
+                                        assetParent = [
+                                          selectedTemplate.assetParent,
+                                        ];
+                                        notesController.text =
+                                            selectedTemplate.notes ?? '';
+                                      });
+                                    },
+                                  );
+                                },
                               ),
 
                             //No seri
@@ -237,12 +324,17 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
                               controller: brandController,
                               labelText: '*Merek',
                               suffixIcon: Icon(Icons.arrow_drop_down),
+                              validator: FormBuilderValidators.required(),
                               onTap: () {
                                 showBrandDialog(
                                   context: context,
                                   brandController: brandController,
-                                  brandSelectedId: brandSelectedId,
-                                  onSelected: (value) => brandSelectedId,
+                                  initialValue: brand,
+                                  onSelected: (selectedBrand) {
+                                    setState(() {
+                                      brand = selectedBrand;
+                                    });
+                                  },
                                 );
                               },
                             ),
@@ -252,13 +344,16 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
                               labelText: '*Kategori',
                               controller: categoryController,
                               suffixIcon: Icon(Icons.arrow_drop_down),
+                              validator: FormBuilderValidators.required(),
                               onTap: () {
                                 showCategoryDialog(
                                   context: context,
-                                  onSelected: ({required code, required id}) =>
-                                      {categoryCode = code, categoryId = id},
-                                  categorySelectedId: categoryId,
                                   categoryController: categoryController,
+                                  initialValue: category,
+                                  onSelected: (selectedCategory) =>
+                                      setState(() {
+                                        category = selectedCategory;
+                                      }),
                                 );
                               },
                             ),
@@ -266,9 +361,10 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
                             CommonTextFormField(
                               labelText: '*Nama',
                               controller: nameController,
+                              validator: FormBuilderValidators.required(),
                               inputFormatters: [
                                 TextInputFormatter.withFunction(
-                                  (oldValue, newValue) => TextEditingValue(
+                                  (oldValueue, newValue) => TextEditingValue(
                                     selection: newValue.selection,
                                     text:
                                         newValue.text[0].toUpperCase() +
@@ -282,6 +378,10 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
                               labelText: '*Harga',
                               controller: priceController,
                               keyboardType: TextInputType.number,
+                              validator: FormBuilderValidators.compose([
+                                FormBuilderValidators.required(),
+                                FormBuilderValidators.numeric(),
+                              ]),
                               inputFormatters: [
                                 FilteringTextInputFormatter.digitsOnly,
                               ],
@@ -294,6 +394,11 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
                                 FilteringTextInputFormatter.digitsOnly,
                                 LengthLimitingTextInputFormatter(4),
                               ],
+                              validator: FormBuilderValidators.compose([
+                                FormBuilderValidators.required(),
+                                FormBuilderValidators.numeric(),
+                                FormBuilderValidators.equalLength(4),
+                              ]),
                             ),
                             //Lokasi
                             CommonTextFormField(
@@ -301,13 +406,15 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
                               labelText: '*Lokasi',
                               controller: locationController,
                               suffixIcon: Icon(Icons.arrow_drop_down),
+                              validator: FormBuilderValidators.required(),
 
                               onTap: () => showLocationDialog(
                                 context: context,
-                                locationId: locationId,
+                                initialValue: location,
                                 locationController: locationController,
-                                onSelected: (selectedLocationId) =>
-                                    locationId = selectedLocationId,
+                                onSelected: (selectedLocation) {
+                                  location = selectedLocation;
+                                },
                               ),
                             ),
                             //Status
@@ -316,14 +423,15 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
                               suffixIcon: Icon(Icons.arrow_drop_down),
                               labelText: '*Status',
                               controller: statusController,
+                              validator: FormBuilderValidators.required(),
 
                               onTap: () => {
                                 showStatusDialog(
                                   context: context,
-                                  statusSelectedValue: statusSelectedValue,
                                   statusController: statusController,
-                                  onSelected: (value) =>
-                                      statusSelectedValue = value,
+                                  onSelected: (value) {
+                                    statusController.text = value;
+                                  },
                                 ),
                               },
                             ),
@@ -331,6 +439,7 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
                             CommonTextFormField(
                               labelText: '*Vendor',
                               controller: vendorController,
+                              validator: FormBuilderValidators.required(),
                               inputFormatters: [
                                 TextInputFormatter.withFunction(
                                   (oldValue, newValue) => TextEditingValue(
@@ -345,7 +454,12 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
                             //Tahun pembelian
                             CommonTextFormField(
                               labelText: '*Tahun pembelian ',
-                              controller: purchaseController,
+                              controller: purchaseYearController,
+                              validator: FormBuilderValidators.compose([
+                                FormBuilderValidators.required(),
+                                FormBuilderValidators.numeric(),
+                                FormBuilderValidators.equalLength(4),
+                              ]),
                               inputFormatters: [
                                 FilteringTextInputFormatter.digitsOnly,
                                 LengthLimitingTextInputFormatter(4),
@@ -355,6 +469,15 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
                             CommonTextFormField(
                               labelText: 'Tahun akhir garansi',
                               controller: warrantyEndYearController,
+                              validator: FormBuilderValidators.compose([
+                                FormBuilderValidators.equalLength(
+                                  4,
+                                  checkNullOrEmpty: false,
+                                ),
+                                FormBuilderValidators.numeric(
+                                  checkNullOrEmpty: false,
+                                ),
+                              ]),
                               inputFormatters: [
                                 FilteringTextInputFormatter.digitsOnly,
                                 LengthLimitingTextInputFormatter(4),
@@ -363,9 +486,12 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
                             //Jadwal servis
                             ServiceScheduleAttachmentField(
                               serviceSchedules: serviceSchedules,
-                              onDeletedChip: () {
+                              onDeletedChip: (item) {
                                 setState(() {
-                                  serviceSchedules?.removeLast();
+                                  serviceSchedules?.removeWhere(
+                                    (element) =>
+                                        item.hashCode == element.hashCode,
+                                  );
                                 });
                               },
                               onAddItem: (item) {
@@ -378,16 +504,18 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
                             //Induk barang
                             AssetDependencyAttachmentField(
                               labelText: 'Induk Barang',
-                              selections: assetParents,
+                              selections: assetParent,
                               onAddItem: (newItem) {
                                 setState(() {
-                                  assetParents ??= [];
-                                  assetParents!.add(newItem);
+                                  assetParent = [];
+                                  assetParent!.add(newItem);
                                 });
                               },
-                              onDeletedChip: () {
+                              onDeletedChip: (id) {
                                 setState(() {
-                                  assetParents?.removeLast();
+                                  assetParent?.removeWhere(
+                                    (element) => element?.id == id,
+                                  );
                                 });
                               },
                             ),
@@ -397,90 +525,29 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
                               selections: assetChilds,
                               onAddItem: (newItem) {
                                 setState(() {
-                                  assetChilds ??= [];
                                   assetChilds!.add(newItem);
                                 });
                               },
-                              onDeletedChip: () {
+                              onDeletedChip: (id) {
                                 setState(() {
-                                  assetChilds?.removeLast();
+                                  assetChilds?.removeWhere(
+                                    (element) => element.id == id,
+                                  );
                                 });
                               },
                             ),
+
                             //Invoice
-                            BlocBuilder<AssetBloc, AssetState>(
-                              builder: (context, state) {
-                                if (state is DownloadFileSuccessState) {
-                                  invoiceFile = state.file;
-                                }
-                                return AttachmentFormField(
-                                  labelText: 'Invoice',
-                                  attachment: invoiceFile != null
-                                      ? [
-                                          FilterChip(
-                                            label: Text(
-                                              invoiceFile?.name ?? '',
-                                            ),
-                                            deleteIcon: Icon(Icons.close),
-                                            onSelected: (value) {
-                                              //download file
-                                              if (invoiceFile == null) {
-                                                context.read<AssetBloc>().add(
-                                                  DownloadFileEvent(
-                                                    assetDetailEntity!
-                                                        .invoicePath!,
-                                                  ),
-                                                );
-                                              }
-                                              //open file Web
-                                              if (kIsWeb) {
-                                                openFile(invoiceFile!.file);
-                                              } else {
-                                                if (invoiceFile?.path != null) {
-                                                  OpenFilex.open(
-                                                    invoiceFile!.path!,
-                                                  );
-                                                }
-                                              }
-                                            },
-                                            onDeleted: () {
-                                              setState(() {
-                                                invoiceFile = null;
-                                              });
-                                            },
-                                          ),
-                                        ]
-                                      : null,
-
-                                  onAddItem: () async {
-                                    FilePickerResult? result = await FilePicker
-                                        .platform
-                                        .pickFiles(withData: true);
-
-                                    setState(() {
-                                      // invoiceFile = result?.files.first != null
-                                      //     ? File(path).
-                                      //     : null;
-                                      final bytes = result?.files.first.bytes;
-                                      if (bytes != null) {
-                                        final Uint8List file = bytes;
-
-                                        final String name =
-                                            result!.files.first.name;
-                                        final String? path =
-                                            result.files.first.path;
-
-                                        invoiceFile = FileEntity(
-                                          name: name,
-                                          file: file,
-                                          path: path,
-                                        );
-                                      }
-                                    });
-                                  },
-                                );
+                            InvoiceField(
+                              invoiceFile: invoiceFile,
+                              invoiceUrl: invoiceUrl,
+                              onAddItem: (FileEntity newItem) {
+                                setState(() {
+                                  invoiceFile = newItem;
+                                });
                               },
                             ),
+
                             //Keterangan lainnya
                             CommonTextFormField(
                               labelText: 'Keterangan lainnya',
@@ -500,49 +567,252 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
                             ),
                           ],
                         ),
-                      );
-                    },
-                  ),
+                      ),
 
-                  //Buttons
-                  Row(children: []),
-                ],
+                      //Buttons
+                      BlocBuilder<AuthBloc, AuthState>(
+                        builder: (context, state) {
+                          if (true) {
+                            // final userId = state.authEntity.user.id;
+                            return Wrap(
+                              spacing: 52,
+                              runSpacing: 52,
+                              alignment: WrapAlignment.center,
+
+                              children: [
+                                // //History
+                                // if (widget.mode == AssetFormMode.edit)
+                                //   CommonButton(
+                                //     text: 'History',
+                                //     style: ElevatedButton.styleFrom(
+                                //       backgroundColor: Theme.of(
+                                //         context,
+                                //       ).colorScheme.tertiary,
+                                //       foregroundColor: Theme.of(
+                                //         context,
+                                //       ).colorScheme.onPrimary,
+                                //     ),
+                                //     onPressed: () {},
+                                //   ),
+                                // //To template
+                                if (widget.mode == AssetFormMode.edit)
+                                  CommonButton(
+                                    text: 'Jadikan template',
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.blue[400],
+                                      foregroundColor: Theme.of(
+                                        context,
+                                      ).colorScheme.onPrimary,
+                                    ),
+                                    onPressed: () {
+                                      final templateNameController =
+                                          TextEditingController();
+                                      showDialog(
+                                        context: context,
+                                        builder: (context) => Dialog(
+                                          constraints: BoxConstraints(
+                                            maxWidth: 500,
+                                            maxHeight: 200,
+                                          ),
+
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(16.0),
+                                            child: Column(
+                                              spacing: 32,
+                                              children: [
+                                                CommonTextFormField(
+                                                  labelText: 'Nama template',
+                                                  controller:
+                                                      templateNameController,
+                                                ),
+
+                                                CommonButton(
+                                                  text: 'Buat template',
+                                                  onPressed: () {
+                                                    if (templateNameController
+                                                        .text
+                                                        .isNotEmpty) {
+                                                      final assetTemplateEntity = AssetTemplateEntity(
+                                                        templateName:
+                                                            templateNameController
+                                                                .text,
+                                                        assetId: id!,
+                                                        name: oldData?.name,
+                                                        brand: oldData?.brand,
+                                                        category:
+                                                            oldData?.category,
+                                                        price: oldData?.price,
+                                                        productionYear: oldData
+                                                            ?.productionYear,
+                                                        location:
+                                                            oldData?.location,
+                                                        status: oldData?.status,
+                                                        vendor: oldData?.vendor,
+                                                        purchaseYear: oldData
+                                                            ?.purchaseYear,
+                                                        warrantyEndYear: oldData
+                                                            ?.warrantyEndYear,
+                                                        serviceSchedules: oldData
+                                                            ?.serviceSchedules,
+                                                        assetParent: oldData
+                                                            ?.assetParent,
+                                                        notes: oldData?.notes,
+                                                      );
+
+                                                      context.read<AssetBloc>().add(
+                                                        AddToTemplateEvent(
+                                                          assetTemplateEntity:
+                                                              assetTemplateEntity,
+                                                        ),
+                                                      );
+                                                      context.pop();
+                                                    }
+                                                  },
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                //Edit
+                                if (widget.mode == AssetFormMode.edit)
+                                  CommonButton(
+                                    text: 'Edit',
+                                    onPressed: () {
+                                      final newData = EditAssetEntity(
+                                        id: id!,
+                                        imageFile: imageFile,
+                                        serialNumber:
+                                            serialNumberController.text,
+                                        name: nameController.text,
+                                        brand: brand,
+                                        category: category,
+                                        price: int.parse(priceController.text),
+                                        productionYear: int.parse(
+                                          productionYearController.text,
+                                        ),
+                                        location: location,
+                                        status: statusController.text,
+                                        vendor: vendorController.text,
+                                        purchaseYear: int.parse(
+                                          purchaseYearController.text,
+                                        ),
+                                        warrantyEndYear: int.parse(
+                                          warrantyEndYearController.text,
+                                        ),
+                                        serviceSchedules: serviceSchedules,
+                                        assetParent: assetParent?.first,
+                                        assetChilds: assetChilds?.toList(),
+                                        invoiceFile: invoiceFile,
+                                        notes: notesController.text,
+                                      );
+
+                                      final compare = DeepCollectionEquality()
+                                          .equals(oldData, newData);
+
+                                      if (!compare ||
+                                          imageFile != null ||
+                                          invoiceFile != null) {
+                                        context.read<AssetBloc>().add(
+                                          EditAssetEvent(
+                                            originalAssetEntity: oldData!,
+                                            editAssetEntity: newData,
+                                          ),
+                                        );
+                                      } else {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              'Tidak ada perubahan apapun!',
+                                            ),
+                                            backgroundColor: Colors.yellow[700],
+                                          ),
+                                        );
+                                      }
+                                      if (widget.mode == AssetFormMode.add) {}
+                                    },
+                                  ),
+
+                                //add
+                                if (widget.mode == AssetFormMode.add)
+                                  CommonButton(
+                                    text: 'Simpan',
+                                    onPressed: () {
+                                      final isValid = _formKey.currentState!
+                                          .validate();
+                                      if (isValid) {
+                                        final newData = AddAssetEntity(
+                                          ownerId:
+                                              'ae1a0cfb-e02c-4583-93ed-26d2d59484cf',
+                                          imageFile: imageFile!,
+                                          serialNumber:
+                                              serialNumberController.text,
+                                          name: nameController.text,
+                                          brandId: brand!.id,
+                                          category: category!,
+                                          price: int.parse(
+                                            priceController.text,
+                                          ),
+                                          productionYear: int.parse(
+                                            productionYearController.text
+                                                .trim(),
+                                          ),
+                                          locationId: location!.id,
+                                          status: statusController.text,
+                                          vendor: vendorController.text,
+                                          purchaseYear: int.parse(
+                                            purchaseYearController.text,
+                                          ),
+                                          warrantyEndYear: int.tryParse(
+                                            warrantyEndYearController.text,
+                                          ),
+                                          serviceSchedules: serviceSchedules,
+                                          assetParent: assetParent?.first?.id,
+                                          assetChilds: assetChilds
+                                              ?.map((e) => e.id)
+                                              .toList(),
+                                          invoiceFile: invoiceFile,
+                                          notes: notesController.text,
+                                        );
+                                        context.read<AssetBloc>().add(
+                                          AddAssetEvent(
+                                            addAssetEntity: newData,
+                                          ),
+                                        );
+                                      } else {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              'Ada bidang yang harus diisi!',
+                                            ),
+                                            backgroundColor: Theme.of(
+                                              context,
+                                            ).colorScheme.error,
+                                          ),
+                                        );
+                                      }
+                                    },
+                                  ),
+                              ],
+                            );
+                          }
+                          return SizedBox();
+                        },
+                      ),
+                    ],
+                  );
+                },
               ),
             ),
           ),
         ),
       ),
     );
-  }
-
-  Widget buildSmallImagePreview() {
-    if (imageNonWeb == null && imageAtWeb == null) {
-      if (imageUrl == null) {
-        return Icon(Icons.image_outlined, size: 128, color: Colors.grey);
-      } else {
-        return Image.network(imageUrl!, width: 128, height: 128);
-      }
-    } else if (kIsWeb) {
-      return Image.memory(imageAtWeb!, width: 128, height: 128);
-    } else {
-      return Image.file(File(imageNonWeb!.path), width: 128, height: 128);
-    }
-  }
-
-  Widget? buildLargeImagePreview() {
-    if (imageNonWeb == null && imageAtWeb == null) {
-      if (imageUrl != null) {
-        return Image.network(imageUrl!, fit: BoxFit.contain);
-      }
-    }
-    if (kIsWeb && imageAtWeb != null) {
-      return Image.memory(imageAtWeb!, fit: BoxFit.contain);
-    }
-
-    if (!kIsWeb && imageNonWeb != null) {
-      return Image.file(File(imageNonWeb!.path), fit: BoxFit.contain);
-    }
-
-    return null;
   }
 }

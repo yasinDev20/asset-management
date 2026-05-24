@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 Future showStatusDialog({
   required BuildContext context,
   required void Function(String value) onSelected,
-  required String? statusSelectedValue,
   required TextEditingController statusController,
 }) async {
   return await showDialog(
@@ -27,11 +26,13 @@ Future showStatusDialog({
                       //Tersedia
                       ListTile(
                         tileColor: Colors.green,
-                        title: Text('Tersedia', style: TextStyle(color: Colors.white)),
+                        title: Text(
+                          'Tersedia',
+                          style: TextStyle(color: Colors.white),
+                        ),
                         onTap: () {
-                          statusSelectedValue = 'Available';
                           statusController.text = 'Tersedia';
-                          onSelected(statusSelectedValue!);
+                          onSelected('Available');
                           context.pop();
                         },
                       ),
@@ -40,11 +41,13 @@ Future showStatusDialog({
                       //Digunakan
                       ListTile(
                         tileColor: Colors.green[400],
-                        title: Text('Digunakan', style: TextStyle(color: Colors.white),),
+                        title: Text(
+                          'Digunakan',
+                          style: TextStyle(color: Colors.white),
+                        ),
                         onTap: () {
-                          statusSelectedValue = 'In use';
                           statusController.text = 'Digunakan';
-                          onSelected(statusSelectedValue!);
+                          onSelected('In use');
                           context.pop();
                         },
                       ),
@@ -53,11 +56,13 @@ Future showStatusDialog({
                       //Diperbaiki
                       ListTile(
                         tileColor: Colors.blue[400],
-                        title: Text('Diperbaiki',style: TextStyle(color: Colors.white)),
+                        title: Text(
+                          'Diperbaiki',
+                          style: TextStyle(color: Colors.white),
+                        ),
                         onTap: () {
-                          statusSelectedValue = 'Maintenance';
                           statusController.text = 'Diperbaiki';
-                          onSelected(statusSelectedValue!);
+                          onSelected('Maintenance');
                           context.pop();
                         },
                       ),
@@ -66,11 +71,13 @@ Future showStatusDialog({
                       //Rusak
                       ListTile(
                         tileColor: Colors.red[400],
-                        title: Text('Rusak', style: TextStyle(color: Colors.white)),
+                        title: Text(
+                          'Rusak',
+                          style: TextStyle(color: Colors.white),
+                        ),
                         onTap: () {
-                          statusSelectedValue = 'Damaged';
                           statusController.text = 'Rusak';
-                          onSelected(statusSelectedValue!);
+                          onSelected('Damaged');
                           context.pop();
                         },
                       ),
@@ -78,11 +85,13 @@ Future showStatusDialog({
                       //Dihapus
                       ListTile(
                         tileColor: Colors.red,
-                        title: Text('Dihapus', style: TextStyle(color: Colors.white)),
+                        title: Text(
+                          'Dihapus',
+                          style: TextStyle(color: Colors.white),
+                        ),
                         onTap: () {
-                          statusSelectedValue = 'Deleted';
                           statusController.text = 'Dihapus';
-                          onSelected(statusSelectedValue!);
+                          onSelected('Deleted');
                           context.pop();
                         },
                       ),

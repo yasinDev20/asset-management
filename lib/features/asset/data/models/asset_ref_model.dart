@@ -47,9 +47,9 @@ class AssetRefModel extends Equatable {
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'id': id,
-      'categoryName': categoryName,
-      'qrCode': qrCode,
-      'brandName': brandName,
+      'category_name': categoryName,
+      'qr_code': qrCode,
+      'brand_name': brandName,
       'name': name,
     };
   }
@@ -58,7 +58,7 @@ class AssetRefModel extends Equatable {
     return AssetRefModel(
       id: map['id'] as String,
       categoryName: map['category']['name'] as String,
-      qrCode: map['qrCode'] as String,
+      qrCode: map['qr_code'] as String,
       brandName: map['brand']['name'] as String,
       name: map['name'] as String,
     );

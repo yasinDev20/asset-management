@@ -1,5 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:assetmanagement/features/asset/domain/entities/asset_ref_entity.dart';
+import 'package:assetmanagement/features/asset/domain/entities/service_schedule_entity.dart';
 import 'package:equatable/equatable.dart';
 
 import 'package:assetmanagement/features/asset/domain/entities/brand_entity.dart';
@@ -27,7 +28,7 @@ class AssetDetailEntity extends Equatable {
   final String vendor;
   final int purchaseYear;
   final int? warrantyEndYear;
-  final List<Map<String,dynamic>>? serviceSchedules;
+  final List<ServiceScheduleEntity>? serviceSchedules;
   final AssetRefEntity? assetParent;
   final List<AssetRefEntity>? assetChilds;
   final String? invoicePath;

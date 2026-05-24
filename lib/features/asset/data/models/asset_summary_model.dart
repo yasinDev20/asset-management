@@ -60,17 +60,17 @@ class AssetLiteModel extends Equatable {
       'id': id,
       'status': status,
       'image': image,
-      'categoryName': categoryName,
-      'qrCode': qrCode,
-      'brandName': brandName,
+      'category_name': categoryName,
+      'qr_code': qrCode,
+      'brand_name': brandName,
       'name': name,
       'location': location,
-      'serviceSchedules': nextServiceSchedule,
+      'service_schedules': nextServiceSchedule,
     };
   }
 
   factory AssetLiteModel.fromMap(Map<String, dynamic> map) {
-    final serviceSchedules = (map['serviceSchedules'] as List);
+    final serviceSchedules = (map['service_schedules'] as List);
     final now = DateTime.now().toUtc();
     final today = DateTime(now.year, now.month, now.day);
     DateTime? nextSchedule;
@@ -109,9 +109,9 @@ class AssetLiteModel extends Equatable {
       id: map['id'] as String,
       status: map['status'] as String,
       image: map['image'] as String,
-      categoryName: map['categoryName']['name'] as String,
-      qrCode: map['qrCode'] as String,
-      brandName: map['brandName']['name'] as String,
+      categoryName: map['category_name']['name'] as String,
+      qrCode: map['qr_code'] as String,
+      brandName: map['brand_name']['name'] as String,
       name: map['name'] as String,
       location: map['location']['name'] as String,
       nextServiceSchedule: nextServiceScheduleChose,

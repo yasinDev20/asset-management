@@ -4,14 +4,20 @@ import 'package:assetmanagement/core/error/failure.dart';
 import 'package:assetmanagement/core/utils/run_catching.dart';
 import 'package:assetmanagement/features/asset/data/datasources/local_datasource.dart';
 import 'package:assetmanagement/features/asset/data/datasources/remote_datasource.dart';
+import 'package:assetmanagement/features/asset/data/models/add_asset_model.dart';
+import 'package:assetmanagement/features/asset/data/models/asset_template_model.dart';
 import 'package:assetmanagement/features/asset/data/models/brand_model.dart';
 import 'package:assetmanagement/features/asset/data/models/category_model.dart';
+import 'package:assetmanagement/features/asset/data/models/edit_asset_model.dart';
 import 'package:assetmanagement/features/asset/data/models/location_model.dart';
 import 'package:assetmanagement/features/asset/domain/entities/asset_detail_entity.dart';
 import 'package:assetmanagement/features/asset/domain/entities/asset_lite_entity.dart';
 import 'package:assetmanagement/features/asset/domain/entities/asset_ref_entity.dart';
+import 'package:assetmanagement/features/asset/domain/entities/asset_template_entity.dart';
 import 'package:assetmanagement/features/asset/domain/entities/brand_entity.dart';
 import 'package:assetmanagement/features/asset/domain/entities/category_entity.dart';
+import 'package:assetmanagement/features/asset/domain/entities/add_asset_entity.dart';
+import 'package:assetmanagement/features/asset/domain/entities/edit_asset_entity.dart';
 import 'package:assetmanagement/features/asset/domain/entities/location_entity.dart';
 import 'package:assetmanagement/features/asset/domain/repositories/asset_repository.dart';
 import 'package:dartz/dartz.dart';
@@ -58,9 +64,9 @@ class AssetRepositoryImpl extends AssetRepository {
               ids: result.assetChildIds!,
             )
           : null;
-      final assetParentData = result.assetParent?.isNotEmpty == true
+      final assetParentData = result.assetParentId?.isNotEmpty == true
           ? await _assetRemoteDataSource.getAssetRefs(
-              ids: result.assetChildIds!,
+              ids: [result.assetParentId!],
             )
           : null;
 
@@ -224,6 +230,79 @@ class AssetRepositoryImpl extends AssetRepository {
     return await runCatching(() async {
       final result = await _assetLocalDataSource.getRecentLocationSelections();
       return result.map((e) => e.toEntity()).toList();
+    });
+  }
+
+  @override
+  Future<Either<Failure, Unit>> addAsset(AddAssetEntity addAssetEntity) async {
+    return await runCatching(() async {
+      final addAssetModel = AddAssetModel.fromEntity(addAssetEntity);
+      await _assetRemoteDataSource.addAsset(addAssetModel);
+      return unit;
+    });
+  }
+
+  @override
+  Future<Either<Failure, String>> downloadFile({
+    required String url,
+    required String fileName,
+    void Function(double progress)? onProgress,
+  }) async {
+    return await runCatching(() async {
+      final path = await _assetRemoteDataSource.downloadFile(
+        url: url,
+        fileName: fileName,
+      );
+      return path;
+    });
+  }
+
+  @override
+  Future<Either<Failure, Unit>> editAsset({
+    required EditAssetEntity originalAssetEntity,
+    required EditAssetEntity editAssetEntity,
+  }) async {
+    return await runCatching(() async {
+      final originalAssetModel = EditAssetModel.fromEntity(originalAssetEntity);
+      final editAssetModel = EditAssetModel.fromEntity(editAssetEntity);
+      await _assetRemoteDataSource.editAsset(
+        originalAssetModel: originalAssetModel,
+        editAssetModel: editAssetModel,
+      );
+      return unit;
+    });
+  }
+
+  @override
+  Future<Either<Failure, Unit>> addToTemplate(
+    AssetTemplateEntity assetTemplateEntity,
+  ) async {
+    return await runCatching(() async {
+      final assetTemplateModel = AssetTemplateModel.fromEntity(
+        assetTemplateEntity,
+      );
+      await _assetRemoteDataSource.addToTemplate(
+        assetTemplateModel: assetTemplateModel,
+      );
+      return unit;
+    });
+  }
+
+  @override
+  Future<Either<Failure, List<AssetTemplateEntity>>> getTemplate(
+    String search,
+  ) async {
+    return await runCatching(() async {
+      final result = await _assetRemoteDataSource.getTemplate(search: search);
+      return result.map((e) => e.toEntity()).toList();
+    });
+  }
+
+  @override
+  Future<Either<Failure, Unit>> deleteTemplate(String id) async {
+    return await runCatching(() async {
+      await _assetRemoteDataSource.deleteTemplate(id);
+      return unit;
     });
   }
 }
