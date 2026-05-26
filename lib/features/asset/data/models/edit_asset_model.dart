@@ -149,7 +149,7 @@ class EditAssetModel extends Equatable {
       if (!listEquals(serviceSchedules, originalAssetModel.serviceSchedules))
         'service_schedules': serviceSchedules?.map((x) => x.toMap()).toList(),
       if (assetParent != originalAssetModel.assetParent)
-        'asset_parent_id': assetParent,
+        'parent_id': assetParent?.id,
       if (!listEquals(assetChilds, originalAssetModel.assetChilds))
         'asset_child_ids': assetChilds,
       if (notes != originalAssetModel.notes) 'notes': notes,

@@ -23,9 +23,9 @@ class DownloadFileEvent extends AssetEvent {
 }
 
 class GetAssetRefEvent extends AssetEvent {
-  final List<String>? ids;
-  final List<String>? qrCodes;
-  const GetAssetRefEvent({this.ids, this.qrCodes});
+  final String? assetId;
+  final String? qrCode;
+  const GetAssetRefEvent({this.assetId, this.qrCode});
 }
 
 class GetBrandsEvent extends AssetEvent {

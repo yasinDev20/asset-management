@@ -76,8 +76,8 @@ class AssetBloc extends Bloc<AssetEvent, AssetState> {
     on<GetAssetRefEvent>((event, emit) async {
       emit(AssetLoadingState());
       final result = await _assetRepository.getAssetRefs(
-        ids: event.ids,
-        qrCodes: event.qrCodes,
+        assetId: event.assetId,
+        qrCode: event.qrCode,
       );
 
       result.fold(

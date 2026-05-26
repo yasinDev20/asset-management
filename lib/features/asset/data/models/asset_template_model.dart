@@ -131,7 +131,7 @@ class AssetTemplateModel extends Equatable {
       'purchase_year': purchaseYear,
       'warranty_end_year': warrantyEndYear,
       'service_schedules': serviceSchedules?.map((x) => x.toMap()).toList(),
-      'asset_parent_id': assetParent?.id,
+      'parent_id': assetParent?.id,
       'notes': notes,
     };
   }

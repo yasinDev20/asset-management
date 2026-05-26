@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
 class AttachmentFormField extends StatefulWidget {
-  final void Function() onAddItem;
+  final void Function()? onAddItem;
   final List<Widget>? attachment;
   final String labelText;
   const AttachmentFormField({
     super.key,
     required this.attachment,
     required this.labelText,
-    required this.onAddItem,
+    this.onAddItem,
   });
   @override
   State<AttachmentFormField> createState() => _AttachmentFormFieldState();
@@ -32,6 +32,7 @@ class _AttachmentFormFieldState extends State<AttachmentFormField> {
                   child: Text(widget.labelText),
                 ),
                 ...widget.attachment ?? [],
+                if (widget.onAddItem != null)
                 IconButton.filled(
                   icon: Icon(Icons.add, color: Colors.white),
                   onPressed: widget.onAddItem,

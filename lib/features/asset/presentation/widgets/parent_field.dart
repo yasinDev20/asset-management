@@ -4,12 +4,12 @@ import 'package:assetmanagement/features/asset/presentation/widgets/attachment_f
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class AssetDependencyAttachmentField extends StatefulWidget {
+class ParentField extends StatefulWidget {
   final String labelText;
   final void Function(AssetRefEntity newItem) onAddItem;
   final void Function(String id) onDeletedChip;
-  final List<AssetRefEntity?>? selections;
-  const AssetDependencyAttachmentField({
+  final AssetRefEntity? selections;
+  const ParentField({
     super.key,
     required this.onDeletedChip,
     this.selections,
@@ -18,12 +18,10 @@ class AssetDependencyAttachmentField extends StatefulWidget {
   });
 
   @override
-  State<AssetDependencyAttachmentField> createState() =>
-      _AssetDependencyAttachmentFieldState();
+  State<ParentField> createState() => _ParentFieldState();
 }
 
-class _AssetDependencyAttachmentFieldState
-    extends State<AssetDependencyAttachmentField> {
+class _ParentFieldState extends State<ParentField> {
   TextEditingController qrCodeSearchController = TextEditingController();
 
   @override
@@ -37,19 +35,18 @@ class _AssetDependencyAttachmentFieldState
   Widget build(BuildContext context) {
     return AttachmentFormField(
       labelText: widget.labelText,
-      attachment: widget.selections?.map((e) {
-        if (e != null) {
-          return Chip(
-            deleteIcon: Icon(Icons.close),
-            labelStyle: TextStyle(),
-            label: Text(
-              '${e.qrCode} ${e.categoryName}${e.brandName.isNotEmpty ? ' ${e.brandName}' : ''} ${e.name}',
-            ),
-            onDeleted: () => widget.onDeletedChip(e.id),
-          );
-        }
-        return SizedBox();
-      }).toList(),
+      attachment: widget.selections != null
+          ? [
+              Chip(
+                deleteIcon: Icon(Icons.close),
+                labelStyle: TextStyle(),
+                label: Text(
+                  '${widget.selections!.qrCode} ${widget.selections!.categoryName}${widget.selections!.brandName.isNotEmpty ? ' ${widget.selections!.brandName}' : ''} ${widget.selections!.name}',
+                ),
+                onDeleted: () => widget.onDeletedChip(widget.selections!.id),
+              ),
+            ]
+          : [SizedBox()],
       onAddItem: () async {
         showBottomSheet(
           context: context,
@@ -77,7 +74,7 @@ class _AssetDependencyAttachmentFieldState
                             ),
                             onSubmitted: (value) {
                               context.read<AssetBloc>().add(
-                                GetAssetRefEvent(qrCodes: [value]),
+                                GetAssetRefEvent(qrCode: value),
                               );
                             },
                           ),

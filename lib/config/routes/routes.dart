@@ -120,7 +120,7 @@ class MyRouter {
         pageBuilder: (context, state) => MaterialPage(
           child: AssetDetailPage(
             id: state.pathParameters['id'],
-            mode: AssetFormMode.add,
+            mode: AssetFormMode.edit,
           ),
         ),
       ),

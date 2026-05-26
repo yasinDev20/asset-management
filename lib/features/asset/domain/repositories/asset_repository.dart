@@ -21,8 +21,8 @@ abstract class AssetRepository {
 
   Future<Either<Failure, AssetDetailEntity>> getAssetDetail(String id);
   Future<Either<Failure, List<AssetRefEntity>>> getAssetRefs({
-    List<String>? ids,
-    List<String>? qrCodes,
+    String? assetId,
+    String? qrCode,
   });
   Future<Either<Failure, List<BrandEntity>>> getBrands(String value);
   Future<Either<Failure, Unit>> addBrand({

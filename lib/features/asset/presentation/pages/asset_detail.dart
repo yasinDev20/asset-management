@@ -12,7 +12,8 @@ import 'package:assetmanagement/features/asset/domain/entities/location_entity.d
 import 'package:assetmanagement/features/asset/domain/entities/service_schedule_entity.dart';
 import 'package:assetmanagement/features/asset/domain/models/asset_detail_model.dart';
 import 'package:assetmanagement/features/asset/presentation/bloc/asset_bloc.dart';
-import 'package:assetmanagement/features/asset/presentation/widgets/asset_dependency_attachment_field.dart';
+import 'package:assetmanagement/features/asset/presentation/widgets/attachment_field.dart';
+import 'package:assetmanagement/features/asset/presentation/widgets/parent_field.dart';
 import 'package:assetmanagement/features/asset/presentation/widgets/image_form_field.dart';
 import 'package:assetmanagement/features/asset/presentation/widgets/invoice_field.dart';
 import 'package:assetmanagement/features/asset/presentation/widgets/service_schedule_attachment_field.dart';
@@ -64,7 +65,7 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
   String? id;
   List<ServiceScheduleEntity>? serviceSchedules;
   List<AssetRefEntity>? assetChilds;
-  List<AssetRefEntity?>? assetParent;
+  AssetRefEntity? assetParent;
   FileEntity? invoiceFile;
   String? invoiceUrl;
   List<Map<String, dynamic>>? assetChildQrCode;
@@ -79,10 +80,10 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
 
   @override
   void initState() {
-    // if (widget.id?.isNotEmpty == true) {}
-    // context.read<AssetBloc>().add(
-    //   GetAssetDetailEvent('feb8f337-a93a-41ed-b8a5-4572a16d168c'),
-    // );
+    if (widget.id?.isNotEmpty == true) {}
+    context.read<AssetBloc>().add(
+      GetAssetDetailEvent('42ac0ebc-f908-44bf-89f1-34e8f3e4d011'),
+    );
 
     super.initState();
   }
@@ -183,7 +184,7 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
                     imageUrl = assetDetailViewModel.imageUrl;
                     serviceSchedules = assetDetailEntity.serviceSchedules
                         ?.toList();
-                    assetParent = [assetDetailEntity.assetParent];
+                    assetParent = assetDetailEntity.assetParent;
                     assetChilds = assetDetailEntity.assetChilds?.toList();
                     invoiceUrl = assetDetailViewModel.invoiceUrl;
                     notesController.text = assetDetailEntity.notes ?? '';
@@ -301,9 +302,9 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
                                         serviceSchedules = selectedTemplate
                                             .serviceSchedules
                                             ?.toList();
-                                        assetParent = [
-                                          selectedTemplate.assetParent,
-                                        ];
+                                        assetParent =
+                                            selectedTemplate.assetParent;
+
                                         notesController.text =
                                             selectedTemplate.notes ?? '';
                                       });
@@ -502,39 +503,36 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
                               },
                             ),
                             //Induk barang
-                            AssetDependencyAttachmentField(
+                            ParentField(
                               labelText: 'Induk Barang',
                               selections: assetParent,
                               onAddItem: (newItem) {
                                 setState(() {
-                                  assetParent = [];
-                                  assetParent!.add(newItem);
+                                  assetParent = newItem;
                                 });
                               },
                               onDeletedChip: (id) {
                                 setState(() {
-                                  assetParent?.removeWhere(
-                                    (element) => element?.id == id,
-                                  );
+                                  assetParent = null;
                                 });
                               },
                             ),
+
                             //Turunan barang
-                            AssetDependencyAttachmentField(
+                            //TODO: ketika di klik maka akan ke asset detail
+                            AttachmentFormField(
                               labelText: 'Turunan barang',
-                              selections: assetChilds,
-                              onAddItem: (newItem) {
-                                setState(() {
-                                  assetChilds!.add(newItem);
-                                });
-                              },
-                              onDeletedChip: (id) {
-                                setState(() {
-                                  assetChilds?.removeWhere(
-                                    (element) => element.id == id,
-                                  );
-                                });
-                              },
+                              attachment: assetChilds
+                                  ?.map(
+                                    (e) => Chip(
+                                      deleteIcon: Icon(Icons.close),
+                                      labelStyle: TextStyle(),
+                                      label: Text(
+                                        '${e.qrCode} ${e.categoryName}${e.brandName.isNotEmpty ? ' ${e.brandName}' : ''} ${e.name}',
+                                      ),
+                                    ),
+                                  )
+                                  .toList(),
                             ),
 
                             //Invoice
@@ -703,7 +701,7 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
                                           warrantyEndYearController.text,
                                         ),
                                         serviceSchedules: serviceSchedules,
-                                        assetParent: assetParent?.first,
+                                        assetParent: assetParent,
                                         assetChilds: assetChilds?.toList(),
                                         invoiceFile: invoiceFile,
                                         notes: notesController.text,
@@ -771,7 +769,7 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
                                             warrantyEndYearController.text,
                                           ),
                                           serviceSchedules: serviceSchedules,
-                                          assetParent: assetParent?.first?.id,
+                                          assetParent: assetParent?.id,
                                           assetChilds: assetChilds
                                               ?.map((e) => e.id)
                                               .toList(),

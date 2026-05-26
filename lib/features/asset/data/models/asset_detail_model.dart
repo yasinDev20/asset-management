@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:assetmanagement/features/asset/data/models/asset_ref_model.dart';
 import 'package:assetmanagement/features/asset/data/models/brand_model.dart';
 import 'package:assetmanagement/features/asset/data/models/category_model.dart';
 import 'package:assetmanagement/features/asset/data/models/location_model.dart';
@@ -30,7 +31,7 @@ class AssetDetailModel extends Equatable {
   final int purchaseYear;
   final int? warrantyEndYear;
   final List<ServiceScheduleModel>? serviceSchedules;
-  final String? assetParentId;
+  final AssetRefModel? assetParent;
   final List<String>? assetChildIds;
   final String? invoicePath;
   final String? notes;
@@ -54,7 +55,7 @@ class AssetDetailModel extends Equatable {
     required this.purchaseYear,
     required this.warrantyEndYear,
     required this.serviceSchedules,
-    required this.assetParentId,
+    required this.assetParent,
     required this.assetChildIds,
     required this.invoicePath,
     required this.notes,
@@ -85,7 +86,7 @@ class AssetDetailModel extends Equatable {
       purchaseYear,
       ?warrantyEndYear,
       ?serviceSchedules,
-      ?assetParentId,
+      ?assetParent,
       ?assetChildIds,
       ?invoicePath,
       ?notes,
@@ -94,10 +95,7 @@ class AssetDetailModel extends Equatable {
     ];
   }
 
-  AssetDetailEntity toEntity({
-    required List<AssetRefEntity>? assetChildData,
-    required AssetRefEntity? assetParentData,
-  }) {
+  AssetDetailEntity toEntity({required List<AssetRefEntity>? assetChildData}) {
     return AssetDetailEntity(
       id: id,
       ownerId: ownerId,
@@ -119,7 +117,7 @@ class AssetDetailModel extends Equatable {
       purchaseYear: purchaseYear,
       warrantyEndYear: warrantyEndYear,
       serviceSchedules: serviceSchedules?.map((e) => e.toEntity()).toList(),
-      assetParent: assetParentData,
+      assetParent: assetParent?.toEntity(),
       assetChilds: assetChildData,
       invoicePath: invoicePath,
       notes: notes,
@@ -152,7 +150,9 @@ class AssetDetailModel extends Equatable {
       serviceSchedules: entity.serviceSchedules
           ?.map((e) => ServiceScheduleModel.fromEntity(e))
           .toList(),
-      assetParentId: entity.assetParent?.id,
+      assetParent: entity.assetParent != null
+          ? AssetRefModel.formEntity(entity.assetParent!)
+          : null,
       assetChildIds: entity.assetChilds?.map((e) => e.id).toList(),
       invoicePath: entity.invoicePath,
       notes: entity.notes,
@@ -179,7 +179,7 @@ class AssetDetailModel extends Equatable {
       'purchase_year': purchaseYear,
       'warranty_end_year': warrantyEndYear,
       'service_schedules': serviceSchedules?.map((e) => e.toMap()).toList(),
-      'asset_parent_id': assetParentId,
+      'parent_id': assetParent,
       'asset_child_ids': assetChildIds,
       'invoice_path': invoicePath,
       'notes': notes,
@@ -220,8 +220,8 @@ class AssetDetailModel extends Equatable {
               ),
             )
           : null,
-      assetParentId: map['asset_parent_id'] != null
-          ? map['asset_parent_id'] as String
+      assetParent: map['asset_parent'] != null
+          ? AssetRefModel.fromMap(map['asset_parent'])
           : null,
       assetChildIds: map['asset_child_ids'] != null
           ? List.from((map['asset_child_ids'] as List))

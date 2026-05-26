@@ -21,10 +21,7 @@ abstract class AssetRemoteDataSource {
   Future<List<AssetLiteModel>> getAssetsLite(List<Map<String, String>> filters);
   Future<AssetDetailModel> getAssetDetail(String id);
 
-  Future<List<AssetRefModel>> getAssetRefs({
-    List<String>? ids,
-    List<String>? qrCodes,
-  });
+  Future<List<AssetRefModel>> getAssetRefs({String? assetId, String? qrCodes});
 
   Future<List<BrandModel>> getBrands(String value);
   Future<void> addBrand({required String name, required String ownerId});
@@ -89,8 +86,15 @@ class AssetRemoteDataSourceImpl implements AssetRemoteDataSource {
     final query = _supabaseClient
         .from('assets')
         .select('''*,
-         brand:brands (*), category:categories (*),
-         location:locations (*), owner:users(*)
+         brand:brands (*),
+         category:categories (*),
+         location:locations (*),
+         owner:users(*),
+         asset_parent:parent_id(
+          id, qr_code, name,
+          category:categories(name),
+          brand:brands(name)    
+         )
       ''')
         .eq('id', id);
 
@@ -101,23 +105,23 @@ class AssetRemoteDataSourceImpl implements AssetRemoteDataSource {
 
   @override
   Future<List<AssetRefModel>> getAssetRefs({
-    List<String>? ids,
-    List<String>? qrCodes,
+    String? assetId,
+    String? qrCodes,
   }) async {
     var query = _supabaseClient.from('assets').select('''id, qr_code, name,
         category:categories(name),
         brand:brands(name)    
       ''');
 
-    if (ids != null && qrCodes != null) {
+    if (assetId != null && qrCodes != null) {
       throw AppException(
         type: ExceptionType.unknown,
-        message: 'Only one use parameter, cannot using two parameters',
+        message: 'Only use one parameter, cannot using two parameters',
       );
-    } else if (ids != null) {
-      query = query.inFilter('id', ids);
+    } else if (assetId != null) {
+      query = query.eq('parent_id', assetId);
     } else if (qrCodes != null) {
-      query = query.inFilter('qr_code', qrCodes);
+      query = query.eq('qr_code', qrCodes);
     }
 
     final response = await query;
@@ -311,7 +315,9 @@ class AssetRemoteDataSourceImpl implements AssetRemoteDataSource {
   Future<void> addToTemplate({
     required AssetTemplateModel assetTemplateModel,
   }) async {
-    await _supabaseClient.from('templates').upsert(assetTemplateModel.toMap(), onConflict: 'asset_id');
+    await _supabaseClient
+        .from('templates')
+        .upsert(assetTemplateModel.toMap(), onConflict: 'asset_id');
   }
 
   @override

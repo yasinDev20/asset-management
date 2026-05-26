@@ -137,7 +137,7 @@ class AddAssetModel extends Equatable {
       'purchase_year': purchaseYear,
       'warranty_end_year': warrantyEndYear,
       'service_schedules': serviceSchedules?.map((e) => e.toMap()).toList(),
-      'asset_parent_id': assetParentId,
+      'parent_id': assetParentId,
       'asset_child_ids': assetChildIds,
       'notes': notes,
     };

@@ -59,33 +59,25 @@ class AssetRepositoryImpl extends AssetRepository {
     return await runCatching(() async {
       final result = await _assetRemoteDataSource.getAssetDetail(id);
 
-      final assetChildData = result.assetChildIds?.isNotEmpty == true
-          ? await _assetRemoteDataSource.getAssetRefs(
-              ids: result.assetChildIds!,
-            )
-          : null;
-      final assetParentData = result.assetParentId?.isNotEmpty == true
-          ? await _assetRemoteDataSource.getAssetRefs(
-              ids: [result.assetParentId!],
-            )
-          : null;
-
+      final assetChildData = await _assetRemoteDataSource.getAssetRefs(
+        assetId: result.id,
+      );
+      
       return result.toEntity(
-        assetParentData: assetParentData?.first.toEntity(),
-        assetChildData: assetChildData?.map((e) => e.toEntity()).toList(),
+        assetChildData: assetChildData.map((e) => e.toEntity()).toList(),
       );
     });
   }
 
   @override
   Future<Either<Failure, List<AssetRefEntity>>> getAssetRefs({
-    List<String>? ids,
-    List<String>? qrCodes,
+    String? assetId,
+    String? qrCode,
   }) async {
     return await runCatching(() async {
       final result = await _assetRemoteDataSource.getAssetRefs(
-        ids: ids,
-        qrCodes: qrCodes,
+        assetId: assetId,
+        qrCodes: qrCode,
       );
 
       return result.map((e) => e.toEntity()).toList();
