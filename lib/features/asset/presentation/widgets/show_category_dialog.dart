@@ -1,4 +1,5 @@
 import 'package:assetmanagement/core/common/widgets/text_form_field.dart';
+import 'package:assetmanagement/features/asset/domain/entities/category_entity.dart';
 import 'package:assetmanagement/features/asset/presentation/bloc/asset_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -7,8 +8,8 @@ import 'package:go_router/go_router.dart';
 
 Future showCategoryDialog({
   required BuildContext context,
-  required void Function({required String id, required String code}) onSelected,
-  required String? categorySelectedId,
+  required CategoryEntity? initialValue,
+  required void Function(CategoryEntity selectedCategory) onSelected,
   required TextEditingController categoryController,
 }) async {
   TextEditingController searchController = TextEditingController();
@@ -18,6 +19,8 @@ Future showCategoryDialog({
   context.read<AssetBloc>().add(GetRecentCategorySelectionsEvent());
 
   bool isAddnewClicked = false;
+
+
   return await showDialog(
     context: context,
     barrierColor: Colors.transparent,
@@ -139,8 +142,7 @@ Future showCategoryDialog({
                                     ).colorScheme.surface,
                                     onTap: () {
                                       onSelected(
-                                        id: category.id,
-                                        code: category.code,
+                                       category
                                       );
                                       categoryController.text =
                                           '${category.name} (${category.code})';

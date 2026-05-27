@@ -1,12 +1,12 @@
-import 'package:assetmanagement/core/common/extension/extension.dart';
+import 'package:assetmanagement/features/asset/domain/entities/service_schedule_entity.dart';
 import 'package:assetmanagement/features/asset/presentation/widgets/attachment_field.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class ServiceScheduleAttachmentField extends StatefulWidget {
-  final List<Map<String, dynamic>>? serviceSchedules;
-  final void Function()? onDeletedChip;
-  final void Function(Map<String, dynamic> item) onAddItem;
+  final List<ServiceScheduleEntity>? serviceSchedules;
+  final void Function(ServiceScheduleEntity item)? onDeletedChip;
+  final void Function(ServiceScheduleEntity item) onAddItem;
 
   const ServiceScheduleAttachmentField({
     super.key,
@@ -22,12 +22,12 @@ class ServiceScheduleAttachmentField extends StatefulWidget {
 
 class _ServiceScheduleAttachmentFieldState
     extends State<ServiceScheduleAttachmentField> {
-  TextEditingController labelScheduleController = TextEditingController();
+  TextEditingController titleController = TextEditingController();
   TextEditingController dateController = TextEditingController();
 
   @override
   void dispose() {
-    labelScheduleController.dispose();
+    titleController.dispose();
     dateController.dispose();
     super.dispose();
   }
@@ -37,17 +37,19 @@ class _ServiceScheduleAttachmentFieldState
     return AttachmentFormField(
       labelText: 'Jadwal servis',
       attachment: widget.serviceSchedules?.map((e) {
-        final dateTimeFormated = DateFormat('d MMMM').format(e['time']);
+        final dateTimeFormated = DateFormat('d MMMM').format(e.time);
         return Row(
           mainAxisAlignment: MainAxisAlignment.center,
           spacing: 10,
           children: [
-            Text((e['type'] as String).serviceTypeToBahasa()),
+            Text(e.type),
             Chip(
               deleteIcon: Icon(Icons.close),
               labelStyle: TextStyle(),
-              label: Text('${e['title']} :  $dateTimeFormated'),
-              onDeleted: widget.onDeletedChip,
+              label: Text('${e.title} :  $dateTimeFormated'),
+              onDeleted: () {
+                widget.onDeletedChip?.call(e);
+              },
             ),
           ],
         );
@@ -97,7 +99,7 @@ class _ServiceScheduleAttachmentFieldState
                           ),
                           //Name
                           TextField(
-                            controller: labelScheduleController,
+                            controller: titleController,
                             decoration: InputDecoration(
                               labelText: 'Nama Jadwal',
                               border: OutlineInputBorder(),
@@ -113,9 +115,9 @@ class _ServiceScheduleAttachmentFieldState
                             ),
 
                             onTap: () async {
-                             dateTimePicked = await showDatePicker(
+                              dateTimePicked = await showDatePicker(
                                 context: context,
-                                firstDate: DateTime.now(),
+                                firstDate: DateTime(DateTime.now().year),
                                 lastDate: DateTime(2100),
                               );
 
@@ -130,16 +132,18 @@ class _ServiceScheduleAttachmentFieldState
                           IconButton.filled(
                             icon: Icon(Icons.add, color: Colors.white),
                             onPressed: () {
-                              if (labelScheduleController.text.isNotEmpty &&
+                              if (titleController.text.isNotEmpty &&
                                   dateController.text.isNotEmpty &&
                                   type.isNotEmpty) {
-                                widget.onAddItem({
-                                  'title': labelScheduleController.text,
-                                  'time': dateTimePicked ,
-                                  'type': type,
-                                });
+                                widget.onAddItem(
+                                  ServiceScheduleEntity(
+                                    title: titleController.text,
+                                    type: type,
+                                    time: dateTimePicked!,
+                                  ),
+                                );
 
-                                labelScheduleController.clear();
+                                titleController.clear();
                                 dateController.clear();
                                 type = '';
 

@@ -37,6 +37,7 @@ class CommonTextFormField extends StatelessWidget {
     this.onFieldSubmitted,
     this.maxLines = 1,
     this.minLines,
+
   });
 
   @override

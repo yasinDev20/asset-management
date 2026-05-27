@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:assetmanagement/features/asset/data/models/service_schedule_model.dart';
 import 'package:equatable/equatable.dart';
 
 import 'package:assetmanagement/features/asset/domain/entities/asset_lite_entity.dart';
@@ -60,46 +61,51 @@ class AssetLiteModel extends Equatable {
       'id': id,
       'status': status,
       'image': image,
-      'categoryName': categoryName,
-      'qrCode': qrCode,
-      'brandName': brandName,
+      'category_name': categoryName,
+      'qr_code': qrCode,
+      'brand_name': brandName,
       'name': name,
       'location': location,
-      'serviceSchedules': nextServiceSchedule,
+      'service_schedules': nextServiceSchedule,
     };
   }
 
   factory AssetLiteModel.fromMap(Map<String, dynamic> map) {
-    final serviceSchedules = (map['serviceSchedules'] as List);
+    final serviceSchedules = map['service_schedules'] != null
+        ? (map['service_schedules'] as List)
+              .map((e) => ServiceScheduleModel.fromMap(e))
+              .toList()
+        : null;
     final now = DateTime.now().toUtc();
     final today = DateTime(now.year, now.month, now.day);
     DateTime? nextSchedule;
+    if (serviceSchedules != null) {
+      for (final element in serviceSchedules) {
+        final raw = element.time;
+        DateTime candidate;
 
-    for (final element in serviceSchedules) {
-      final raw = DateTime.parse(element['time']).toUtc();
-      DateTime candidate;
+        // Feb 29 will be auto-normalized to Mar 1 on non-leap years (intended behavior)
+        if (element.type == 'yearly') {
+          candidate = DateTime(today.year, raw.month, raw.day);
 
-      // Feb 29 will be auto-normalized to Mar 1 on non-leap years (intended behavior)
-      if (element['type'] == 'yearly') {
-        candidate = DateTime(today.year, raw.month, raw.day);
+          //!candidate.isAfter(today) same with "<="
+          if (!candidate.isAfter(today)) {
+            candidate = DateTime(today.year + 1, raw.month, raw.day);
+          }
+        } else if (element.type == 'monthly') {
+          candidate = DateTime(today.year, today.month, raw.day);
 
-        //!candidate.isAfter(today) same with "<="
-        if (!candidate.isAfter(today)) {
-          candidate = DateTime(today.year + 1, raw.month, raw.day);
+          if (!candidate.isAfter(today)) {
+            candidate = DateTime(today.year, today.month + 1, raw.day);
+          }
+        } else {
+          continue;
         }
-      } else if (element['type'] == 'monthly') {
-        candidate = DateTime(today.year, today.month, raw.day);
 
-        if (!candidate.isAfter(today)) {
-          candidate = DateTime(today.year, today.month + 1, raw.day);
+        //compare for the nearest date
+        if (nextSchedule == null || candidate.isBefore(nextSchedule)) {
+          nextSchedule = candidate;
         }
-      } else {
-        continue;
-      }
-
-      //compare for the nearest date
-      if (nextSchedule == null || candidate.isBefore(nextSchedule)) {
-        nextSchedule = candidate;
       }
     }
 
@@ -108,10 +114,10 @@ class AssetLiteModel extends Equatable {
     return AssetLiteModel(
       id: map['id'] as String,
       status: map['status'] as String,
-      image: map['image'] as String,
-      categoryName: map['categoryName']['name'] as String,
-      qrCode: map['qrCode'] as String,
-      brandName: map['brandName']['name'] as String,
+      image: map['image_path'] as String,
+      categoryName: map['category_name']['name'] as String,
+      qrCode: map['qr_code'] as String,
+      brandName: map['brand_name']['name'] as String,
       name: map['name'] as String,
       location: map['location']['name'] as String,
       nextServiceSchedule: nextServiceScheduleChose,

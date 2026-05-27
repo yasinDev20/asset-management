@@ -230,7 +230,7 @@ void main() {
       'emits [AssetLoadingState, GetAssetRefSuccsessState] when GetAssetRefEvent is added',
       build: () {
         when(
-          () => mockAssetRepository.getAssetRefs(ids: ['id']),
+          () => mockAssetRepository.getAssetRefs(assetId: ['id']),
         ).thenAnswer((_) async => Right([assetRefEntity]));
         return assetBloc;
       },
@@ -242,14 +242,14 @@ void main() {
         GetAssetRefSuccsessState(assetRefEntity: [assetRefEntity]),
       ],
       verify: (_) {
-        verify(() => mockAssetRepository.getAssetRefs(ids: ['id'])).called(1);
+        verify(() => mockAssetRepository.getAssetRefs(assetId: ['id'])).called(1);
       },
     );
 
     blocTest<AssetBloc, AssetState>(
       'emits [AssetLoadingState, AssetFailureState] when GetAssetRefEvent handler fails',
       build: () {
-        when(() => mockAssetRepository.getAssetRefs(ids: ['id'])).thenAnswer(
+        when(() => mockAssetRepository.getAssetRefs(assetId: ['id'])).thenAnswer(
           (_) async => Left(
             NetworkFailure(message: 'Network Failure', code: 'NETWORK_FAILURE'),
           ),
@@ -267,7 +267,7 @@ void main() {
         ),
       ],
       verify: (_) {
-        verify(() => mockAssetRepository.getAssetRefs(ids: ['id'])).called(1);
+        verify(() => mockAssetRepository.getAssetRefs(assetId: ['id'])).called(1);
       },
     );
   });

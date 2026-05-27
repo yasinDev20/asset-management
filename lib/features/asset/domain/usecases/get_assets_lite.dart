@@ -10,6 +10,8 @@ class GetAssetsLiteUsecase {
 
   Future<Either<Failure, List<AssetLiteEntity>>> call(List<Map<String,String>> filter) async {
     return await _assetRepository.getAssetsLite(filter);
+
+    
   }
   
 }

@@ -2,8 +2,13 @@ import 'package:assetmanagement/features/asset/data/datasources/local_datasource
 import 'package:assetmanagement/features/asset/data/datasources/remote_datasource.dart';
 import 'package:assetmanagement/features/asset/data/repositories/asset_repository_impl.dart';
 import 'package:assetmanagement/features/asset/domain/repositories/asset_repository.dart';
+import 'package:assetmanagement/features/asset/domain/usecases/add_asset.dart';
+import 'package:assetmanagement/features/asset/domain/usecases/add_to_template.dart';
+import 'package:assetmanagement/features/asset/domain/usecases/delete_template.dart';
+import 'package:assetmanagement/features/asset/domain/usecases/edit_asset.dart';
 import 'package:assetmanagement/features/asset/domain/usecases/get_asset_detail.dart';
 import 'package:assetmanagement/features/asset/domain/usecases/get_assets_lite.dart';
+import 'package:assetmanagement/features/asset/domain/usecases/get_template.dart';
 import 'package:assetmanagement/features/asset/presentation/bloc/asset_bloc.dart';
 import 'package:assetmanagement/features/authentication/domain/usecases/email_register.dart';
 import 'package:assetmanagement/features/authentication/domain/usecases/forgot_password.dart';
@@ -23,6 +28,7 @@ import 'package:assetmanagement/features/user/domain/usecases/add_user.dart';
 import 'package:assetmanagement/features/user/domain/usecases/get_all_user.dart';
 import 'package:assetmanagement/features/user/domain/usecases/get_user.dart';
 import 'package:assetmanagement/features/user/presentation/bloc/user_bloc.dart';
+import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
@@ -54,6 +60,8 @@ Future<void> injectionInit() async {
   myInjection.registerLazySingleton<SupabaseClient>(
     () => Supabase.instance.client,
   );
+  // Register supabase
+  myInjection.registerLazySingleton<Dio>(() => Dio());
 
   myInjection.registerLazySingleton<AuthEventListener>(
     () => AuthEventListenerImpl(),
@@ -85,10 +93,16 @@ Future<void> injectionInit() async {
       assetRepository: myInjection(),
       getAssetsUsecase: myInjection(),
       getAssetDetailUsecase: myInjection(),
+      addAssetUsecase: myInjection(),
+      editAssetUsecase: myInjection(),
+      addToTemplateUsecase: myInjection(),
+      getTemplateUsecase: myInjection(),
+      deleteTemplateUsecase: myInjection()
     ),
   );
 
   //Usecase
+
   //Auth Usecase
   myInjection.registerLazySingleton(
     () => EmailRegisterUsecase(myInjection()), //diisi AuthRepositoryImpl
@@ -129,6 +143,11 @@ Future<void> injectionInit() async {
   //Asset Usecase
   myInjection.registerLazySingleton(() => GetAssetsLiteUsecase(myInjection()));
   myInjection.registerLazySingleton(() => GetAssetDetailUsecase(myInjection()));
+  myInjection.registerLazySingleton(() => AddAssetUsecase(myInjection()));
+  myInjection.registerLazySingleton(() => EditAssetUsecase(myInjection()));
+  myInjection.registerLazySingleton(() => AddToTemplateUsecase(myInjection()));
+  myInjection.registerLazySingleton(() => GetTemplateUsecase(myInjection()));
+  myInjection.registerLazySingleton(() => DeleteTemplateUsecase(myInjection()));
 
   //Repository
   myInjection.registerLazySingleton<AuthRepository>(
@@ -166,6 +185,9 @@ Future<void> injectionInit() async {
   );
 
   myInjection.registerLazySingleton<AssetRemoteDataSource>(
-    () => AssetRemoteDataSourceImpl(supabaseClient: myInjection()),
+    () => AssetRemoteDataSourceImpl(
+      supabaseClient: myInjection(),
+      dio: myInjection(),
+    ),
   );
 }

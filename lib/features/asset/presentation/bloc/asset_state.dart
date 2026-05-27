@@ -91,17 +91,49 @@ class AddRecentBrandSelectionSuccessState extends AssetState {
 class GetRecentBrandSelectionsSuccessState extends GetBrandsSuccsessState {
   const GetRecentBrandSelectionsSuccessState({required super.brandsEntity});
 }
+
 class AddRecentCategorySelectionSuccessState extends AssetState {
   const AddRecentCategorySelectionSuccessState();
 }
 
-class GetRecentCategorySelectionsSuccessState extends GetCategoriesSuccsessState {
-  const GetRecentCategorySelectionsSuccessState({required super.categoriesEntity});
+class GetRecentCategorySelectionsSuccessState
+    extends GetCategoriesSuccsessState {
+  const GetRecentCategorySelectionsSuccessState({
+    required super.categoriesEntity,
+  });
 }
+
 class AddRecentLocationSelectionSuccessState extends AssetState {
   const AddRecentLocationSelectionSuccessState();
 }
 
-class GetRecentLocationSelectionsSuccessState extends GetLocationsSuccsessState {
-  const GetRecentLocationSelectionsSuccessState({required super.locationsEntity});
+class GetRecentLocationSelectionsSuccessState
+    extends GetLocationsSuccsessState {
+  const GetRecentLocationSelectionsSuccessState({
+    required super.locationsEntity,
+  });
+}
+
+class AddAssetSuccessState extends AssetState {
+  final String message;
+  const AddAssetSuccessState({required this.message});
+}
+
+class EditAssetSuccessState extends AssetState {
+  final String message;
+  const EditAssetSuccessState({required this.message});
+}
+
+class AddToTemplateSuccessState extends AssetState {
+  final String message;
+  const AddToTemplateSuccessState({required this.message});
+}
+class DeleteTemplatesSuccsessState extends AssetState {
+  final String message = 'Berhasil menghapus template';
+  const DeleteTemplatesSuccsessState();
+}
+
+class GetTemplatesSuccsessState extends AssetState {
+  final List<AssetTemplateEntity> assetTemplateEntity;
+  const GetTemplatesSuccsessState({required this.assetTemplateEntity});
 }

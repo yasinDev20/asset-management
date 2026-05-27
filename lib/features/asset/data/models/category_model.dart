@@ -47,20 +47,20 @@ class CategoryModel extends Equatable {
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
       'id': id,
-      'ownerId': ownerId,
+      'owner_id': ownerId,
       'name': name,
       'code': code,
-      'lastSequance': lastSequance,
+      'last_sequence': lastSequance,
     };
   }
 
   factory CategoryModel.fromMap(Map<String, dynamic> map) {
     return CategoryModel(
       id: map['id'] as String,
-      ownerId: map['ownerId'] as String,
+      ownerId: map['owner_id'] as String,
       name: map['name'] as String,
       code: map['code'] as String,
-      lastSequance: map['lastSequance'] as int,
+      lastSequance: map['last_sequence'] as int,
     );
   }
 

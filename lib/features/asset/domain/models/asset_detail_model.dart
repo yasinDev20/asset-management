@@ -1,6 +1,5 @@
 
 
-import 'package:assetmanagement/features/asset/domain/entities/file_entity.dart';
 import 'package:equatable/equatable.dart';
 
 import 'package:assetmanagement/features/asset/domain/entities/asset_detail_entity.dart';
@@ -8,14 +7,14 @@ import 'package:assetmanagement/features/asset/domain/entities/asset_detail_enti
 class AssetDetail extends Equatable {
   final AssetDetailEntity assetDetailEntity;
   final String imageUrl;
-  final FileEntity? invoiceFile;
+  final String? invoiceUrl;
 
   const AssetDetail({
     required this.assetDetailEntity,
     required this.imageUrl,
-    required this.invoiceFile,
+    required this.invoiceUrl,
   });
 
   @override
-  List<Object> get props => [assetDetailEntity, imageUrl, ?invoiceFile];
+  List<Object> get props => [assetDetailEntity, imageUrl, ?invoiceUrl];
 }
