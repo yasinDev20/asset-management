@@ -44,8 +44,8 @@ class UserModel extends Equatable {
       'id': id,
       'email': email,
       'name': name,
-      'createdAt': createdAt.toIso8601String(),
-      'updatedAt': updatedAt?.toIso8601String(),
+      'created_at': createdAt.toIso8601String(),
+      'updated_at': updatedAt?.toIso8601String(),
     };
   }
 
@@ -55,8 +55,8 @@ class UserModel extends Equatable {
       email: map['email'] as String,
       name: map['name'] as String,
       //selalu gunakan date time parse karen date berstandar iso 8601
-      createdAt: DateTime.parse(map['createdAt'] as String),
-      updatedAt: map['updatedAt'] != null ? DateTime.parse(map['updatedAt']) : null
+      createdAt: DateTime.parse(map['created_at'] as String),
+      updatedAt: map['updated_at'] != null ? DateTime.parse(map['updated_at']) : null
     );
   }
 

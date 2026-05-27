@@ -1,5 +1,6 @@
 import 'package:assetmanagement/config/routes/route_names.dart';
 import 'package:assetmanagement/core/common/pages/not_found.dart';
+import 'package:assetmanagement/features/asset/presentation/pages/asset_detail.dart';
 import 'package:assetmanagement/features/authentication/domain/entities/user_entity.dart';
 import 'package:assetmanagement/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:assetmanagement/features/authentication/presentation/pages/email_register.dart';
@@ -15,8 +16,7 @@ import 'package:go_router/go_router.dart';
 
 class MyRouter {
   GoRouter get router => GoRouter(
-    initialLocation: '/${RouteNames.login}',
-
+    initialLocation: '/${RouteNames.assetDetail}',
     errorPageBuilder: (context, state) {
       return const MaterialPage(child: NotFoundPage());
     },
@@ -24,7 +24,7 @@ class MyRouter {
     redirect: (context, state) {
       final authState = context.read<AuthBloc>().state;
       final currentPath = state.uri.path;
-      final loginPath = '/${RouteNames.login}';
+      final loginPath = '/${RouteNames.assetDetail}'; //ubah ini untuk ke page sedang di develop
       final forgotPasswordPath =
           '/${RouteNames.login}/${RouteNames.forgotPassword}';
       final emailRegisterPath =
@@ -93,8 +93,6 @@ class MyRouter {
                 pageBuilder: (context, state) =>
                     const MaterialPage(child: UsersPage()),
                 routes: [
-                  //TODO: Pisahkan karena ini harus menggunakan scaffold. kemudian buat rootpage menjadi appshell dan pindahkan di folder route
-
                   //UserDetail
                   GoRoute(
                     path: '${RouteNames.userDetail}/:userId',
@@ -107,13 +105,24 @@ class MyRouter {
                       ),
                     ),
                   ),
-
-                 
                 ],
               ),
             ],
           ),
         ],
+      ),
+
+      //Detail asset
+      GoRoute(
+        // path: '/${RouteNames.assetDetail}/:id',
+        path: '/${RouteNames.assetDetail}',
+        name: RouteNames.assetDetail,
+        pageBuilder: (context, state) => MaterialPage(
+          child: AssetDetailPage(
+            id: state.pathParameters['id'],
+            mode: AssetFormMode.edit,
+          ),
+        ),
       ),
     ],
   );

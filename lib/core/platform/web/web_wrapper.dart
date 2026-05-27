@@ -4,4 +4,5 @@
 
 // 'web_wrapper_web.dart' hanya bisa di import di web saja jika di import di non web maka eror. oleh karena itu perlu pemisahan 3 file ini
 
-export 'web_wrapper_stub.dart' if (dart.library.js_util) 'web_wrapper_web.dart';
+// export 'web_wrapper_stub.dart' if (dart.library.js_util) 'web_wrapper_web.dart';
+export 'web_wrapper_stub.dart' if (dart.library.js_interop) 'web_wrapper_web.dart';
