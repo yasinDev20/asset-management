@@ -16,7 +16,7 @@ import 'package:go_router/go_router.dart';
 
 class MyRouter {
   GoRouter get router => GoRouter(
-    initialLocation: '/${RouteNames.assetDetail}',
+    initialLocation: '/${RouteNames.assetDetail}', //ubah ini untuk ke page sedang di develop
     errorPageBuilder: (context, state) {
       return const MaterialPage(child: NotFoundPage());
     },
