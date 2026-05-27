@@ -63,7 +63,7 @@ class AssetRemoteDataSourceImpl implements AssetRemoteDataSource {
     List<Map<String, String>> filters,
   ) async {
     final query = _supabaseClient.from('assets').select(
-      '''id, status, image, qr_code, name, service_schedules,
+      '''id, status, image_path, qr_code, name, service_schedules,
          brand_name:brands (name), category_name:categories (name),
          location:locations (name), owner:users(name)
       ''',
