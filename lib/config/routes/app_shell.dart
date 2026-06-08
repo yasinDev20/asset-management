@@ -13,24 +13,27 @@ class AppShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: BlocListener<AuthBloc, AuthState>(
-        listener: (context, state) {
-          switch (state) {
-            case FailureState(message: final message):
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(SnackBar(content: Text(message)));
-              context.goNamed(RouteNames.login);
+      body: SelectionArea(child: SafeArea(child: child)),
+      //  BlocListener<AuthBloc, AuthState>(
+      //   listener: (context, state) {
+      //     switch (state) {
+      //       case FailureState(message: final message):
+      //         ScaffoldMessenger.of(
+      //           context,
+      //         ).showSnackBar(SnackBar(content: Text(message)));
+      //         context.goNamed(RouteNames.login);
 
-            case UnAuthenticatedState():
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(const SnackBar(content: Text('Please login')));
-              context.goNamed(RouteNames.login);
-          }
-        },
-        child: SelectionArea(child: SafeArea(child: child)),
-      ),
+      //       case UnAuthenticatedState():
+      //         ScaffoldMessenger.of(
+      //           context,
+      //         ).showSnackBar(const SnackBar(content: Text('Please login')));
+      //         context.goNamed(RouteNames.login);
+      //     }
+      //   },
+      //   child: 
+        
+      //   SelectionArea(child: SafeArea(child: child)),
+      // ),
 
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex(context),
@@ -77,7 +80,7 @@ class AppShell extends StatelessWidget {
       case 1:
         GoRouter.of(context).goNamed('/');
       case 2:
-        GoRouter.of(context).go('/c');
+        GoRouter.of(context).goNamed(RouteNames.addAsset);
     }
   }
 }

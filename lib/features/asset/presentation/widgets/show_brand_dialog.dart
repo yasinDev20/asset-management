@@ -1,6 +1,7 @@
 import 'package:assetmanagement/core/common/widgets/text_form_field.dart';
 import 'package:assetmanagement/features/asset/domain/entities/brand_entity.dart';
 import 'package:assetmanagement/features/asset/presentation/bloc/asset_bloc.dart';
+import 'package:assetmanagement/features/asset/presentation/bloc/asset_support_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,15 +10,13 @@ import 'package:go_router/go_router.dart';
 Future showBrandDialog({
   required BuildContext context,
   required void Function(BrandEntity selectedBrand) onSelected,
-  required BrandEntity? initialValue,
-  required TextEditingController brandController,
+  TextEditingController? brandController,
 }) async {
   TextEditingController searchController = TextEditingController();
   TextEditingController newBrandController = TextEditingController();
 
-  context.read<AssetBloc>().add(GetRecentBrandSelectionsEvent());
+  context.read<AssetSupportBloc>().add(GetRecentBrandSelectionsEvent());
 
-  
   return await showDialog(
     context: context,
     barrierColor: Colors.transparent,
@@ -54,7 +53,7 @@ Future showBrandDialog({
                           icon: Icon(Icons.add_circle_outline),
                           onPressed: () {
                             if (newBrandController.text.isNotEmpty) {
-                              context.read<AssetBloc>().add(
+                              context.read<AssetSupportBloc>().add(
                                 AddBrandEvent(newBrandController.text),
                               );
                             }
@@ -76,7 +75,7 @@ Future showBrandDialog({
 
                         onFieldSubmitted: (newValue) {
                           if (newValue.isNotEmpty) {
-                            context.read<AssetBloc>().add(
+                            context.read<AssetSupportBloc>().add(
                               GetBrandsEvent(newValue),
                             );
                           }
@@ -101,11 +100,11 @@ Future showBrandDialog({
                                   ),
                                 );
 
-                                brandController.text = 'Tidak ada merk';
+                                brandController?.text = 'Tidak ada merk';
                                 context.pop();
                               },
                             ),
-                            BlocBuilder<AssetBloc, AssetState>(
+                            BlocBuilder<AssetSupportBloc, AssetState>(
                               builder: (context, state) {
                                 if (state is AssetLoadingState) {
                                   return CircularProgressIndicator();
@@ -124,13 +123,15 @@ Future showBrandDialog({
                                           ).colorScheme.surface,
                                           onTap: () {
                                             onSelected(brand);
-                                            brandController.text = brand.name;
+                                            brandController?.text = brand.name;
 
-                                            context.read<AssetBloc>().add(
-                                              AddRecentBrandSelectionEvent(
-                                                brandEntity: brand,
-                                              ),
-                                            );
+                                            context
+                                                .read<AssetSupportBloc>()
+                                                .add(
+                                                  AddRecentBrandSelectionEvent(
+                                                    brandEntity: brand,
+                                                  ),
+                                                );
                                             context.pop();
                                           },
                                         );

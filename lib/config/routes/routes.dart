@@ -16,42 +16,43 @@ import 'package:go_router/go_router.dart';
 
 class MyRouter {
   GoRouter get router => GoRouter(
-    initialLocation: '/${RouteNames.assetDetail}', //ubah ini untuk ke page sedang di develop
+    initialLocation:
+        '/${RouteNames.home}', //ubah ini untuk ke page sedang di develop
     errorPageBuilder: (context, state) {
       return const MaterialPage(child: NotFoundPage());
     },
 
-    redirect: (context, state) {
-      final authState = context.read<AuthBloc>().state;
-      final currentPath = state.uri.path;
-      final loginPath = '/${RouteNames.assetDetail}'; //ubah ini untuk ke page sedang di develop
-      final forgotPasswordPath =
-          '/${RouteNames.login}/${RouteNames.forgotPassword}';
-      final emailRegisterPath =
-          '/${RouteNames.login}/${RouteNames.emailRegister}';
-      final publicPath = [loginPath, emailRegisterPath, forgotPasswordPath];
+    // redirect: (context, state) {
+    //   final authState = context.read<AuthBloc>().state;
+    //   final currentPath = state.uri.path;
+    //   final loginPath =
+    //       '/${RouteNames.home}'; //ubah ini untuk ke page sedang di develop
+    //   final forgotPasswordPath =
+    //       '/${RouteNames.login}/${RouteNames.forgotPassword}';
+    //   final emailRegisterPath =
+    //       '/${RouteNames.login}/${RouteNames.emailRegister}';
+    //   final publicPath = [loginPath, emailRegisterPath, forgotPasswordPath];
 
-      // debugPrint(authState.toString());
+    //   // debugPrint(authState.toString());
 
-      // 1️⃣ Biarkan auth proses dulu (ex: auto login)
-      if (authState is AuthInitialState || authState is AuthLoadingState) {
-        return null;
-      }
+    //   // 1️⃣ Biarkan auth proses dulu (ex: auto login)
+    //   if (authState is AuthInitialState || authState is AuthLoadingState) {
+    //     return null;
+    //   }
 
-      // 2️⃣ Sudah login → jangan ke login page
-      if (authState is AuthenticatedState && currentPath == loginPath) {
-        return '/';
-      }
+    //   // 2️⃣ Sudah login → jangan ke login page
+    //   if (authState is AuthenticatedState && currentPath == loginPath) {
+    //     return '/';
+    //   }
 
-      // 3️⃣ Belum login → arahkan ke login
-      if (authState is! AuthenticatedState &&
-          !publicPath.contains(currentPath)) {
-        return loginPath;
-      }
+    //   // 3️⃣ Belum login → arahkan ke login
+    //   if (authState is! AuthenticatedState &&
+    //       !publicPath.contains(currentPath)) {
+    //     return loginPath;
+    //   }
 
-      return null;
-    },
-
+    //   return null;
+    // },
     routes: [
       //login
       GoRoute(
@@ -107,22 +108,29 @@ class MyRouter {
                   ),
                 ],
               ),
+
+              //Detail asset
+              GoRoute(
+                path: '/${RouteNames.assetDetail}/:id',
+                name: RouteNames.assetDetail,
+                pageBuilder: (context, state) => MaterialPage(
+                  child: AssetDetailPage(
+                    id: state.pathParameters['id'],
+                    mode: AssetFormMode.edit,
+                  ),
+                ),
+              ),
+
+              GoRoute(
+                path: RouteNames.addAsset,
+                name: RouteNames.addAsset,
+                pageBuilder: (context, state) => const MaterialPage(
+                  child: AssetDetailPage(id: null, mode: AssetFormMode.add),
+                ),
+              ),
             ],
           ),
         ],
-      ),
-
-      //Detail asset
-      GoRoute(
-        // path: '/${RouteNames.assetDetail}/:id',
-        path: '/${RouteNames.assetDetail}',
-        name: RouteNames.assetDetail,
-        pageBuilder: (context, state) => MaterialPage(
-          child: AssetDetailPage(
-            id: state.pathParameters['id'],
-            mode: AssetFormMode.edit,
-          ),
-        ),
       ),
     ],
   );

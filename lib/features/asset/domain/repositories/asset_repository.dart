@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:assetmanagement/core/error/failure.dart';
 import 'package:assetmanagement/features/asset/domain/entities/asset_detail_entity.dart';
+import 'package:assetmanagement/features/asset/domain/entities/asset_filter_entity.dart';
 import 'package:assetmanagement/features/asset/domain/entities/asset_lite_entity.dart';
 import 'package:assetmanagement/features/asset/domain/entities/asset_ref_entity.dart';
 import 'package:assetmanagement/features/asset/domain/entities/asset_template_entity.dart';
@@ -16,7 +17,10 @@ abstract class AssetRepository {
   Future<Either<Failure, String>> getUrl(String path);
   Future<Either<Failure, String>> uploadImage(File fileData, String assetId);
   Future<Either<Failure, List<AssetLiteEntity>>> getAssetsLite(
-    List<Map<String, String>> filter,
+    AssetFilterEntity? filter, {
+    required int page,
+    required int pageSize,
+  }
   );
 
   Future<Either<Failure, AssetDetailEntity>> getAssetDetail(String id);
@@ -50,7 +54,9 @@ abstract class AssetRepository {
     required EditAssetEntity originalAssetEntity,
     required EditAssetEntity editAssetEntity,
   });
-  Future<Either<Failure, Unit>> addToTemplate(AssetTemplateEntity assetTemplateEntity);
+  Future<Either<Failure, Unit>> addToTemplate(
+    AssetTemplateEntity assetTemplateEntity,
+  );
   Future<Either<Failure, Unit>> deleteTemplate(String id);
   Future<Either<Failure, List<AssetTemplateEntity>>> getTemplate(String search);
 

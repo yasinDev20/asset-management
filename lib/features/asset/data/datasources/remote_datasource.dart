@@ -1,7 +1,9 @@
 import 'dart:typed_data';
+import 'package:assetmanagement/core/common/extension/extension.dart';
 import 'package:assetmanagement/core/error/exception.dart';
 import 'package:assetmanagement/features/asset/data/models/add_asset_model.dart';
 import 'package:assetmanagement/features/asset/data/models/asset_detail_model.dart';
+import 'package:assetmanagement/features/asset/data/models/asset_filter_model.dart';
 import 'package:assetmanagement/features/asset/data/models/asset_ref_model.dart';
 import 'package:assetmanagement/features/asset/data/models/asset_summary_model.dart';
 import 'package:assetmanagement/features/asset/data/models/asset_template_model.dart';
@@ -18,7 +20,11 @@ abstract class AssetRemoteDataSource {
   Future<String> getUrlFile(String path);
   Future<Uint8List> donwloadByPath(String path);
   Future<String> uploadImage(Uint8List fileData, String fileName);
-  Future<List<AssetLiteModel>> getAssetsLite(List<Map<String, String>> filters);
+  Future<List<AssetLiteModel>> getAssetsLite(
+    AssetFilterModel? filters, {
+    required int page,
+    required int pageSize,
+  });
   Future<AssetDetailModel> getAssetDetail(String id);
 
   Future<List<AssetRefModel>> getAssetRefs({String? assetId, String? qrCodes});
@@ -60,24 +66,59 @@ class AssetRemoteDataSourceImpl implements AssetRemoteDataSource {
 
   @override
   Future<List<AssetLiteModel>> getAssetsLite(
-    List<Map<String, String>> filters,
-  ) async {
-    final query = _supabaseClient.from('assets').select(
+    AssetFilterModel? filters, {
+    required int page,
+    required int pageSize,
+  }) async {
+    dynamic query = _supabaseClient.from('assets').select(
       '''id, status, image_path, qr_code, name, service_schedules,
          brand_name:brands (name), category_name:categories (name),
          location:locations (name), owner:users(name)
       ''',
     );
 
-    for (final filter in filters) {
-      final column = filter['column'] as String;
-      final values = filter['values'] as List;
-
-      query.inFilter(column, values);
+    if (filters?.locations.isNotEmpty == true) {
+      query = query.inFilter(
+        'location_id',
+        filters!.locations.map((e) => e.id).toList(),
+      );
+    }
+    if (filters?.categories.isNotEmpty == true) {
+      query = query.inFilter(
+        'category_id',
+        filters!.categories.map((e) => e.id).toList(),
+      );
+    }
+    if (filters?.brands.isNotEmpty == true) {
+      query = query.inFilter(
+        'brand_id',
+        filters!.brands.map((e) => e.id).toList(),
+      );
     }
 
-    final response = await query;
+    if (filters?.vendor.isNotEmpty == true) {
+      query = query.ilikeAnyOf('vendor', filters!.vendor.toLikePatterns);
+    }
+    if (filters?.status.isNotEmpty == true) {
+      query = query.inFilter('status', filters!.status);
+    }
+    if (filters?.qrCode?.isNotEmpty == true) {
+      query = query.ilike('qr_code', filters!.qrCode!.toLikePatterns);
+    }
+    if (filters?.productionYear.isNotEmpty == true) {
+      query = query.inFilter('production_year', filters!.productionYear);
+    }
+    if (filters?.purchaseYear.isNotEmpty == true) {
+      query = query.inFilter('purchase_year', filters!.purchaseYear);
+    }
+    if (filters?.warrantyEndYear.isNotEmpty == true) {
+      query = query.inFilter('warranty_end_year', filters!.warrantyEndYear);
+    }
 
+    final from = page * pageSize;
+    final to = from + pageSize - 1;
+
+    final response = await query.range(from, to) as List<dynamic>;
     return response.map((e) => AssetLiteModel.fromMap(e)).toList();
   }
 

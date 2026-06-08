@@ -1,5 +1,6 @@
 import 'package:assetmanagement/features/asset/domain/entities/asset_ref_entity.dart';
 import 'package:assetmanagement/features/asset/presentation/bloc/asset_bloc.dart';
+import 'package:assetmanagement/features/asset/presentation/bloc/asset_support_bloc.dart';
 import 'package:assetmanagement/features/asset/presentation/widgets/attachment_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -73,13 +74,13 @@ class _ParentFieldState extends State<ParentField> {
                               border: OutlineInputBorder(),
                             ),
                             onSubmitted: (value) {
-                              context.read<AssetBloc>().add(
+                              context.read<AssetSupportBloc>().add(
                                 GetAssetRefEvent(qrCode: value),
                               );
                             },
                           ),
 
-                          BlocBuilder<AssetBloc, AssetState>(
+                          BlocBuilder<AssetSupportBloc, AssetState>(
                             builder: (context, state) {
                               if (state is GetAssetRefSuccsessState &&
                                   state.assetRefEntity.isEmpty) {

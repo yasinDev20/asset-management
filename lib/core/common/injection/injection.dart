@@ -10,6 +10,8 @@ import 'package:assetmanagement/features/asset/domain/usecases/get_asset_detail.
 import 'package:assetmanagement/features/asset/domain/usecases/get_assets_lite.dart';
 import 'package:assetmanagement/features/asset/domain/usecases/get_template.dart';
 import 'package:assetmanagement/features/asset/presentation/bloc/asset_bloc.dart';
+import 'package:assetmanagement/features/asset/presentation/bloc/asset_list_bloc.dart';
+import 'package:assetmanagement/features/asset/presentation/bloc/asset_support_bloc.dart';
 import 'package:assetmanagement/features/authentication/domain/usecases/email_register.dart';
 import 'package:assetmanagement/features/authentication/domain/usecases/forgot_password.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -91,14 +93,21 @@ Future<void> injectionInit() async {
   myInjection.registerFactory(
     () => AssetBloc(
       assetRepository: myInjection(),
-      getAssetsUsecase: myInjection(),
+
       getAssetDetailUsecase: myInjection(),
       addAssetUsecase: myInjection(),
       editAssetUsecase: myInjection(),
       addToTemplateUsecase: myInjection(),
       getTemplateUsecase: myInjection(),
-      deleteTemplateUsecase: myInjection()
+      deleteTemplateUsecase: myInjection(),
     ),
+  );
+
+  myInjection.registerFactory(
+    () => AssetSupportBloc(assetRepository: myInjection()),
+  );
+  myInjection.registerFactory(
+    () => AssetListBloc(getAssetsUsecase: myInjection()),
   );
 
   //Usecase

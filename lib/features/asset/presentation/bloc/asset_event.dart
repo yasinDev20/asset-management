@@ -8,8 +8,13 @@ abstract class AssetEvent extends Equatable {
 }
 
 class GetAssetsLiteEvent extends AssetEvent {
-  final List<Map<String, String>> filter;
-  const GetAssetsLiteEvent(this.filter);
+  final AssetFilterEntity? filter;
+  const GetAssetsLiteEvent({this.filter});
+}
+
+class LoadMoreAssetsEvent extends AssetEvent {
+  final AssetFilterEntity? filter;
+  const LoadMoreAssetsEvent({this.filter});
 }
 
 class GetAssetDetailEvent extends AssetEvent {
@@ -107,11 +112,13 @@ class AddToTemplateEvent extends AssetEvent {
 
   const AddToTemplateEvent({required this.assetTemplateEntity});
 }
+
 class GetTemplatesEvent extends AssetEvent {
   final String value;
 
   const GetTemplatesEvent({required this.value});
 }
+
 class DeleteTemplateEvent extends AssetEvent {
   final String id;
 

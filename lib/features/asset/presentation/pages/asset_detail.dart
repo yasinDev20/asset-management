@@ -10,7 +10,7 @@ import 'package:assetmanagement/features/asset/domain/entities/edit_asset_entity
 import 'package:assetmanagement/features/asset/domain/entities/file_entity.dart';
 import 'package:assetmanagement/features/asset/domain/entities/location_entity.dart';
 import 'package:assetmanagement/features/asset/domain/entities/service_schedule_entity.dart';
-import 'package:assetmanagement/features/asset/domain/models/asset_detail_model.dart';
+import 'package:assetmanagement/features/asset/domain/entities/asset_detail_result_entity.dart';
 import 'package:assetmanagement/features/asset/presentation/bloc/asset_bloc.dart';
 import 'package:assetmanagement/features/asset/presentation/widgets/attachment_field.dart';
 import 'package:assetmanagement/features/asset/presentation/widgets/parent_field.dart';
@@ -19,7 +19,7 @@ import 'package:assetmanagement/features/asset/presentation/widgets/invoice_fiel
 import 'package:assetmanagement/features/asset/presentation/widgets/service_schedule_attachment_field.dart';
 import 'package:assetmanagement/features/asset/presentation/widgets/show_brand_dialog.dart';
 import 'package:assetmanagement/features/asset/presentation/widgets/show_category_dialog.dart';
-import 'package:assetmanagement/features/asset/presentation/widgets/show_location_dialog.dart';
+import 'package:assetmanagement/core/common/widgets/show_location_dialog.dart';
 import 'package:assetmanagement/features/asset/presentation/widgets/show_status_dialog.dart';
 import 'package:assetmanagement/features/asset/presentation/widgets/show_template_dialog.dart';
 import 'package:assetmanagement/features/authentication/presentation/bloc/auth_bloc.dart';
@@ -80,10 +80,9 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
 
   @override
   void initState() {
-    if (widget.id?.isNotEmpty == true) {}
-    context.read<AssetBloc>().add(
-      GetAssetDetailEvent('42ac0ebc-f908-44bf-89f1-34e8f3e4d011'),
-    );
+    if (widget.id?.isNotEmpty == true) {
+      context.read<AssetBloc>().add(GetAssetDetailEvent(widget.id!));
+    }
 
     super.initState();
   }
@@ -122,7 +121,7 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
               ),
               child: BlocConsumer<AssetBloc, AssetState>(
                 listener: (context, state) {
-                  final AssetDetail assetDetailViewModel;
+                  final AssetDetailResult assetDetailViewModel;
                   final AssetDetailEntity assetDetailEntity;
 
                   if (state is GetAssetDetailSuccsessState) {
@@ -330,7 +329,6 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
                                 showBrandDialog(
                                   context: context,
                                   brandController: brandController,
-                                  initialValue: brand,
                                   onSelected: (selectedBrand) {
                                     setState(() {
                                       brand = selectedBrand;
@@ -350,7 +348,7 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
                                 showCategoryDialog(
                                   context: context,
                                   categoryController: categoryController,
-                                  initialValue: category,
+
                                   onSelected: (selectedCategory) =>
                                       setState(() {
                                         category = selectedCategory;
@@ -411,7 +409,7 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
 
                               onTap: () => showLocationDialog(
                                 context: context,
-                                initialValue: location,
+
                                 locationController: locationController,
                                 onSelected: (selectedLocation) {
                                   location = selectedLocation;

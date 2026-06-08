@@ -32,6 +32,7 @@ class AssetLiteCard extends StatelessWidget {
     return ClipRRect(
       borderRadius: BorderRadiusGeometry.circular(6),
       child: GestureDetector(
+        behavior: HitTestBehavior.opaque, 
         onTap: () {
           context.goNamed(RouteNames.assetDetail, pathParameters: {'id' : id});
         },
@@ -46,6 +47,7 @@ class AssetLiteCard extends StatelessWidget {
                   //Image
                   SizedBox(
                     width: double.infinity,
+                    height: 124,
                     child: Image.network(image, fit: BoxFit.cover),
                   ),
         
@@ -58,104 +60,101 @@ class AssetLiteCard extends StatelessWidget {
             //Detail
             Flexible(
               flex: 6,
-              child: Padding(
-                padding: EdgeInsetsGeometry.symmetric(horizontal: 4),
-                child: Column(
-                  spacing: 6,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    //Category + Brand + Name
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          category,
-                          style: Theme.of(context).textTheme.bodySmall,
-                          maxLines: 2,
+              child: Column(
+                spacing: 6,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  //Category + Brand + Name
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        category,
+                        style: Theme.of(context).textTheme.bodySmall,
+                        maxLines: 2,
+                      ),
+                      Text(
+                        brand == 'noBrand' ? name : '$brand $name',
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 3,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Theme.of(context).colorScheme.onSurfaceVariant,
                         ),
-                        Text(
-                          brand == 'noBrand' ? name : '$brand $name',
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 3,
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                      ],
-                    ),
-        
-                    //Qr + Location + Time
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-        
-                      spacing: 4,
-                      children: [
-                        //Qr
-                        Row(
-                          spacing: 4,
-                          children: [
-                            Icon(Icons.qr_code, size: 16),
-                            Flexible(
-                              child: Text(
-                                qrCode,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: Theme.of(context).textTheme.bodySmall
-                                    ?.copyWith(
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.onSurfaceVariant,
-                                    ),
-                              ),
-                            ),
-                          ],
-                        ),
-        
-                        //Location
-                        Row(
-                          spacing: 4,
-                          children: [
-                            Icon(Icons.location_on_outlined, size: 16),
-                            Flexible(
-                              child: Text(
-                                location,
-                                maxLines: 3,
-                                overflow: TextOverflow.ellipsis,
-                                style: Theme.of(context).textTheme.bodySmall
-                                    ?.copyWith(
-                                      color: Theme.of(
-                                        context,
-                                      ).colorScheme.onSurfaceVariant,
-                                    ),
-                              ),
-                            ),
-                          ],
-                        ),
-        
-                        //Time
-                        Row(
-                          spacing: 4,
-                          children: [
-                            Icon(Icons.build_outlined, size: 16),
-                            Text(
+                      ),
+                    ],
+                  ),
+                        
+                  //Qr + Location + Time
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                        
+                    spacing: 4,
+                    children: [
+                      //Qr
+                      Row(
+                        spacing: 4,
+                        children: [
+                          Icon(Icons.qr_code, size: 16),
+                          Flexible(
+                            child: Text(
+                              qrCode,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                               style: Theme.of(context).textTheme.bodySmall
                                   ?.copyWith(
                                     color: Theme.of(
                                       context,
                                     ).colorScheme.onSurfaceVariant,
                                   ),
-                              nextSchedule == null
-                                  ? ''
-                                  : DateFormat(
-                                      'dd/MM/yyyy',
-                                    ).format(nextSchedule!),
                             ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                          ),
+                        ],
+                      ),
+                        
+                      //Location
+                      Row(
+                        spacing: 4,
+                        children: [
+                          Icon(Icons.location_on_outlined, size: 16),
+                          Flexible(
+                            child: Text(
+                              location,
+                              maxLines: 3,
+                              overflow: TextOverflow.ellipsis,
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(
+                                    color: Theme.of(
+                                      context,
+                                    ).colorScheme.onSurfaceVariant,
+                                  ),
+                            ),
+                          ),
+                        ],
+                      ),
+                        
+                      //Time
+                      Row(
+                        spacing: 4,
+                        children: [
+                          Icon(Icons.build_outlined, size: 16),
+                          Text(
+                            style: Theme.of(context).textTheme.bodySmall
+                                ?.copyWith(
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurfaceVariant,
+                                ),
+                            nextSchedule == null
+                                ? ''
+                                : DateFormat(
+                                    'dd/MM/yyyy',
+                                  ).format(nextSchedule!),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
           ],

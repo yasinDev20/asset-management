@@ -36,14 +36,31 @@ class GetAssetRefSuccsessState extends AssetState {
   const GetAssetRefSuccsessState({required this.assetRefEntity});
 }
 
-class GetAssetsLiteSuccsessState extends AssetState {
-  final List<AssetLiteEntity> allAsset;
+class GetAssetsLiteSuccessState extends AssetState {
+  final List<AssetLiteEntity> assets;
+  final bool hasReachedMax;
 
-  const GetAssetsLiteSuccsessState({required this.allAsset});
+  const GetAssetsLiteSuccessState({
+    required this.assets,
+    required this.hasReachedMax,
+  });
+
+  GetAssetsLiteSuccessState copyWith({
+    List<AssetLiteEntity>? assets,
+    bool? hasReachedMax,
+  }) => GetAssetsLiteSuccessState(
+    assets: assets ?? this.assets,
+    hasReachedMax: hasReachedMax ?? this.hasReachedMax,
+  );
+}
+
+class AssetLoadingMoreState extends AssetState {
+  final List<AssetLiteEntity> currentAssets;
+  const AssetLoadingMoreState({required this.currentAssets});
 }
 
 class GetAssetDetailSuccsessState extends AssetState {
-  final AssetDetail assetDetail;
+  final AssetDetailResult assetDetail;
 
   const GetAssetDetailSuccsessState({required this.assetDetail});
 }
@@ -128,6 +145,7 @@ class AddToTemplateSuccessState extends AssetState {
   final String message;
   const AddToTemplateSuccessState({required this.message});
 }
+
 class DeleteTemplatesSuccsessState extends AssetState {
   final String message = 'Berhasil menghapus template';
   const DeleteTemplatesSuccsessState();

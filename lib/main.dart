@@ -2,6 +2,8 @@ import 'package:assetmanagement/config/routes/routes.dart';
 import 'package:assetmanagement/core/common/bloc/app_bloc_observer.dart';
 import 'package:assetmanagement/core/theme/theme.dart';
 import 'package:assetmanagement/core/common/injection/injection.dart';
+import 'package:assetmanagement/features/asset/presentation/bloc/asset_list_bloc.dart';
+import 'package:assetmanagement/features/asset/presentation/bloc/asset_support_bloc.dart';
 import 'package:assetmanagement/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:assetmanagement/features/user/presentation/bloc/user_bloc.dart';
 import 'package:assetmanagement/firebase_options.dart';
@@ -57,6 +59,8 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context) => myInjection<AuthBloc>()),
         BlocProvider(create: (context) => myInjection<UserBloc>()),
         BlocProvider(create: (context) => myInjection<AssetBloc>()),
+        BlocProvider(create: (context) => myInjection<AssetSupportBloc>()),
+        BlocProvider(create: (context) => myInjection<AssetListBloc>()),
       ],
 
       child: MaterialApp.router(

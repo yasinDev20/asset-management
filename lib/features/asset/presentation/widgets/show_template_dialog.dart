@@ -11,7 +11,7 @@ Future showTemplateDialog({
 }) async {
   TextEditingController searchController = TextEditingController();
 
-  context.read<AssetBloc>().add(GetRecentBrandSelectionsEvent());
+  context.read<AssetBloc>().add(GetTemplatesEvent(value: ''));
 
   return await showDialog(
     context: context,

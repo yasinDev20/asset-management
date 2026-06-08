@@ -5,12 +5,14 @@ import 'package:assetmanagement/core/utils/run_catching.dart';
 import 'package:assetmanagement/features/asset/data/datasources/local_datasource.dart';
 import 'package:assetmanagement/features/asset/data/datasources/remote_datasource.dart';
 import 'package:assetmanagement/features/asset/data/models/add_asset_model.dart';
+import 'package:assetmanagement/features/asset/data/models/asset_filter_model.dart';
 import 'package:assetmanagement/features/asset/data/models/asset_template_model.dart';
 import 'package:assetmanagement/features/asset/data/models/brand_model.dart';
 import 'package:assetmanagement/features/asset/data/models/category_model.dart';
 import 'package:assetmanagement/features/asset/data/models/edit_asset_model.dart';
 import 'package:assetmanagement/features/asset/data/models/location_model.dart';
 import 'package:assetmanagement/features/asset/domain/entities/asset_detail_entity.dart';
+import 'package:assetmanagement/features/asset/domain/entities/asset_filter_entity.dart';
 import 'package:assetmanagement/features/asset/domain/entities/asset_lite_entity.dart';
 import 'package:assetmanagement/features/asset/domain/entities/asset_ref_entity.dart';
 import 'package:assetmanagement/features/asset/domain/entities/asset_template_entity.dart';
@@ -36,10 +38,19 @@ class AssetRepositoryImpl extends AssetRepository {
 
   @override
   Future<Either<Failure, List<AssetLiteEntity>>> getAssetsLite(
-    List<Map<String, String>> filter,
-  ) async {
+    AssetFilterEntity? filter, {
+    required int page,
+    required int pageSize,
+  }) async {
     return await runCatching(() async {
-      final result = await _assetRemoteDataSource.getAssetsLite(filter);
+      final filterModel = filter != null
+          ? AssetFilterModel.fromEntity(filter)
+          : null;
+      final result = await _assetRemoteDataSource.getAssetsLite(
+        filterModel,
+        page: page,
+        pageSize: pageSize,
+      );
       //convert image path to image url
       final assets = await Future.wait(
         result.map((assetModel) async {
@@ -62,7 +73,7 @@ class AssetRepositoryImpl extends AssetRepository {
       final assetChildData = await _assetRemoteDataSource.getAssetRefs(
         assetId: result.id,
       );
-      
+
       return result.toEntity(
         assetChildData: assetChildData.map((e) => e.toEntity()).toList(),
       );

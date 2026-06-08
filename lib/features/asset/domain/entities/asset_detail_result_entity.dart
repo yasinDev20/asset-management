@@ -4,12 +4,12 @@ import 'package:equatable/equatable.dart';
 
 import 'package:assetmanagement/features/asset/domain/entities/asset_detail_entity.dart';
 
-class AssetDetail extends Equatable {
+class AssetDetailResult extends Equatable {
   final AssetDetailEntity assetDetailEntity;
   final String imageUrl;
   final String? invoiceUrl;
 
-  const AssetDetail({
+  const AssetDetailResult({
     required this.assetDetailEntity,
     required this.imageUrl,
     required this.invoiceUrl,

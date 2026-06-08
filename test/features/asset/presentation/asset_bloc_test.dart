@@ -5,7 +5,7 @@ import 'package:assetmanagement/features/asset/domain/entities/asset_ref_entity.
 import 'package:assetmanagement/features/asset/domain/entities/brand_entity.dart';
 import 'package:assetmanagement/features/asset/domain/entities/category_entity.dart';
 import 'package:assetmanagement/features/asset/domain/entities/location_entity.dart';
-import 'package:assetmanagement/features/asset/domain/models/asset_detail_model.dart';
+import 'package:assetmanagement/features/asset/domain/entities/asset_detail_result_entity.dart';
 import 'package:assetmanagement/features/asset/domain/repositories/asset_repository.dart';
 import 'package:assetmanagement/features/asset/domain/usecases/get_asset_detail.dart';
 import 'package:assetmanagement/features/asset/domain/usecases/get_assets_lite.dart';
@@ -35,7 +35,7 @@ void main() {
   late CategoryEntity categoryEntity;
   late LocationEntity locationEntity;
   late AssetDetailEntity assetDetailEntity;
-  late AssetDetail assetDetail;
+  late AssetDetailResult assetDetail;
   late AssetRefEntity assetRefEntity;
   setUp(() {
     mockAssetRepository = MockAssetRepository();
@@ -120,7 +120,7 @@ void main() {
       location: locationEntity,
     );
 
-    assetDetail =AssetDetail(assetDetailEntity: assetDetailEntity, imageUrl: 'imageUrl', invoiceUrl: 'invoiceUrl');
+    assetDetail =AssetDetailResult(assetDetailEntity: assetDetailEntity, imageUrl: 'imageUrl', invoiceUrl: 'invoiceUrl');
 
     assetRefEntity = AssetRefEntity(
       id: 'id',
@@ -145,7 +145,7 @@ void main() {
       },
       expect: () => [
         AssetLoadingState(),
-        GetAssetsLiteSuccsessState(allAsset: allAssetSummaryEntity),
+        GetAssetsLiteSuccessState(assets: allAssetSummaryEntity),
       ],
       verify: (_) {
         verify(() => mockGetAssetsUsecase(filter)).called(1);

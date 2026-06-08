@@ -1,5 +1,5 @@
 import 'package:assetmanagement/core/error/failure.dart';
-import 'package:assetmanagement/features/asset/domain/models/asset_detail_model.dart';
+import 'package:assetmanagement/features/asset/domain/entities/asset_detail_result_entity.dart';
 import 'package:assetmanagement/features/asset/domain/repositories/asset_repository.dart';
 import 'package:dartz/dartz.dart';
 
@@ -8,7 +8,7 @@ class GetAssetDetailUsecase {
 
   GetAssetDetailUsecase(this._assetRepository);
 
-  Future<Either<Failure, AssetDetail>> call(String id) async {
+  Future<Either<Failure, AssetDetailResult>> call(String id) async {
     final assetResult = await _assetRepository.getAssetDetail(id);
 
     if (assetResult.isLeft()) {
@@ -40,7 +40,7 @@ class GetAssetDetailUsecase {
     }
 
     return Right(
-      AssetDetail(
+      AssetDetailResult(
         assetDetailEntity: assetDetailEntity,
         imageUrl: imageUrl,
         invoiceUrl: invoiceUrl,

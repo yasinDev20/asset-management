@@ -1,6 +1,7 @@
 import 'package:assetmanagement/core/common/widgets/text_form_field.dart';
 import 'package:assetmanagement/features/asset/domain/entities/location_entity.dart';
 import 'package:assetmanagement/features/asset/presentation/bloc/asset_bloc.dart';
+import 'package:assetmanagement/features/asset/presentation/bloc/asset_support_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,15 +10,12 @@ import 'package:go_router/go_router.dart';
 Future showLocationDialog({
   required BuildContext context,
   required void Function(LocationEntity selectedLocation) onSelected,
-  required LocationEntity? initialValue,
-  required TextEditingController locationController,
+  TextEditingController? locationController,
 }) async {
   TextEditingController searchController = TextEditingController();
   TextEditingController newLocationController = TextEditingController();
 
-  context.read<AssetBloc>().add(GetRecentLocationSelectionsEvent());
-
-  
+  context.read<AssetSupportBloc>().add(GetRecentLocationSelectionsEvent());
 
   return await showDialog(
     context: context,
@@ -36,7 +34,7 @@ Future showLocationDialog({
                   child: Column(
                     spacing: 16,
                     children: [
-                      //add new locatiom
+                      //add new location
                       CommonTextFormField(
                         labelText: 'Tambahkan lokasi baru',
                         controller: newLocationController,
@@ -55,7 +53,7 @@ Future showLocationDialog({
                           icon: Icon(Icons.add_circle_outline),
                           onPressed: () {
                             if (newLocationController.text.isNotEmpty) {
-                              context.read<AssetBloc>().add(
+                              context.read<AssetSupportBloc>().add(
                                 AddLocationEvent(
                                   name: newLocationController.text,
                                 ),
@@ -79,7 +77,7 @@ Future showLocationDialog({
 
                         onFieldSubmitted: (newValue) {
                           if (newValue.isNotEmpty) {
-                            context.read<AssetBloc>().add(
+                            context.read<AssetSupportBloc>().add(
                               GetLocationsEvent(newValue),
                             );
                           }
@@ -90,7 +88,7 @@ Future showLocationDialog({
                       Expanded(
                         child: Column(
                           children: [
-                            BlocBuilder<AssetBloc, AssetState>(
+                            BlocBuilder<AssetSupportBloc, AssetState>(
                               builder: (context, state) {
                                 if (state is AssetLoadingState) {
                                   return CircularProgressIndicator();
@@ -109,10 +107,10 @@ Future showLocationDialog({
                                           ).colorScheme.surface,
                                           onTap: () {
                                             onSelected(location);
-                                            locationController.text =
+                                            locationController?.text =
                                                 location.name;
 
-                                            context.read<AssetBloc>().add(
+                                            context.read<AssetSupportBloc>().add(
                                               AddRecentLocationSelectionEvent(
                                                 locationEntity: location,
                                               ),

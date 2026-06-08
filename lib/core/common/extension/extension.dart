@@ -43,3 +43,11 @@ extension BrandLanguageX on String {
     }
   }
 }
+
+extension ToLikePatternList on List<String> {
+  List<String> get toLikePatterns => map((v) => '%$v%').toList();
+}
+
+extension ToLikePatternString on String {
+  String get toLikePatterns => '%$this%';
+}
