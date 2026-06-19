@@ -3,12 +3,12 @@ import 'package:assetmanagement/core/common/widgets/text_form_field.dart';
 import 'package:assetmanagement/features/asset/domain/entities/asset_detail_entity.dart';
 import 'package:assetmanagement/features/asset/domain/entities/asset_ref_entity.dart';
 import 'package:assetmanagement/features/asset/domain/entities/asset_template_entity.dart';
-import 'package:assetmanagement/features/asset/domain/entities/brand_entity.dart';
-import 'package:assetmanagement/features/asset/domain/entities/category_entity.dart';
+import 'package:assetmanagement/features/asset_brand/domain/entities/brand_detail_entity.dart';
+import 'package:assetmanagement/features/asset_category/domain/entities/category_detail_entity.dart';
 import 'package:assetmanagement/features/asset/domain/entities/add_asset_entity.dart';
 import 'package:assetmanagement/features/asset/domain/entities/edit_asset_entity.dart';
 import 'package:assetmanagement/features/asset/domain/entities/file_entity.dart';
-import 'package:assetmanagement/features/asset/domain/entities/location_entity.dart';
+import 'package:assetmanagement/features/asset_location/domain/entities/location_detail_entity.dart';
 import 'package:assetmanagement/features/asset/domain/entities/service_schedule_entity.dart';
 import 'package:assetmanagement/features/asset/domain/entities/asset_detail_result_entity.dart';
 import 'package:assetmanagement/features/asset/presentation/bloc/asset_bloc.dart';
@@ -73,9 +73,9 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
   String? imagePath;
   String? invoicePath;
   FileEntity? imageFile;
-  BrandEntity? brand;
-  CategoryEntity? category;
-  LocationEntity? location;
+  BrandDetailEntity? brand;
+  CategoryDetailEntity? category;
+  LocationDetailEntity? location;
   EditAssetEntity? oldData;
 
   @override

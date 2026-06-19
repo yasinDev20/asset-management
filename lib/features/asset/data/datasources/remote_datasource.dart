@@ -7,10 +7,7 @@ import 'package:assetmanagement/features/asset/data/models/asset_filter_model.da
 import 'package:assetmanagement/features/asset/data/models/asset_ref_model.dart';
 import 'package:assetmanagement/features/asset/data/models/asset_summary_model.dart';
 import 'package:assetmanagement/features/asset/data/models/asset_template_model.dart';
-import 'package:assetmanagement/features/asset/data/models/brand_model.dart';
-import 'package:assetmanagement/features/asset/data/models/category_model.dart';
 import 'package:assetmanagement/features/asset/data/models/edit_asset_model.dart';
-import 'package:assetmanagement/features/asset/data/models/location_model.dart';
 import 'package:dio/dio.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -25,20 +22,11 @@ abstract class AssetRemoteDataSource {
     required int page,
     required int pageSize,
   });
+
   Future<AssetDetailModel> getAssetDetail(String id);
 
   Future<List<AssetRefModel>> getAssetRefs({String? assetId, String? qrCodes});
 
-  Future<List<BrandModel>> getBrands(String value);
-  Future<void> addBrand({required String name, required String ownerId});
-  Future<List<CategoryModel>> getCategories(String value);
-  Future<void> addCategory({
-    required String name,
-    required String code,
-    required String ownerId,
-  });
-  Future<List<LocationModel>> getLocations(String value);
-  Future<void> addLocation({required String name, required String ownerId});
   Future<void> addAsset(AddAssetModel addAssetModel);
   Future<void> editAsset({
     required EditAssetModel originalAssetModel,
@@ -144,6 +132,7 @@ class AssetRemoteDataSourceImpl implements AssetRemoteDataSource {
     return AssetDetailModel.fromMap(response.first);
   }
 
+  //TODO: need owner id agar tidak menagmbil aset owner lain
   @override
   Future<List<AssetRefModel>> getAssetRefs({
     String? assetId,
@@ -182,72 +171,6 @@ class AssetRemoteDataSourceImpl implements AssetRemoteDataSource {
   @override
   Future<Uint8List> donwloadByPath(String path) async {
     return await _supabaseClient.storage.from("assets").download(path);
-  }
-
-  @override
-  Future<List<BrandModel>> getBrands(String value) async {
-    final response = await _supabaseClient
-        .from('brands')
-        .select('*')
-        .ilike('name', '$value%');
-    final brandsModel = response.map((e) => BrandModel.fromMap(e)).toList();
-    return brandsModel;
-  }
-
-  @override
-  Future<void> addBrand({required String name, required String ownerId}) async {
-    await _supabaseClient.from('brands').insert({
-      'name': name,
-      'owner_id': ownerId,
-    });
-  }
-
-  @override
-  Future<void> addCategory({
-    required String name,
-    required String code,
-    required String ownerId,
-  }) async {
-    await _supabaseClient.from('categories').insert({
-      'name': name,
-      'code': code,
-      'owner_id': ownerId,
-    });
-  }
-
-  @override
-  Future<List<CategoryModel>> getCategories(String value) async {
-    final response = await _supabaseClient
-        .from('categories')
-        .select('*')
-        .ilike('name', '$value%');
-    final categoriesModel = response
-        .map((e) => CategoryModel.fromMap(e))
-        .toList();
-    return categoriesModel;
-  }
-
-  @override
-  Future<void> addLocation({
-    required String name,
-    required String ownerId,
-  }) async {
-    await _supabaseClient.from('locations').insert({
-      'name': name,
-      'owner_id': ownerId,
-    });
-  }
-
-  @override
-  Future<List<LocationModel>> getLocations(String value) async {
-    final response = await _supabaseClient
-        .from('locations')
-        .select('*')
-        .ilike('name', '$value%');
-    final locationsModel = response
-        .map((e) => LocationModel.fromMap(e))
-        .toList();
-    return locationsModel;
   }
 
   @override

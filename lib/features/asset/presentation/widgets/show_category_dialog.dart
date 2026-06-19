@@ -1,7 +1,7 @@
 import 'package:assetmanagement/core/common/widgets/text_form_field.dart';
-import 'package:assetmanagement/features/asset/domain/entities/category_entity.dart';
-import 'package:assetmanagement/features/asset/presentation/bloc/asset_bloc.dart';
-import 'package:assetmanagement/features/asset/presentation/bloc/asset_support_bloc.dart';
+import 'package:assetmanagement/features/asset_category/domain/entities/add_category_entity.dart';
+import 'package:assetmanagement/features/asset_category/domain/entities/category_detail_entity.dart';
+import 'package:assetmanagement/features/asset_category/presentation/bloc/asset_category_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,14 +9,14 @@ import 'package:go_router/go_router.dart';
 
 Future showCategoryDialog({
   required BuildContext context,
-  required void Function(CategoryEntity selectedCategory) onSelected,
+  required void Function(CategoryDetailEntity selectedCategory) onSelected,
   TextEditingController? categoryController,
 }) async {
   TextEditingController searchController = TextEditingController();
   TextEditingController newCategoryController = TextEditingController();
   TextEditingController newCodeController = TextEditingController();
 
-  context.read<AssetSupportBloc>().add(GetRecentCategorySelectionsEvent());
+  context.read<AssetCategoryBloc>().add(GetRecentCategorySelectionsEvent());
 
   bool isAddnewClicked = false;
 
@@ -85,10 +85,12 @@ Future showCategoryDialog({
                               onPressed: () {
                                 if (newCategoryController.text.isNotEmpty &&
                                     newCodeController.text.isNotEmpty) {
-                                  context.read<AssetSupportBloc>().add(
+                                  context.read<AssetCategoryBloc>().add(
                                     AddCategoryEvent(
-                                      name: newCategoryController.text,
-                                      code: newCodeController.text,
+                                      categoryEntity: AddCategoryEntity(
+                                        name: newCategoryController.text,
+                                        code: newCodeController.text,
+                                      ),
                                     ),
                                   );
                                 }
@@ -112,7 +114,7 @@ Future showCategoryDialog({
 
                         onFieldSubmitted: (newValue) {
                           if (newValue.isNotEmpty) {
-                            context.read<AssetSupportBloc>().add(
+                            context.read<AssetCategoryBloc>().add(
                               GetCategoriesEvent(newValue),
                             );
                           }
@@ -120,12 +122,12 @@ Future showCategoryDialog({
                       ),
 
                       //search result
-                      BlocBuilder<AssetSupportBloc, AssetState>(
+                      BlocBuilder<AssetCategoryBloc, AssetCategoryState>(
                         builder: (context, state) {
-                          if (state is AssetLoadingState) {
+                          if (state.status == CategoryStatus.loading) {
                             return CircularProgressIndicator();
                           }
-                          if (state is GetCategoriesSuccsessState) {
+                          if (state.status == CategoryStatus.getRecentSuccess) {
                             final allCategory = state.categoriesEntity;
                             return Expanded(
                               child: ListView.builder(
@@ -144,7 +146,7 @@ Future showCategoryDialog({
                                       categoryController?.text =
                                           '${category.name} (${category.code})';
 
-                                      context.read<AssetSupportBloc>().add(
+                                      context.read<AssetCategoryBloc>().add(
                                         AddRecentCategorySelectionEvent(
                                           categoryEntity: category,
                                         ),

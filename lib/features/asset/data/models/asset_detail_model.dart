@@ -1,12 +1,12 @@
 import 'dart:convert';
 
 import 'package:assetmanagement/features/asset/data/models/asset_ref_model.dart';
-import 'package:assetmanagement/features/asset/data/models/brand_model.dart';
-import 'package:assetmanagement/features/asset/data/models/category_model.dart';
-import 'package:assetmanagement/features/asset/data/models/location_model.dart';
+import 'package:assetmanagement/features/asset_brand/data/models/brand_detail_model.dart';
+import 'package:assetmanagement/features/asset_category/data/models/category_detail_model.dart';
 import 'package:assetmanagement/features/asset/data/models/service_schedule_model.dart';
 import 'package:assetmanagement/features/asset/domain/entities/asset_detail_entity.dart';
 import 'package:assetmanagement/features/asset/domain/entities/asset_ref_entity.dart';
+import 'package:assetmanagement/features/asset_location/data/models/location_detail_model.dart';
 import 'package:assetmanagement/features/authentication/data/models/user_model.dart';
 import 'package:equatable/equatable.dart';
 
@@ -19,13 +19,13 @@ class AssetDetailModel extends Equatable {
   final String? serialNumber;
   final String name;
   final String brandId;
-  final BrandModel brand;
+  final BrandDetailModel brand;
   final String categoryId;
-  final CategoryModel category;
+  final CategoryDetailModel category;
   final int price;
   final int productionYear;
   final String locationId;
-  final LocationModel location;
+  final LocationDetailModel location;
   final String status;
   final String vendor;
   final int purchaseYear;
@@ -136,13 +136,13 @@ class AssetDetailModel extends Equatable {
       serialNumber: entity.serialNumber,
       name: entity.name,
       brandId: entity.brandId,
-      brand: BrandModel.fromEntity(entity.brand),
+      brand: BrandDetailModel.fromEntity(entity.brand),
       categoryId: entity.categoryId,
-      category: CategoryModel.fromEntity(entity.category),
+      category: CategoryDetailModel.fromEntity(entity.category),
       price: entity.price,
       productionYear: entity.productionYear,
       locationId: entity.locationId,
-      location: LocationModel.fromEntity(entity.location),
+      location: LocationDetailModel.fromEntity(entity.location),
       status: entity.status,
       vendor: entity.vendor,
       purchaseYear: entity.purchaseYear,
@@ -200,13 +200,13 @@ class AssetDetailModel extends Equatable {
           : null,
       name: map['name'] as String,
       brandId: map['brand_id'] as String,
-      brand: BrandModel.fromMap(map['brand']),
+      brand: BrandDetailModel.fromMap(map['brand']),
       categoryId: map['category_id'] as String,
-      category: CategoryModel.fromMap(map['category']),
+      category: CategoryDetailModel.fromMap(map['category']),
       price: map['price'] as int,
       productionYear: map['production_year'] as int,
       locationId: map['location_id'] as String,
-      location: LocationModel.fromMap(map['location']),
+      location: LocationDetailModel.fromMap(map['location']),
       status: map['status'] as String,
       vendor: map['vendor'] as String,
       purchaseYear: map['purchase_year'] as int,

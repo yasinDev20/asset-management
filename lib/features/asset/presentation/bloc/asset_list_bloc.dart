@@ -1,13 +1,18 @@
+import 'package:assetmanagement/features/asset/domain/repositories/asset_repository.dart';
 import 'package:assetmanagement/features/asset/domain/usecases/get_assets_lite.dart';
 import 'package:assetmanagement/features/asset/presentation/bloc/asset_bloc.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
 
 class AssetListBloc extends Bloc<AssetEvent, AssetState> {
   late final GetAssetsLiteUsecase _getAssetLitesUsecase;
+  late final AssetRepository _assetRepository;
   static const _pageSize = 20;
-  AssetListBloc({required GetAssetsLiteUsecase getAssetsUsecase})
-    : super(AssetInitial()) {
+  AssetListBloc({
+    required GetAssetsLiteUsecase getAssetsUsecase,
+    required AssetRepository assetRepository,
+  }) : super(AssetInitial()) {
     _getAssetLitesUsecase = getAssetsUsecase;
+    _assetRepository = assetRepository;
     on<GetAssetsLiteEvent>((event, emit) async {
       emit(AssetLoadingState());
       final result = await _getAssetLitesUsecase.call(
@@ -51,5 +56,7 @@ class AssetListBloc extends Bloc<AssetEvent, AssetState> {
         ),
       );
     });
+
+    
   }
 }

@@ -1,13 +1,14 @@
 import 'dart:convert';
 
-import 'package:assetmanagement/features/asset/domain/entities/location_entity.dart';
+import 'package:assetmanagement/features/asset_brand/domain/entities/brand_detail_entity.dart';
 import 'package:equatable/equatable.dart';
 
-class LocationModel extends Equatable {
+class BrandDetailModel extends Equatable {
   final String id;
   final String ownerId;
   final String name;
-  const LocationModel({
+
+  const BrandDetailModel({
     required this.id,
     required this.ownerId,
     required this.name,
@@ -15,12 +16,13 @@ class LocationModel extends Equatable {
 
   @override
   List<Object> get props => [id, ownerId, name];
-  LocationEntity toEntity() {
-    return LocationEntity(id: id, ownerId: ownerId, name: name);
+
+  BrandDetailEntity toEntity() {
+    return BrandDetailEntity(id: id, ownerId: ownerId, name: name);
   }
 
-  factory LocationModel.fromEntity(LocationEntity entity) {
-    return LocationModel(
+  factory BrandDetailModel.fromEntity(BrandDetailEntity entity) {
+    return BrandDetailModel(
       id: entity.id,
       ownerId: entity.ownerId,
       name: entity.name,
@@ -31,8 +33,8 @@ class LocationModel extends Equatable {
     return <String, dynamic>{'id': id, 'owner_id': ownerId, 'name': name};
   }
 
-  factory LocationModel.fromMap(Map<String, dynamic> map) {
-    return LocationModel(
+  factory BrandDetailModel.fromMap(Map<String, dynamic> map) {
+    return BrandDetailModel(
       id: map['id'] as String,
       ownerId: map['owner_id'] as String,
       name: map['name'] as String,
@@ -41,6 +43,6 @@ class LocationModel extends Equatable {
 
   String toJson() => json.encode(toMap());
 
-  factory LocationModel.fromJson(String source) =>
-      LocationModel.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory BrandDetailModel.fromJson(String source) =>
+      BrandDetailModel.fromMap(json.decode(source) as Map<String, dynamic>);
 }

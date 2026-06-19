@@ -1,4 +1,4 @@
-import 'package:assetmanagement/features/asset/domain/entities/category_entity.dart';
+import 'package:assetmanagement/features/asset_category/domain/entities/category_detail_entity.dart';
 import 'package:assetmanagement/features/asset/domain/entities/service_schedule_entity.dart';
 import 'package:equatable/equatable.dart';
 import 'package:assetmanagement/features/asset/domain/entities/file_entity.dart';
@@ -9,7 +9,7 @@ class AddAssetEntity extends Equatable {
   final String? serialNumber;
   final String name;
   final String brandId;
-  final CategoryEntity category;
+  final CategoryDetailEntity category;
   final int price;
   final int productionYear;
   final String locationId;

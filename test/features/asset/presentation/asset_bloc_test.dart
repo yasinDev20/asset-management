@@ -2,9 +2,9 @@ import 'package:assetmanagement/core/error/failure.dart';
 import 'package:assetmanagement/features/asset/domain/entities/asset_detail_entity.dart';
 import 'package:assetmanagement/features/asset/domain/entities/asset_lite_entity.dart';
 import 'package:assetmanagement/features/asset/domain/entities/asset_ref_entity.dart';
-import 'package:assetmanagement/features/asset/domain/entities/brand_entity.dart';
-import 'package:assetmanagement/features/asset/domain/entities/category_entity.dart';
-import 'package:assetmanagement/features/asset/domain/entities/location_entity.dart';
+import 'package:assetmanagement/features/asset_brand/domain/entities/brand_detail_entity.dart';
+import 'package:assetmanagement/features/asset_category/domain/entities/category_detail_entity.dart';
+import 'package:assetmanagement/features/asset_location/domain/entities/location_detail_entity.dart';
 import 'package:assetmanagement/features/asset/domain/entities/asset_detail_result_entity.dart';
 import 'package:assetmanagement/features/asset/domain/repositories/asset_repository.dart';
 import 'package:assetmanagement/features/asset/domain/usecases/get_asset_detail.dart';
@@ -31,8 +31,8 @@ void main() {
   late AssetLiteEntity assetSummaryEntity;
   late List<AssetLiteEntity> allAssetSummaryEntity;
   late UserEntity userEntity;
-  late BrandEntity brandEntity;
-  late CategoryEntity categoryEntity;
+  late BrandDetailEntity brandEntity;
+  late CategoryDetailEntity categoryEntity;
   late LocationEntity locationEntity;
   late AssetDetailEntity assetDetailEntity;
   late AssetDetailResult assetDetail;
@@ -66,8 +66,8 @@ void main() {
       name: 'name',
       createdAt: DateTime(2000),
     );
-    brandEntity = BrandEntity(id: 'id', ownerId: 'ownerId', name: 'name');
-    categoryEntity = CategoryEntity(
+    brandEntity = BrandDetailEntity(id: 'id', ownerId: 'ownerId', name: 'name');
+    categoryEntity = CategoryDetailEntity(
       id: 'id',
       ownerId: 'ownerId',
       name: 'name',

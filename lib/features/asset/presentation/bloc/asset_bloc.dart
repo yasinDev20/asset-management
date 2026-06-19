@@ -3,12 +3,12 @@ import 'package:assetmanagement/features/asset/domain/entities/asset_filter_enti
 import 'package:assetmanagement/features/asset/domain/entities/asset_lite_entity.dart';
 import 'package:assetmanagement/features/asset/domain/entities/asset_ref_entity.dart';
 import 'package:assetmanagement/features/asset/domain/entities/asset_template_entity.dart';
-import 'package:assetmanagement/features/asset/domain/entities/brand_entity.dart';
-import 'package:assetmanagement/features/asset/domain/entities/category_entity.dart';
+import 'package:assetmanagement/features/asset_brand/domain/entities/brand_detail_entity.dart';
+import 'package:assetmanagement/features/asset_category/domain/entities/category_detail_entity.dart';
 import 'package:assetmanagement/features/asset/domain/entities/add_asset_entity.dart';
 import 'package:assetmanagement/features/asset/domain/entities/edit_asset_entity.dart';
 import 'package:assetmanagement/features/asset/domain/entities/file_entity.dart';
-import 'package:assetmanagement/features/asset/domain/entities/location_entity.dart';
+import 'package:assetmanagement/features/asset_location/domain/entities/location_detail_entity.dart';
 import 'package:assetmanagement/features/asset/domain/entities/asset_detail_result_entity.dart';
 import 'package:assetmanagement/features/asset/domain/repositories/asset_repository.dart';
 import 'package:assetmanagement/features/asset/domain/usecases/add_asset.dart';

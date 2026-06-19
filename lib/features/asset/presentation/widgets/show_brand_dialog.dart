@@ -1,7 +1,7 @@
 import 'package:assetmanagement/core/common/widgets/text_form_field.dart';
-import 'package:assetmanagement/features/asset/domain/entities/brand_entity.dart';
-import 'package:assetmanagement/features/asset/presentation/bloc/asset_bloc.dart';
-import 'package:assetmanagement/features/asset/presentation/bloc/asset_support_bloc.dart';
+import 'package:assetmanagement/features/asset_brand/domain/entities/add_brand_entity.dart';
+import 'package:assetmanagement/features/asset_brand/domain/entities/brand_detail_entity.dart';
+import 'package:assetmanagement/features/asset_brand/presentation/bloc/asset_brand_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,13 +9,13 @@ import 'package:go_router/go_router.dart';
 
 Future showBrandDialog({
   required BuildContext context,
-  required void Function(BrandEntity selectedBrand) onSelected,
+  required void Function(BrandDetailEntity selectedBrand) onSelected,
   TextEditingController? brandController,
 }) async {
   TextEditingController searchController = TextEditingController();
   TextEditingController newBrandController = TextEditingController();
 
-  context.read<AssetSupportBloc>().add(GetRecentBrandSelectionsEvent());
+  context.read<AssetBrandBloc>().add(GetRecentBrandSelectionsEvent());
 
   return await showDialog(
     context: context,
@@ -53,8 +53,10 @@ Future showBrandDialog({
                           icon: Icon(Icons.add_circle_outline),
                           onPressed: () {
                             if (newBrandController.text.isNotEmpty) {
-                              context.read<AssetSupportBloc>().add(
-                                AddBrandEvent(newBrandController.text),
+                              context.read<AssetBrandBloc>().add(
+                                AddBrandEvent(
+                                  AddBrandEntity(name: newBrandController.text),
+                                ),
                               );
                             }
                           },
@@ -75,7 +77,7 @@ Future showBrandDialog({
 
                         onFieldSubmitted: (newValue) {
                           if (newValue.isNotEmpty) {
-                            context.read<AssetSupportBloc>().add(
+                            context.read<AssetBrandBloc>().add(
                               GetBrandsEvent(newValue),
                             );
                           }
@@ -92,7 +94,7 @@ Future showBrandDialog({
                               title: Text('Tidak ada merk'),
                               onTap: () {
                                 onSelected(
-                                  BrandEntity(
+                                  BrandDetailEntity(
                                     id: '550e8400-e29b-41d4-a716-446655440000',
                                     ownerId:
                                         '550e8400-e29b-41d4-a716-446655440000',
@@ -104,12 +106,12 @@ Future showBrandDialog({
                                 context.pop();
                               },
                             ),
-                            BlocBuilder<AssetSupportBloc, AssetState>(
+                            BlocBuilder<AssetBrandBloc, AssetBrandState>(
                               builder: (context, state) {
-                                if (state is AssetLoadingState) {
+                                if (state.status == BrandStatus.loading) {
                                   return CircularProgressIndicator();
                                 }
-                                if (state is GetBrandsSuccsessState) {
+                                if (state.status == BrandStatus.getSuccess) {
                                   final allBrands = state.brandsEntity;
                                   return Expanded(
                                     child: ListView.builder(
@@ -125,13 +127,11 @@ Future showBrandDialog({
                                             onSelected(brand);
                                             brandController?.text = brand.name;
 
-                                            context
-                                                .read<AssetSupportBloc>()
-                                                .add(
-                                                  AddRecentBrandSelectionEvent(
-                                                    brandEntity: brand,
-                                                  ),
-                                                );
+                                            context.read<AssetBrandBloc>().add(
+                                              AddRecentBrandSelectionEvent(
+                                                brandEntity: brand,
+                                              ),
+                                            );
                                             context.pop();
                                           },
                                         );

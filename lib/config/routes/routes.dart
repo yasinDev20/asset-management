@@ -1,12 +1,23 @@
 import 'package:assetmanagement/config/routes/route_names.dart';
+import 'package:assetmanagement/core/common/injection/injection.dart';
 import 'package:assetmanagement/core/common/pages/not_found.dart';
 import 'package:assetmanagement/features/asset/presentation/pages/asset_detail.dart';
+import 'package:assetmanagement/features/asset_brand/domain/entities/edit_brand_entity.dart';
+import 'package:assetmanagement/features/asset_brand/presentation/bloc/asset_brand_bloc.dart';
+import 'package:assetmanagement/features/asset_category/domain/entities/edit_category_entity.dart';
+import 'package:assetmanagement/features/asset_category/presentation/bloc/asset_category_bloc.dart';
+import 'package:assetmanagement/features/asset_location/domain/entities/edit_location_entity.dart';
+import 'package:assetmanagement/features/asset_location/presentation/bloc/asset_location_bloc.dart';
 import 'package:assetmanagement/features/authentication/domain/entities/user_entity.dart';
-import 'package:assetmanagement/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:assetmanagement/features/authentication/presentation/pages/email_register.dart';
 import 'package:assetmanagement/features/authentication/presentation/pages/login.dart';
 import 'package:assetmanagement/features/home/presentation/pages/home.dart';
 import 'package:assetmanagement/config/routes/app_shell.dart';
+import 'package:assetmanagement/features/settings/presentation/pages/brands.dart';
+import 'package:assetmanagement/features/settings/presentation/pages/edit_field.dart';
+import 'package:assetmanagement/features/settings/presentation/pages/categories.dart';
+import 'package:assetmanagement/features/settings/presentation/pages/locations.dart';
+import 'package:assetmanagement/features/settings/presentation/pages/settings.dart';
 import 'package:assetmanagement/features/user/presentation/pages/user_detail.dart';
 import 'package:assetmanagement/features/authentication/presentation/pages/forgot_password.dart';
 import 'package:assetmanagement/features/user/presentation/pages/users.dart';
@@ -17,7 +28,7 @@ import 'package:go_router/go_router.dart';
 class MyRouter {
   GoRouter get router => GoRouter(
     initialLocation:
-        '/${RouteNames.home}', //ubah ini untuk ke page sedang di develop
+        '/${RouteNames.settings}', //ubah ini untuk ke page sedang di develop
     errorPageBuilder: (context, state) {
       return const MaterialPage(child: NotFoundPage());
     },
@@ -127,6 +138,250 @@ class MyRouter {
                 pageBuilder: (context, state) => const MaterialPage(
                   child: AssetDetailPage(id: null, mode: AssetFormMode.add),
                 ),
+              ),
+            ],
+          ),
+        ],
+      ),
+
+      GoRoute(
+        path: '/${RouteNames.settings}',
+        name: RouteNames.settings,
+        pageBuilder: (context, state) =>
+            const MaterialPage(child: SettingsPage()),
+        routes: [
+          //category
+          GoRoute(
+            path: RouteNames.categories,
+            name: RouteNames.categories,
+            pageBuilder: (context, state) => MaterialPage(
+              child: BlocProvider(
+                create: (context) => myInjection<AssetCategoryBloc>(),
+                child: CategoriesPage(),
+              ),
+            ),
+            routes: [
+              GoRoute(
+                path: '${RouteNames.editcategory}/:id/:name/:code',
+                name: RouteNames.editcategory,
+                pageBuilder: (context, state) {
+                  return MaterialPage(
+                    child: BlocProvider(
+                      create: (context) => myInjection<AssetCategoryBloc>(),
+                      child: Builder(
+                        builder: (context) {
+                          return BlocListener<
+                            AssetCategoryBloc,
+                            AssetCategoryState
+                          >(
+                            listener: (context, state) {
+                              if (state.status == CategoryStatus.editSucces) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('Berhasil mengedit kategori'),
+                                    backgroundColor: Colors.green,
+                                  ),
+                                );
+                              }
+                              if (state.status == CategoryStatus.failure) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(state.failure?.message ?? ''),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                              }
+                            },
+                            child: EditFieldPage(
+                              title: 'kategori',
+                              id: state.pathParameters['id']!,
+                              code: state.pathParameters['code']!,
+                              name: state.pathParameters['name']!,
+                              onDeleted: () =>
+                                  context.read<AssetCategoryBloc>().add(
+                                    DeleteCategoryEvent(
+                                      id: state.pathParameters['id']!,
+                                    ),
+                                  ),
+                              onEdit:
+                                  ({
+                                    required id,
+                                    required code,
+                                    required name,
+                                  }) {
+                                    context.read<AssetCategoryBloc>().add(
+                                      EditCategoryEvent(
+                                        categoryEntity: EditCategoryEntity(
+                                          id: id,
+                                          name: name,
+                                          code: code,
+                                        ),
+                                      ),
+                                    );
+
+                                    context.read<AssetCategoryBloc>().add(
+                                      SearchCategoriesEvent(''),
+                                    );
+                                  },
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+          //brand
+          GoRoute(
+            path: RouteNames.brands,
+            name: RouteNames.brands,
+            pageBuilder: (context, state) => MaterialPage(
+              child: BlocProvider(
+                create: (context) => myInjection<AssetBrandBloc>(),
+                child: BrandsPage(),
+              ),
+            ),
+            routes: [
+              GoRoute(
+                path: '${RouteNames.editbrand}/:id/:name',
+                name: RouteNames.editbrand,
+                pageBuilder: (context, state) {
+                  return MaterialPage(
+                    child: BlocProvider(
+                      create: (context) => myInjection<AssetBrandBloc>(),
+                      child: Builder(
+                        builder: (context) {
+                          return BlocListener<AssetBrandBloc, AssetBrandState>(
+                            listener: (context, state) {
+                              if (state.status == BrandStatus.editSucces) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('Berhasil mengedit merek'),
+                                    backgroundColor: Colors.green,
+                                  ),
+                                );
+                              }
+
+                              if (state.status == BrandStatus.failure) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(state.failure?.message ?? ''),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                              }
+                            },
+                            child: EditFieldPage(
+                              title: 'merek',
+                              id: state.pathParameters['id']!,
+                              name: state.pathParameters['name']!,
+                              onDeleted: () =>
+                                  context.read<AssetBrandBloc>().add(
+                                    DeleteBrandEvent(
+                                      id: state.pathParameters['id']!,
+                                    ),
+                                  ),
+                              onEdit:
+                                  ({
+                                    required id,
+                                    required code,
+                                    required name,
+                                  }) {
+                                    context.read<AssetBrandBloc>().add(
+                                      EditBrandEvent(
+                                        brandEntity: EditBrandEntity(
+                                          id: id,
+                                          name: name,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+          //location
+          GoRoute(
+            path: RouteNames.locations,
+            name: RouteNames.locations,
+            pageBuilder: (context, state) => MaterialPage(
+              child: BlocProvider(
+                create: (context) => myInjection<AssetLocationBloc>(),
+                child: LocationsPage(),
+              ),
+            ),
+            routes: [
+              GoRoute(
+                path: '${RouteNames.editlocation}/:id/:name',
+                name: RouteNames.editlocation,
+                pageBuilder: (context, state) {
+                  return MaterialPage(
+                    child: BlocProvider(
+                      create: (context) => myInjection<AssetLocationBloc>(),
+                      child: Builder(
+                        builder: (context) {
+                          return BlocListener<
+                            AssetLocationBloc,
+                            AssetLocationState
+                          >(
+                            listener: (context, state) {
+                              if (state.status == LocationStatus.editSucces) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('Berhasil mengedit lokasi'),
+                                    backgroundColor: Colors.green,
+                                  ),
+                                );
+                              }
+                              if (state.status == LocationStatus.failure) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(state.failure?.message ?? ''),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                              }
+                            },
+                            child: EditFieldPage(
+                              title: 'lokasi',
+                              id: state.pathParameters['id']!,
+                              name: state.pathParameters['name']!,
+                              onDeleted: () =>
+                                  context.read<AssetLocationBloc>().add(
+                                    DeleteLocationEvent(
+                                      id: state.pathParameters['id']!,
+                                    ),
+                                  ),
+                              onEdit:
+                                  ({
+                                    required id,
+                                    required code,
+                                    required name,
+                                  }) {
+                                    context.read<AssetLocationBloc>().add(
+                                      EditLocationEvent(
+                                        locationEntity: EditLocationEntity(
+                                          id: id,
+                                          name: name,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  );
+                },
               ),
             ],
           ),

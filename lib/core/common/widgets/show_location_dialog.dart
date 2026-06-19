@@ -1,7 +1,7 @@
 import 'package:assetmanagement/core/common/widgets/text_form_field.dart';
-import 'package:assetmanagement/features/asset/domain/entities/location_entity.dart';
-import 'package:assetmanagement/features/asset/presentation/bloc/asset_bloc.dart';
-import 'package:assetmanagement/features/asset/presentation/bloc/asset_support_bloc.dart';
+import 'package:assetmanagement/features/asset_location/domain/entities/add_location_entity%20.dart';
+import 'package:assetmanagement/features/asset_location/domain/entities/location_detail_entity.dart';
+import 'package:assetmanagement/features/asset_location/presentation/bloc/asset_location_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,13 +9,13 @@ import 'package:go_router/go_router.dart';
 
 Future showLocationDialog({
   required BuildContext context,
-  required void Function(LocationEntity selectedLocation) onSelected,
+  required void Function(LocationDetailEntity selectedLocation) onSelected,
   TextEditingController? locationController,
 }) async {
   TextEditingController searchController = TextEditingController();
   TextEditingController newLocationController = TextEditingController();
 
-  context.read<AssetSupportBloc>().add(GetRecentLocationSelectionsEvent());
+  context.read<AssetLocationBloc>().add(GetRecentLocationSelectionsEvent());
 
   return await showDialog(
     context: context,
@@ -53,9 +53,11 @@ Future showLocationDialog({
                           icon: Icon(Icons.add_circle_outline),
                           onPressed: () {
                             if (newLocationController.text.isNotEmpty) {
-                              context.read<AssetSupportBloc>().add(
+                              context.read<AssetLocationBloc>().add(
                                 AddLocationEvent(
-                                  name: newLocationController.text,
+                                  locationEntity: AddLocationEntity(
+                                    name: newLocationController.text,
+                                  ),
                                 ),
                               );
                             }
@@ -77,7 +79,7 @@ Future showLocationDialog({
 
                         onFieldSubmitted: (newValue) {
                           if (newValue.isNotEmpty) {
-                            context.read<AssetSupportBloc>().add(
+                            context.read<AssetLocationBloc>().add(
                               GetLocationsEvent(newValue),
                             );
                           }
@@ -88,12 +90,12 @@ Future showLocationDialog({
                       Expanded(
                         child: Column(
                           children: [
-                            BlocBuilder<AssetSupportBloc, AssetState>(
+                            BlocBuilder<AssetLocationBloc, AssetLocationState>(
                               builder: (context, state) {
-                                if (state is AssetLoadingState) {
+                                if (state.status == LocationStatus.loading) {
                                   return CircularProgressIndicator();
                                 }
-                                if (state is GetLocationsSuccsessState) {
+                                if (state.status == LocationStatus.getSuccess) {
                                   final allLocations = state.locationsEntity;
                                   return Expanded(
                                     child: ListView.builder(
@@ -110,7 +112,7 @@ Future showLocationDialog({
                                             locationController?.text =
                                                 location.name;
 
-                                            context.read<AssetSupportBloc>().add(
+                                            context.read<AssetLocationBloc>().add(
                                               AddRecentLocationSelectionEvent(
                                                 locationEntity: location,
                                               ),

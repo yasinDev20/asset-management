@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:assetmanagement/features/asset/data/models/category_model.dart';
+import 'package:assetmanagement/features/asset_category/data/models/category_detail_model.dart';
 import 'package:assetmanagement/features/asset/data/models/service_schedule_model.dart';
 import 'package:equatable/equatable.dart';
 
@@ -13,7 +13,7 @@ class AddAssetModel extends Equatable {
   final String? serialNumber;
   final String name;
   final String brandId;
-  final CategoryModel category;
+  final CategoryDetailModel category;
   final int price;
   final int productionYear;
   final String locationId;
@@ -101,7 +101,7 @@ class AddAssetModel extends Equatable {
       serialNumber: addAssetEntity.serialNumber,
       name: addAssetEntity.name,
       brandId: addAssetEntity.brandId,
-      category: CategoryModel.fromEntity(addAssetEntity.category),
+      category: CategoryDetailModel.fromEntity(addAssetEntity.category),
       price: addAssetEntity.price,
       productionYear: addAssetEntity.productionYear,
       locationId: addAssetEntity.locationId,

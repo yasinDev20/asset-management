@@ -1,12 +1,12 @@
 import 'package:assetmanagement/core/common/widgets/show_location_dialog.dart';
 import 'package:assetmanagement/core/common/widgets/text_field.dart';
-import 'package:assetmanagement/features/asset/domain/entities/location_entity.dart';
+import 'package:assetmanagement/features/asset_location/domain/entities/location_detail_entity.dart';
 import 'package:flutter/material.dart';
 
 class LocationFilter extends StatefulWidget {
-  final List<LocationEntity>? initialValue;
-  final void Function(List<LocationEntity> locations) onSelected;
-  final void Function(LocationEntity item)? onDeleted;
+  final List<LocationDetailEntity>? initialValue;
+  final void Function(List<LocationDetailEntity> locations) onSelected;
+  final void Function(LocationDetailEntity item)? onDeleted;
 
   const LocationFilter({
     super.key,
@@ -20,7 +20,7 @@ class LocationFilter extends StatefulWidget {
 }
 
 class _LocationFilterState extends State<LocationFilter> {
-  List<LocationEntity> get _locations => widget.initialValue ?? [];
+  List<LocationDetailEntity> get _locations => widget.initialValue ?? [];
 
   @override
   Widget build(BuildContext context) {

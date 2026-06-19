@@ -1,14 +1,14 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:equatable/equatable.dart';
 
-import 'package:assetmanagement/features/asset/domain/entities/brand_entity.dart';
-import 'package:assetmanagement/features/asset/domain/entities/category_entity.dart';
-import 'package:assetmanagement/features/asset/domain/entities/location_entity.dart';
+import 'package:assetmanagement/features/asset_brand/domain/entities/brand_detail_entity.dart';
+import 'package:assetmanagement/features/asset_category/domain/entities/category_detail_entity.dart';
+import 'package:assetmanagement/features/asset_location/domain/entities/location_detail_entity.dart';
 
 class AssetFilterEntity extends Equatable {
-  final List<LocationEntity> locations;
-  final List<CategoryEntity> categories;
-  final List<BrandEntity> brands;
+  final List<LocationDetailEntity> locations;
+  final List<CategoryDetailEntity> categories;
+  final List<BrandDetailEntity> brands;
   final List<String> vendor;
   final List<String> status;
   final String? qrCode;
@@ -44,9 +44,9 @@ class AssetFilterEntity extends Equatable {
   }
 
   AssetFilterEntity copyWith({
-    List<LocationEntity>? locations,
-    List<CategoryEntity>? categories,
-    List<BrandEntity>? brands,
+    List<LocationDetailEntity>? locations,
+    List<CategoryDetailEntity>? categories,
+    List<BrandDetailEntity>? brands,
     List<String>? vendor,
     List<String>? status,
     String? qrCode,

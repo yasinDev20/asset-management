@@ -21,4 +21,18 @@ abstract class RouteNames {
   static const addUser = 'addUser';
   //user
   static const addAsset = 'addAsset';
+
+//settings
+  static const settings ='settings';
+  static const categories ='categories';
+  static const editcategory ='editcategory';
+
+  static const brands ='brands';
+  static const editbrand ='editbrand';
+
+  static const locations ='locations';
+  static const editlocation ='editlocation';
+  
+  static const templates ='templates';
+  static const edittemplate ='edittemplate';
 }

@@ -1,17 +1,17 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'dart:convert';
 
-import 'package:assetmanagement/features/asset/domain/entities/category_entity.dart';
+import 'package:assetmanagement/features/asset_category/domain/entities/category_detail_entity.dart';
 import 'package:equatable/equatable.dart';
 
-class CategoryModel extends Equatable {
+class CategoryDetailModel extends Equatable {
   final String id;
   final String ownerId;
   final String name;
   final String code;
   final int lastSequance;
 
-  const CategoryModel({
+  const CategoryDetailModel({
     required this.id,
     required this.ownerId,
     required this.name,
@@ -24,8 +24,8 @@ class CategoryModel extends Equatable {
     return [id, ownerId, name, code, lastSequance];
   }
 
-  CategoryEntity toEntity() {
-    return CategoryEntity(
+  CategoryDetailEntity toEntity() {
+    return CategoryDetailEntity(
       id: id,
       ownerId: ownerId,
       name: name,
@@ -34,8 +34,8 @@ class CategoryModel extends Equatable {
     );
   }
 
-  factory CategoryModel.fromEntity(CategoryEntity entity) {
-    return CategoryModel(
+  factory CategoryDetailModel.fromEntity(CategoryDetailEntity entity) {
+    return CategoryDetailModel(
       id: entity.id,
       ownerId: entity.ownerId,
       name: entity.name,
@@ -54,8 +54,8 @@ class CategoryModel extends Equatable {
     };
   }
 
-  factory CategoryModel.fromMap(Map<String, dynamic> map) {
-    return CategoryModel(
+  factory CategoryDetailModel.fromMap(Map<String, dynamic> map) {
+    return CategoryDetailModel(
       id: map['id'] as String,
       ownerId: map['owner_id'] as String,
       name: map['name'] as String,
@@ -66,6 +66,6 @@ class CategoryModel extends Equatable {
 
   String toJson() => json.encode(toMap());
 
-  factory CategoryModel.fromJson(String source) =>
-      CategoryModel.fromMap(json.decode(source) as Map<String, dynamic>);
+  factory CategoryDetailModel.fromJson(String source) =>
+      CategoryDetailModel.fromMap(json.decode(source) as Map<String, dynamic>);
 }

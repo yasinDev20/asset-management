@@ -33,63 +33,6 @@ class GetAssetRefEvent extends AssetEvent {
   const GetAssetRefEvent({this.assetId, this.qrCode});
 }
 
-class GetBrandsEvent extends AssetEvent {
-  final String value;
-  const GetBrandsEvent(this.value);
-}
-
-class AddBrandEvent extends AssetEvent {
-  final String name;
-  const AddBrandEvent(this.name);
-}
-
-class GetCategoriesEvent extends AssetEvent {
-  final String value;
-  const GetCategoriesEvent(this.value);
-}
-
-class AddCategoryEvent extends AssetEvent {
-  final String name;
-  final String code;
-  const AddCategoryEvent({required this.code, required this.name});
-}
-
-class GetLocationsEvent extends AssetEvent {
-  final String value;
-  const GetLocationsEvent(this.value);
-}
-
-class AddLocationEvent extends AssetEvent {
-  final String name;
-  const AddLocationEvent({required this.name});
-}
-
-class AddRecentBrandSelectionEvent extends AssetEvent {
-  final BrandEntity brandEntity;
-  const AddRecentBrandSelectionEvent({required this.brandEntity});
-}
-
-class GetRecentBrandSelectionsEvent extends AssetEvent {
-  const GetRecentBrandSelectionsEvent();
-}
-
-class AddRecentCategorySelectionEvent extends AssetEvent {
-  final CategoryEntity categoryEntity;
-  const AddRecentCategorySelectionEvent({required this.categoryEntity});
-}
-
-class GetRecentCategorySelectionsEvent extends AssetEvent {
-  const GetRecentCategorySelectionsEvent();
-}
-
-class AddRecentLocationSelectionEvent extends AssetEvent {
-  final LocationEntity locationEntity;
-  const AddRecentLocationSelectionEvent({required this.locationEntity});
-}
-
-class GetRecentLocationSelectionsEvent extends AssetEvent {
-  const GetRecentLocationSelectionsEvent();
-}
 
 class EditAssetEvent extends AssetEvent {
   final EditAssetEntity originalAssetEntity;

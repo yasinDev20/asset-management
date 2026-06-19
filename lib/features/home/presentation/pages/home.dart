@@ -186,12 +186,12 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
 
-              Flexible(
-                child: IconButton(
-                  icon: const Icon(Icons.settings, size: 32),
-                  onPressed: () => context.goNamed(RouteNames.user),
+                Flexible(
+                  child: IconButton(
+                    icon: const Icon(Icons.settings, size: 32),
+                    onPressed: () => context.pushNamed  (RouteNames.settings),
+                  ),
                 ),
-              ),
             ],
           ),
 

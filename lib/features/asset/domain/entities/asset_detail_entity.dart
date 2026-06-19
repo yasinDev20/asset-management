@@ -3,9 +3,9 @@ import 'package:assetmanagement/features/asset/domain/entities/asset_ref_entity.
 import 'package:assetmanagement/features/asset/domain/entities/service_schedule_entity.dart';
 import 'package:equatable/equatable.dart';
 
-import 'package:assetmanagement/features/asset/domain/entities/brand_entity.dart';
-import 'package:assetmanagement/features/asset/domain/entities/category_entity.dart';
-import 'package:assetmanagement/features/asset/domain/entities/location_entity.dart';
+import 'package:assetmanagement/features/asset_brand/domain/entities/brand_detail_entity.dart';
+import 'package:assetmanagement/features/asset_category/domain/entities/category_detail_entity.dart';
+import 'package:assetmanagement/features/asset_location/domain/entities/location_detail_entity.dart';
 import 'package:assetmanagement/features/authentication/domain/entities/user_entity.dart';
 
 class AssetDetailEntity extends Equatable {
@@ -17,13 +17,13 @@ class AssetDetailEntity extends Equatable {
   final String? serialNumber;
   final String name;
   final String brandId;
-  final BrandEntity brand;
+  final BrandDetailEntity brand;
   final String categoryId;
-  final CategoryEntity category;
+  final CategoryDetailEntity category;
   final int price;
   final int productionYear;
   final String locationId;
-  final LocationEntity location;
+  final LocationDetailEntity location;
   final String status;
   final String vendor;
   final int purchaseYear;
@@ -58,12 +58,12 @@ class AssetDetailEntity extends Equatable {
     required this.invoicePath,
     required this.notes,
     required this.createdAt,
-    required this.updatedAt, required this.owner, required this.brand, required this.category, required this.location,
+    required this.updatedAt,
+    required this.owner,
+    required this.brand,
+    required this.category,
+    required this.location,
   });
-
-  
-
-  
 
   @override
   List<Object> get props {

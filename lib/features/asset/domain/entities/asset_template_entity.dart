@@ -1,22 +1,21 @@
 import 'package:assetmanagement/features/asset/domain/entities/asset_ref_entity.dart';
-import 'package:assetmanagement/features/asset/domain/entities/brand_entity.dart';
-import 'package:assetmanagement/features/asset/domain/entities/category_entity.dart';
-import 'package:assetmanagement/features/asset/domain/entities/location_entity.dart';
+import 'package:assetmanagement/features/asset_brand/domain/entities/brand_detail_entity.dart';
+import 'package:assetmanagement/features/asset_category/domain/entities/category_detail_entity.dart';
+import 'package:assetmanagement/features/asset_location/domain/entities/location_detail_entity.dart';
 import 'package:equatable/equatable.dart';
 
 import 'package:assetmanagement/features/asset/domain/entities/service_schedule_entity.dart';
-
 
 class AssetTemplateEntity extends Equatable {
   final String? id;
   final String templateName;
   final String assetId;
   final String? name;
-  final BrandEntity? brand;
-  final CategoryEntity? category;
+  final BrandDetailEntity? brand;
+  final CategoryDetailEntity? category;
   final int? price;
   final int? productionYear;
-  final LocationEntity? location;
+  final LocationDetailEntity? location;
   final String? status;
   final String? vendor;
   final int? purchaseYear;

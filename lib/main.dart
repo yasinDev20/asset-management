@@ -27,10 +27,10 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   if (!kIsWeb) {
-  var dir = await getApplicationDocumentsDirectory();
+    var dir = await getApplicationDocumentsDirectory();
     Hive.init(dir.path);
   }
-  
+
   await Hive.openBox('recentCategorySelections');
   await Hive.openBox('recentBrandSelections');
   await Hive.openBox('recentLocationSelections');
@@ -53,7 +53,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final materialTheme = MaterialTheme(Typography.material2021().black);
-
+    //TODO: pindahkan yang tidak global
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => myInjection<AuthBloc>()),

@@ -1,9 +1,9 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 
 import 'package:assetmanagement/features/asset/data/models/asset_ref_model.dart';
-import 'package:assetmanagement/features/asset/domain/entities/brand_entity.dart';
-import 'package:assetmanagement/features/asset/domain/entities/category_entity.dart';
-import 'package:assetmanagement/features/asset/domain/entities/location_entity.dart';
+import 'package:assetmanagement/features/asset_brand/domain/entities/brand_detail_entity.dart';
+import 'package:assetmanagement/features/asset_category/domain/entities/category_detail_entity.dart';
+import 'package:assetmanagement/features/asset_location/domain/entities/location_detail_entity.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 
@@ -16,11 +16,11 @@ class EditAssetModel extends Equatable {
   final FileModel? imageFile;
   final String? serialNumber;
   final String? name;
-  final BrandEntity? brand;
-  final CategoryEntity? category;
+  final BrandDetailEntity? brand;
+  final CategoryDetailEntity? category;
   final int? price;
   final int? productionYear;
-  final LocationEntity? location;
+  final LocationDetailEntity? location;
   final String? status;
   final String? vendor;
   final int? purchaseYear;
@@ -95,8 +95,12 @@ class EditAssetModel extends Equatable {
       serviceSchedules: entity.serviceSchedules
           ?.map((e) => ServiceScheduleModel.fromEntity(e))
           .toList(),
-      assetParent: entity.assetParent != null ? AssetRefModel.formEntity(entity.assetParent!) : null,
-      assetChilds: entity.assetChilds?.map((e) => AssetRefModel.formEntity(e)).toList(),
+      assetParent: entity.assetParent != null
+          ? AssetRefModel.formEntity(entity.assetParent!)
+          : null,
+      assetChilds: entity.assetChilds
+          ?.map((e) => AssetRefModel.formEntity(e))
+          .toList(),
       invoiceFile: entity.invoiceFile != null
           ? FileModel.fromEntity(entity.invoiceFile!)
           : null,

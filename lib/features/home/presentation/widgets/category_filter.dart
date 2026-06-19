@@ -1,12 +1,12 @@
 import 'package:assetmanagement/core/common/widgets/text_field.dart';
-import 'package:assetmanagement/features/asset/domain/entities/category_entity.dart';
+import 'package:assetmanagement/features/asset_category/domain/entities/category_detail_entity.dart';
 import 'package:assetmanagement/features/asset/presentation/widgets/show_category_dialog.dart';
 import 'package:flutter/material.dart';
 
 class CategoryFilter extends StatefulWidget {
-  final List<CategoryEntity>? initialValue;
-  final void Function(List<CategoryEntity> categories) onSelected;
-  final void Function(CategoryEntity item)? onDeleted;
+  final List<CategoryDetailEntity>? initialValue;
+  final void Function(List<CategoryDetailEntity> categories) onSelected;
+  final void Function(CategoryDetailEntity item)? onDeleted;
 
   const CategoryFilter({
     super.key,
@@ -20,7 +20,7 @@ class CategoryFilter extends StatefulWidget {
 }
 
 class _CategoryFilterState extends State<CategoryFilter> {
-  List<CategoryEntity> get _categories => widget.initialValue?.toList() ?? [];
+  List<CategoryDetailEntity> get _categories => widget.initialValue?.toList() ?? [];
 
   @override
   Widget build(BuildContext context) {

@@ -2,11 +2,11 @@
 import 'dart:convert';
 
 import 'package:assetmanagement/features/asset/data/models/asset_ref_model.dart';
-import 'package:assetmanagement/features/asset/data/models/brand_model.dart';
-import 'package:assetmanagement/features/asset/data/models/category_model.dart';
-import 'package:assetmanagement/features/asset/data/models/location_model.dart';
+import 'package:assetmanagement/features/asset_brand/data/models/brand_detail_model.dart';
+import 'package:assetmanagement/features/asset_category/data/models/category_detail_model.dart';
 import 'package:assetmanagement/features/asset/data/models/service_schedule_model.dart';
 import 'package:assetmanagement/features/asset/domain/entities/asset_template_entity.dart';
+import 'package:assetmanagement/features/asset_location/data/models/location_detail_model.dart';
 import 'package:equatable/equatable.dart';
 
 class AssetTemplateModel extends Equatable {
@@ -14,11 +14,11 @@ class AssetTemplateModel extends Equatable {
   final String templateName;
   final String assetId;
   final String? name;
-  final BrandModel? brand;
-  final CategoryModel? category;
+  final BrandDetailModel? brand;
+  final CategoryDetailModel? category;
   final int? price;
   final int? productionYear;
-  final LocationModel? location;
+  final LocationDetailModel? location;
   final String? status;
   final String? vendor;
   final int? purchaseYear;
@@ -71,14 +71,16 @@ class AssetTemplateModel extends Equatable {
       id: entity.assetId,
       assetId: entity.assetId,
       name: entity.name,
-      brand: entity.brand != null ? BrandModel.fromEntity(entity.brand!) : null,
+      brand: entity.brand != null
+          ? BrandDetailModel.fromEntity(entity.brand!)
+          : null,
       category: entity.category != null
-          ? CategoryModel.fromEntity(entity.category!)
+          ? CategoryDetailModel.fromEntity(entity.category!)
           : null,
       price: entity.price,
       productionYear: entity.productionYear,
       location: entity.location != null
-          ? LocationModel.fromEntity(entity.location!)
+          ? LocationDetailModel.fromEntity(entity.location!)
           : null,
       status: entity.status,
       vendor: entity.vendor,
@@ -140,18 +142,20 @@ class AssetTemplateModel extends Equatable {
     return AssetTemplateModel(
       id: map['id'] as String,
       templateName: map['template_name'] as String,
-      assetId: map['asset_id']  as String,
+      assetId: map['asset_id'] as String,
       name: map['name'] != null ? map['name'] as String : null,
-      brand: map['brand'] != null ? BrandModel.fromMap(map['brand']) : null,
+      brand: map['brand'] != null
+          ? BrandDetailModel.fromMap(map['brand'])
+          : null,
       category: map['category'] != null
-          ? CategoryModel.fromMap(map['category'])
+          ? CategoryDetailModel.fromMap(map['category'])
           : null,
       price: map['price'] != null ? map['price'] as int : null,
       productionYear: map['production_year'] != null
           ? map['production_year'] as int
           : null,
       location: map['location'] != null
-          ? LocationModel.fromMap(map['location'])
+          ? LocationDetailModel.fromMap(map['location'])
           : null,
       status: map['status'] != null ? map['status'] as String : null,
       vendor: map['vendor'] != null ? map['vendor'] as String : null,

@@ -71,66 +71,6 @@ class DownloadFileSuccessState extends AssetState {
   const DownloadFileSuccessState({required this.file});
 }
 
-class GetBrandsSuccsessState extends AssetState {
-  final List<BrandEntity> brandsEntity;
-
-  const GetBrandsSuccsessState({required this.brandsEntity});
-}
-
-class AddBrandSuccsessState extends AssetSuccesState {
-  const AddBrandSuccsessState({required super.message});
-}
-
-class GetCategoriesSuccsessState extends AssetState {
-  final List<CategoryEntity> categoriesEntity;
-
-  const GetCategoriesSuccsessState({required this.categoriesEntity});
-}
-
-class AddCategorySuccsessState extends AssetSuccesState {
-  const AddCategorySuccsessState({required super.message});
-}
-
-class GetLocationsSuccsessState extends AssetState {
-  final List<LocationEntity> locationsEntity;
-
-  const GetLocationsSuccsessState({required this.locationsEntity});
-}
-
-class AddLocationSuccsessState extends AssetSuccesState {
-  const AddLocationSuccsessState({required super.message});
-}
-
-class AddRecentBrandSelectionSuccessState extends AssetState {
-  const AddRecentBrandSelectionSuccessState();
-}
-
-class GetRecentBrandSelectionsSuccessState extends GetBrandsSuccsessState {
-  const GetRecentBrandSelectionsSuccessState({required super.brandsEntity});
-}
-
-class AddRecentCategorySelectionSuccessState extends AssetState {
-  const AddRecentCategorySelectionSuccessState();
-}
-
-class GetRecentCategorySelectionsSuccessState
-    extends GetCategoriesSuccsessState {
-  const GetRecentCategorySelectionsSuccessState({
-    required super.categoriesEntity,
-  });
-}
-
-class AddRecentLocationSelectionSuccessState extends AssetState {
-  const AddRecentLocationSelectionSuccessState();
-}
-
-class GetRecentLocationSelectionsSuccessState
-    extends GetLocationsSuccsessState {
-  const GetRecentLocationSelectionsSuccessState({
-    required super.locationsEntity,
-  });
-}
-
 class AddAssetSuccessState extends AssetState {
   final String message;
   const AddAssetSuccessState({required this.message});

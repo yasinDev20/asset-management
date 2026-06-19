@@ -1,14 +1,13 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:equatable/equatable.dart';
 
-class CategoryEntity extends Equatable {
+class CategoryDetailEntity extends Equatable {
   final String id;
   final String ownerId;
   final String name;
   final String code;
   final int lastSequance;
 
-  const CategoryEntity({
+  const CategoryDetailEntity({
     required this.id,
     required this.ownerId,
     required this.name,

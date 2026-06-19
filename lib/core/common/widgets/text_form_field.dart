@@ -3,9 +3,10 @@ import 'package:flutter/services.dart';
 
 class CommonTextFormField extends StatelessWidget {
   final String labelText;
-  final TextEditingController controller;
+  final String? initialValue;
+  final TextEditingController? controller;
   final bool obscureText;
-  final String? Function(String?)? validator;
+  final String? Function(String? value)? validator;
   final TextCapitalization? textCapitalization;
   final Widget? suffixIcon;
   final Widget? prefixIcon;
@@ -13,7 +14,8 @@ class CommonTextFormField extends StatelessWidget {
   final TextInputType? keyboardType;
   final List<TextInputFormatter>? inputFormatters;
   final void Function()? onTap;
-  final void Function(String)? onFieldSubmitted;
+  final void Function(String value)? onFieldSubmitted;
+  final void Function(String value)? onChanged;
   final FocusNode? focusNode;
   final String? helperText;
   final int? maxLines;
@@ -22,7 +24,8 @@ class CommonTextFormField extends StatelessWidget {
   const CommonTextFormField({
     super.key,
     required this.labelText,
-    required this.controller,
+    this.initialValue,
+    this.controller,
     this.readOnly = false,
     this.obscureText = false,
     this.suffixIcon,
@@ -37,7 +40,7 @@ class CommonTextFormField extends StatelessWidget {
     this.onFieldSubmitted,
     this.maxLines = 1,
     this.minLines,
-
+    this.onChanged,
   });
 
   @override
@@ -46,6 +49,7 @@ class CommonTextFormField extends StatelessWidget {
       minLines: minLines,
       maxLines: maxLines,
       readOnly: readOnly,
+      initialValue: initialValue,
       controller: controller,
       autovalidateMode: AutovalidateMode.onUnfocus,
       validator: validator,
@@ -56,6 +60,7 @@ class CommonTextFormField extends StatelessWidget {
       onTap: onTap,
       focusNode: focusNode,
       onFieldSubmitted: onFieldSubmitted,
+      onChanged: onChanged,
       decoration: InputDecoration(
         suffixIcon: suffixIcon,
         prefixIcon: prefixIcon,

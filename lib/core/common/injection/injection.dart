@@ -12,9 +12,43 @@ import 'package:assetmanagement/features/asset/domain/usecases/get_template.dart
 import 'package:assetmanagement/features/asset/presentation/bloc/asset_bloc.dart';
 import 'package:assetmanagement/features/asset/presentation/bloc/asset_list_bloc.dart';
 import 'package:assetmanagement/features/asset/presentation/bloc/asset_support_bloc.dart';
+import 'package:assetmanagement/features/asset_brand/data/datasources/local_datasource.dart';
+import 'package:assetmanagement/features/asset_brand/data/datasources/remote_datasource.dart';
+import 'package:assetmanagement/features/asset_brand/data/repositories/repo_impl.dart';
+import 'package:assetmanagement/features/asset_brand/domain/repositories/repo.dart';
+import 'package:assetmanagement/features/asset_brand/domain/usecases/add_brand.dart';
+import 'package:assetmanagement/features/asset_brand/domain/usecases/add_recent_brand_selections.dart';
+import 'package:assetmanagement/features/asset_brand/domain/usecases/edit_brand.dart';
+import 'package:assetmanagement/features/asset_brand/domain/usecases/get_brand.dart';
+import 'package:assetmanagement/features/asset_brand/domain/usecases/get_recent_brand_selection.dart';
+import 'package:assetmanagement/features/asset_brand/domain/usecases/search_brands.dart';
+import 'package:assetmanagement/features/asset_brand/presentation/bloc/asset_brand_bloc.dart';
+import 'package:assetmanagement/features/asset_category/data/datasources/local_datasorce.dart';
+import 'package:assetmanagement/features/asset_category/data/datasources/remote_datasource.dart';
+import 'package:assetmanagement/features/asset_category/data/repositories/repo_impl.dart';
+import 'package:assetmanagement/features/asset_category/domain/repositories/repo.dart';
+import 'package:assetmanagement/features/asset_category/domain/usecases/add_category.dart';
+import 'package:assetmanagement/features/asset_category/domain/usecases/add_recent_category_selections.dart';
+import 'package:assetmanagement/features/asset_category/domain/usecases/delete_category.dart';
+import 'package:assetmanagement/features/asset_category/domain/usecases/edit_category.dart';
+import 'package:assetmanagement/features/asset_category/domain/usecases/get_category.dart';
+import 'package:assetmanagement/features/asset_category/domain/usecases/get_recent_category_selection.dart';
+import 'package:assetmanagement/features/asset_category/domain/usecases/search_categories.dart';
+import 'package:assetmanagement/features/asset_category/presentation/bloc/asset_category_bloc.dart';
+import 'package:assetmanagement/features/asset_location/data/datasources/local_datasource.dart';
+import 'package:assetmanagement/features/asset_location/data/datasources/remote_datasource.dart';
+import 'package:assetmanagement/features/asset_location/data/repositories/repo_impl.dart';
+import 'package:assetmanagement/features/asset_location/domain/repositories/repo.dart';
+import 'package:assetmanagement/features/asset_location/domain/usecases/add_location.dart';
+import 'package:assetmanagement/features/asset_location/domain/usecases/add_recent_location_selections.dart';
+import 'package:assetmanagement/features/asset_location/domain/usecases/delete_location.dart';
+import 'package:assetmanagement/features/asset_location/domain/usecases/edit_location.dart';
+import 'package:assetmanagement/features/asset_location/domain/usecases/get_location.dart';
+import 'package:assetmanagement/features/asset_location/domain/usecases/get_recent_location_selection.dart';
+import 'package:assetmanagement/features/asset_location/domain/usecases/search_location.dart';
+import 'package:assetmanagement/features/asset_location/presentation/bloc/asset_location_bloc.dart';
 import 'package:assetmanagement/features/authentication/domain/usecases/email_register.dart';
 import 'package:assetmanagement/features/authentication/domain/usecases/forgot_password.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:assetmanagement/features/authentication/data/datasources/remote_datasource.dart';
 import 'package:assetmanagement/features/authentication/data/repositories/auth_repository_impl.dart';
 import 'package:assetmanagement/features/authentication/domain/repositories/auth_repository.dart';
@@ -36,12 +70,14 @@ import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
+import '../../../features/asset_brand/domain/usecases/delete_brand.dart';
 // import 'package:google_sign_in/google_sign_in.dart';
 
 var myInjection =
     GetIt.instance; // merupakan tempat penampungan semua dependencies
 
-//Kita akan men-inject semua dependencies
+// --- Depedency
 Future<void> injectionInit() async {
   //Google SignIn
   myInjection.registerLazySingleton(() => GoogleSignIn.instance);
@@ -54,22 +90,228 @@ Future<void> injectionInit() async {
   // Register FirebaseAuth
   myInjection.registerLazySingleton<FirebaseAuth>(() => FirebaseAuth.instance);
 
-  // Register FirebaseFirestore
-  myInjection.registerLazySingleton<FirebaseFirestore>(
-    () => FirebaseFirestore.instance,
-  );
   // Register supabase
   myInjection.registerLazySingleton<SupabaseClient>(
     () => Supabase.instance.client,
   );
-  // Register supabase
+  // Register Dio
   myInjection.registerLazySingleton<Dio>(() => Dio());
 
   myInjection.registerLazySingleton<AuthEventListener>(
     () => AuthEventListenerImpl(),
   );
 
-  //Bloc
+  //Depedency ---
+
+  //---Repository
+  myInjection.registerLazySingleton<AuthRepository>(
+    () => AuthRepositoryImpl(authRemoteDataSource: myInjection()),
+  );
+  myInjection.registerLazySingleton<UserRepository>(
+    () => UserRepositoryImpl(
+      firebaseAuth: myInjection(),
+      firebaseFirestore: myInjection(),
+    ),
+  );
+  myInjection.registerLazySingleton<AssetRepository>(
+    () => AssetRepositoryImpl(
+      assetLocalDatasource: myInjection(),
+      assetRemoteDataSource: myInjection(),
+      supabaseClient: myInjection(),
+    ),
+  );
+
+  myInjection.registerLazySingleton<CategoryRepo>(
+    () => CategoryRepoImpl(
+      localDatasource: myInjection(),
+      remoteDatasource: myInjection(),
+    ),
+  );
+  myInjection.registerLazySingleton<BrandRepo>(
+    () => BrandRepoImpl(
+      localDatasource: myInjection(),
+      remoteDatasource: myInjection(),
+    ),
+  );
+  myInjection.registerLazySingleton<LocationRepo>(
+    () => LocationRepoImpl(
+      localDatasource: myInjection(),
+      remoteDatasource: myInjection(),
+    ),
+  );
+  //Repository ---
+
+  //--- Data Source
+  myInjection.registerLazySingleton<AuthRemoteDatasource>(
+    () => AuthRemoteDatasourceImpl(
+      isWeb: kIsWeb,
+      googleSignInPackage: myInjection(),
+      googleAuthProvider: myInjection(),
+      firebaseAuth: myInjection(),
+      firestore: myInjection(),
+    ),
+  );
+
+  myInjection.registerLazySingleton<AssetLocalDataSource>(
+    () => AssetLocalDatasourceImpl(),
+  );
+
+  myInjection.registerLazySingleton<AssetRemoteDataSource>(
+    () => AssetRemoteDataSourceImpl(
+      supabaseClient: myInjection(),
+      dio: myInjection(),
+    ),
+  );
+
+  myInjection.registerLazySingleton<CategoryRemoteDatasource>(
+    () => CategoryRemoteDatasourceImpl(supabaseClient: myInjection()),
+  );
+  myInjection.registerLazySingleton<CategoryLocalDatasource>(
+    () => CategoryLocalDatasourceImpl(),
+  );
+
+  myInjection.registerLazySingleton<BrandRemoteDatasource>(
+    () => BrandRemoteDatasourceImpl(supabaseClient: myInjection()),
+  );
+  myInjection.registerLazySingleton<BrandLocalDatasource>(
+    () => BrandLocalDatasourceImpl(),
+  );
+  myInjection.registerLazySingleton<LocationRemoteDatasource>(
+    () => LocationRemoteDatasourceImpl(supabaseClient: myInjection()),
+  );
+  myInjection.registerLazySingleton<LocationLocalDatasource>(
+    () => LocationLocalDatasourceImpl(),
+  );
+
+  // Datasoruce ---
+
+  //--- Usecase
+
+  // Auth Usecase
+  myInjection.registerLazySingleton(
+    () => EmailRegisterUsecase(myInjection()), //diisi AuthRepositoryImpl
+  );
+  myInjection.registerLazySingleton(
+    () => EmailPasswordSignUsecase(myInjection()), //diisi AuthRepositoryImpl
+  );
+  myInjection.registerLazySingleton(
+    () => GoogleSignInUsecase(myInjection()), //diisi AuthRepositoryImpl
+  );
+  myInjection.registerLazySingleton(
+    () => GetUserUsecase(myInjection()), //diisi AuthRepositoryImpl
+  );
+  myInjection.registerLazySingleton(
+    () => ForgotPasswordUsecase(myInjection()), //diisi AuthRepositoryImpl
+  );
+  myInjection.registerLazySingleton(
+    () => SignOutUsecase(myInjection()), //diisi AuthRepositoryImpl
+  );
+
+  // Auth Usecase
+
+  // User Usecase
+  myInjection.registerLazySingleton(
+    () => GetAllUserUseCase(
+      userRepository: myInjection(),
+    ), //diisi AuthRepositoryImpl
+  );
+  myInjection.registerLazySingleton(
+    () => AddUserUsecase(
+      userRepository: myInjection(),
+    ), //diisi AuthRepositoryImpl
+  );
+  myInjection.registerLazySingleton(
+    () => GetUserUseCase(
+      userRepository: myInjection(),
+    ), //diisi AuthRepositoryImpl
+  );
+  // User Usecase
+
+  // Asset Usecase
+  myInjection.registerLazySingleton(() => GetAssetsLiteUsecase(myInjection()));
+  myInjection.registerLazySingleton(() => GetAssetDetailUsecase(myInjection()));
+  myInjection.registerLazySingleton(() => AddAssetUsecase(myInjection()));
+  myInjection.registerLazySingleton(() => EditAssetUsecase(myInjection()));
+  myInjection.registerLazySingleton(() => AddToTemplateUsecase(myInjection()));
+  myInjection.registerLazySingleton(() => GetTemplateUsecase(myInjection()));
+  myInjection.registerLazySingleton(() => DeleteTemplateUsecase(myInjection()));
+  // Asset Usecase
+
+  // Category Usecase
+  myInjection.registerLazySingleton(
+    () => SearchCategoriesUsecase(categoryRepo: myInjection()),
+  );
+  myInjection.registerLazySingleton(
+    () => GetCategoryUsecase(categoryRepo: myInjection()),
+  );
+  myInjection.registerLazySingleton(
+    () => AddCategoryUsecase(categoryRepo: myInjection()),
+  );
+  myInjection.registerLazySingleton(
+    () => EditCategoryUsecase(categoryRepo: myInjection()),
+  );
+  myInjection.registerLazySingleton(
+    () => DeleteCategoryUsecase(categoryRepo: myInjection()),
+  );
+  myInjection.registerLazySingleton(
+    () => GetRecentCategorySelectionsUsecase(categoryRepo: myInjection()),
+  );
+  myInjection.registerLazySingleton(
+    () => AddRecentCategorySelectionUsecase(categoryRepo: myInjection()),
+  );
+  // Category Usecase
+
+  // Brand Usecase
+  myInjection.registerLazySingleton(
+    () => SearchBrandsUsecase(brandRepo: myInjection()),
+  );
+  myInjection.registerLazySingleton(
+    () => GetBrandUsecase(brandRepo: myInjection()),
+  );
+  myInjection.registerLazySingleton(
+    () => AddBrandUsecase(brandRepo: myInjection()),
+  );
+  myInjection.registerLazySingleton(
+    () => EditBrandUsecase(brandRepo: myInjection()),
+  );
+  myInjection.registerLazySingleton(
+    () => DeleteBrandUsecase(brandRepo: myInjection()),
+  );
+  myInjection.registerLazySingleton(
+    () => GetRecentBrandSelectionsUsecase(brandRepo: myInjection()),
+  );
+  myInjection.registerLazySingleton(
+    () => AddRecentBrandSelectionUsecase(brandRepo: myInjection()),
+  );
+  // Brand Usecase
+
+  // Location Usecase
+  myInjection.registerLazySingleton(
+    () => SearchLocationsUsecase(locationRepo: myInjection()),
+  );
+  myInjection.registerLazySingleton(
+    () => GetLocationUsecase(locationRepo: myInjection()),
+  );
+  myInjection.registerLazySingleton(
+    () => AddLocationUsecase(locationRepo: myInjection()),
+  );
+  myInjection.registerLazySingleton(
+    () => EditLocationUsecase(locationRepo: myInjection()),
+  );
+  myInjection.registerLazySingleton(
+    () => DeleteLocationUsecase(locationRepo: myInjection()),
+  );
+  myInjection.registerLazySingleton(
+    () => GetRecentLocationSelectionsUsecase(locationRepo: myInjection()),
+  );
+  myInjection.registerLazySingleton(
+    () => AddRecentLocationSelectionUsecase(locationRepo: myInjection()),
+  );
+  // Location Usecase
+
+  //Usecase ---
+
+  //---Bloc
   myInjection.registerFactory(
     () => AuthBloc(
       authEventListener: myInjection(),
@@ -107,96 +349,46 @@ Future<void> injectionInit() async {
     () => AssetSupportBloc(assetRepository: myInjection()),
   );
   myInjection.registerFactory(
-    () => AssetListBloc(getAssetsUsecase: myInjection()),
-  );
-
-  //Usecase
-
-  //Auth Usecase
-  myInjection.registerLazySingleton(
-    () => EmailRegisterUsecase(myInjection()), //diisi AuthRepositoryImpl
-  );
-  myInjection.registerLazySingleton(
-    () => EmailPasswordSignUsecase(myInjection()), //diisi AuthRepositoryImpl
-  );
-  myInjection.registerLazySingleton(
-    () => GoogleSignInUsecase(myInjection()), //diisi AuthRepositoryImpl
-  );
-  myInjection.registerLazySingleton(
-    () => GetUserUsecase(myInjection()), //diisi AuthRepositoryImpl
-  );
-  myInjection.registerLazySingleton(
-    () => ForgotPasswordUsecase(myInjection()), //diisi AuthRepositoryImpl
-  );
-  myInjection.registerLazySingleton(
-    () => SignOutUsecase(myInjection()), //diisi AuthRepositoryImpl
-  );
-
-  //User Usecase
-  myInjection.registerLazySingleton(
-    () => GetAllUserUseCase(
-      userRepository: myInjection(),
-    ), //diisi AuthRepositoryImpl
-  );
-  myInjection.registerLazySingleton(
-    () => AddUserUsecase(
-      userRepository: myInjection(),
-    ), //diisi AuthRepositoryImpl
-  );
-  myInjection.registerLazySingleton(
-    () => GetUserUseCase(
-      userRepository: myInjection(),
-    ), //diisi AuthRepositoryImpl
-  );
-
-  //Asset Usecase
-  myInjection.registerLazySingleton(() => GetAssetsLiteUsecase(myInjection()));
-  myInjection.registerLazySingleton(() => GetAssetDetailUsecase(myInjection()));
-  myInjection.registerLazySingleton(() => AddAssetUsecase(myInjection()));
-  myInjection.registerLazySingleton(() => EditAssetUsecase(myInjection()));
-  myInjection.registerLazySingleton(() => AddToTemplateUsecase(myInjection()));
-  myInjection.registerLazySingleton(() => GetTemplateUsecase(myInjection()));
-  myInjection.registerLazySingleton(() => DeleteTemplateUsecase(myInjection()));
-
-  //Repository
-  myInjection.registerLazySingleton<AuthRepository>(
-    () => AuthRepositoryImpl(
-      authRemoteDataSource: myInjection(),
-    ), //diisi AuthRemoteDatasourceImpl()
-  );
-  myInjection.registerLazySingleton<UserRepository>(
-    () => UserRepositoryImpl(
-      firebaseAuth: myInjection(),
-      firebaseFirestore: myInjection(),
+    () => AssetListBloc(
+      getAssetsUsecase: myInjection(),
+      assetRepository: myInjection(),
     ),
   );
-  myInjection.registerLazySingleton<AssetRepository>(
-    () => AssetRepositoryImpl(
-      assetLocalDatasource: myInjection(),
-      assetRemoteDataSource: myInjection(),
-      supabaseClient: myInjection(),
+  myInjection.registerFactory(
+    () => AssetCategoryBloc(
+      categoryRepo: myInjection(),
+      searchCategoriesUsecase: myInjection(),
+      getCategoryUsecase: myInjection(),
+      addCategoryUsecase: myInjection(),
+      editCategoryUsecase: myInjection(),
+      deleteCategoryUsecase: myInjection(),
+      getRecentCategorySelectionsUsecase: myInjection(),
+      addRecentCategorySelectionUsecase: myInjection(),
     ),
   );
-
-  //Data Source
-  myInjection.registerLazySingleton<AuthRemoteDatasource>(
-    () => AuthRemoteDatasourceImpl(
-      isWeb: kIsWeb,
-      googleSignInPackage: myInjection(),
-      googleAuthProvider: myInjection(),
-      firebaseAuth: myInjection(),
-      firestore: myInjection(),
+  myInjection.registerFactory(
+    () => AssetBrandBloc(
+      brandRepo: myInjection(),
+      searchBrandsUsecase: myInjection(),
+      getBrandUsecase: myInjection(),
+      addBrandUsecase: myInjection(),
+      editBrandUsecase: myInjection(),
+      deleteBrandUsecase: myInjection(),
+      getRecentBrandSelectionsUsecase: myInjection(),
+      addRecentBrandSelectionUsecase: myInjection(),
     ),
   );
-
-  myInjection.registerLazySingleton<AssetLocalDataSource>(
-    () => AssetLocalDatasourceImpl(),
-  );
-
-  myInjection.registerLazySingleton<AssetRemoteDataSource>(
-    () => AssetRemoteDataSourceImpl(
-      supabaseClient: myInjection(),
-      dio: myInjection(),
+  myInjection.registerFactory(
+    () => AssetLocationBloc(
+      locationRepo: myInjection(),
+      searchLocationsUsecase: myInjection(),
+      getLocationUsecase: myInjection(),
+      addLocationUsecase: myInjection(),
+      editLocationUsecase: myInjection(),
+      deleteLocationUsecase: myInjection(),
+      getRecentLocationSelectionsUsecase: myInjection(),
+      addRecentLocationSelectionUsecase: myInjection(),
     ),
   );
+  //Bloc ---
 }

@@ -1,13 +1,13 @@
 import 'package:assetmanagement/features/asset/domain/entities/asset_filter_entity.dart';
-import 'package:assetmanagement/features/asset/domain/entities/brand_entity.dart';
-import 'package:assetmanagement/features/asset/domain/entities/category_entity.dart';
-import 'package:assetmanagement/features/asset/domain/entities/location_entity.dart';
+import 'package:assetmanagement/features/asset_brand/domain/entities/brand_detail_entity.dart';
+import 'package:assetmanagement/features/asset_category/domain/entities/category_detail_entity.dart';
+import 'package:assetmanagement/features/asset_location/domain/entities/location_detail_entity.dart';
 import 'package:equatable/equatable.dart';
 
 class AssetFilterModel extends Equatable {
-  final List<LocationEntity> locations;
-  final List<CategoryEntity> categories;
-  final List<BrandEntity> brands;
+  final List<LocationDetailEntity> locations;
+  final List<CategoryDetailEntity> categories;
+  final List<BrandDetailEntity> brands;
   final List<String> vendor;
   final List<String> status;
   final String? qrCode;
