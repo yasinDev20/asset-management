@@ -9,6 +9,7 @@ class GetAssetDetailUsecase {
   GetAssetDetailUsecase(this._assetRepository);
 
   Future<Either<Failure, AssetDetailResult>> call(String id) async {
+    //get assetDetail
     final assetResult = await _assetRepository.getAssetDetail(id);
 
     if (assetResult.isLeft()) {
@@ -17,6 +18,16 @@ class GetAssetDetailUsecase {
 
     final assetDetailEntity = assetResult.getOrElse(() => throw Exception());
 
+    //get childs
+    final childsResult = await _assetRepository.getAssetRefs(assetId: id);
+
+     if (childsResult.isLeft()) {
+      return Left(assetResult.swap().getOrElse(() => throw Exception()));
+    }
+
+    final childsEntity = childsResult.getOrElse(() =>  throw Exception(),);
+
+    //get image
     final imageResult = await _assetRepository.getUrl(
       assetDetailEntity.imagePath,
     );
@@ -25,7 +36,8 @@ class GetAssetDetailUsecase {
     }
 
     final imageUrl = imageResult.getOrElse(() => throw Exception());
-
+    
+   //get invoice when invoicePath not null
     String? invoiceUrl;
     if (assetDetailEntity.invoicePath != null) {
       final invoiceResult = await _assetRepository.getUrl(
@@ -42,6 +54,7 @@ class GetAssetDetailUsecase {
     return Right(
       AssetDetailResult(
         assetDetailEntity: assetDetailEntity,
+        childsEntity: childsEntity,
         imageUrl: imageUrl,
         invoiceUrl: invoiceUrl,
       ),

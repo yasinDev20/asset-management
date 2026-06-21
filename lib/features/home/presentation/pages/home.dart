@@ -3,8 +3,6 @@ import 'package:assetmanagement/core/utils/responsive_device_utils.dart';
 import 'package:assetmanagement/features/asset/domain/entities/asset_filter_entity.dart';
 import 'package:assetmanagement/features/asset/domain/entities/asset_lite_entity.dart';
 import 'package:assetmanagement/features/asset/presentation/bloc/asset_bloc.dart';
-import 'package:assetmanagement/features/asset/presentation/bloc/asset_list_bloc.dart';
-import 'package:assetmanagement/features/asset/presentation/bloc/asset_support_bloc.dart';
 import 'package:assetmanagement/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:assetmanagement/features/home/presentation/widgets/asset_card.dart';
 import 'package:assetmanagement/features/home/presentation/widgets/filter_option.dart';
@@ -27,7 +25,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    context.read<AssetListBloc>().add(GetAssetsLiteEvent(filter: filter));
+    context.read<AssetBloc>().add(GetAssetsLiteEvent(filter: filter));
     _scrollController.addListener(_onScroll);
   }
 
@@ -44,7 +42,7 @@ class _HomePageState extends State<HomePage> {
   void _onScroll() {
     if (_scrollController.position.pixels >=
         _scrollController.position.maxScrollExtent - 300) {
-      context.read<AssetListBloc>().add(LoadMoreAssetsEvent(filter: filter));
+      context.read<AssetBloc>().add(LoadMoreAssetsEvent(filter: filter));
     }
   }
 
@@ -106,7 +104,7 @@ class _HomePageState extends State<HomePage> {
     return GridView.builder(
       controller: _scrollController,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: columnCount,// jumlah colomn
+        crossAxisCount: columnCount, // jumlah colomn
         mainAxisExtent: 290, //tinggi maksimum
         mainAxisSpacing: 6,
         crossAxisSpacing: 6,
@@ -179,19 +177,19 @@ class _HomePageState extends State<HomePage> {
                           qrCode: _qrCodeSearchController.text,
                         );
                       }
-                      context.read<AssetListBloc>().add(
+                      context.read<AssetBloc>().add(
                         GetAssetsLiteEvent(filter: filter),
                       );
                     },
                   ),
                 ),
 
-                Flexible(
-                  child: IconButton(
-                    icon: const Icon(Icons.settings, size: 32),
-                    onPressed: () => context.pushNamed  (RouteNames.settings),
-                  ),
+              Flexible(
+                child: IconButton(
+                  icon: const Icon(Icons.settings, size: 32),
+                  onPressed: () => context.goNamed(RouteNames.settings),
                 ),
+              ),
             ],
           ),
 
@@ -211,22 +209,25 @@ class _HomePageState extends State<HomePage> {
                     .floor()
                     .clamp(1, 10);
 
-                return BlocBuilder<AssetListBloc, AssetState>(
+                return BlocBuilder<AssetBloc, AssetState>(
                   builder: (context, state) {
-                    if (state is AssetLoadingState) {
+                    if (state.status == AssetStatus.loading) {
                       return const Center(child: CircularProgressIndicator());
                     }
 
-                    if (state is AssetFailureState) {
+                    if (state.status == AssetStatus.failure) {
                       return Center(
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Text(state.failure.message),
+                            Text(
+                              state.failure?.message ??
+                                  'Sepertinya ada kesalahan',
+                            ),
                             TextButton(
-                              onPressed: () => context
-                                  .read<AssetListBloc>()
-                                  .add(GetAssetsLiteEvent(filter: filter)),
+                              onPressed: () => context.read<AssetBloc>().add(
+                                GetAssetsLiteEvent(filter: filter),
+                              ),
                               child: const Text('Coba lagi'),
                             ),
                           ],
@@ -234,22 +235,22 @@ class _HomePageState extends State<HomePage> {
                       );
                     }
 
-                    if (state is GetAssetsLiteSuccessState) {
-                      if (state.assets.isEmpty) {
-                        return const Center(child: Text('Tidak ada aset'));
-                      }
+                    if (state.assetsLite.isEmpty) {
+                      return const Center(child: Text('Tidak ada aset'));
+                    }
+                    if (state.assetsLite.isNotEmpty) {
                       return _buildGrid(
                         context: context,
-                        assets: state.assets,
+                        assets: state.assetsLite,
                         isLoadingMore: false,
                         columnCount: columnCount,
                       );
                     }
 
-                    if (state is AssetLoadingMoreState) {
+                    if (state.status == AssetStatus.loadMoreState) {
                       return _buildGrid(
                         context: context,
-                        assets: state.currentAssets,
+                        assets: state.assetsLite,
                         isLoadingMore: true,
                         columnCount: columnCount,
                       );

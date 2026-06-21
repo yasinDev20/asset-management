@@ -17,10 +17,10 @@ import 'package:assetmanagement/features/asset/presentation/widgets/parent_field
 import 'package:assetmanagement/features/asset/presentation/widgets/image_form_field.dart';
 import 'package:assetmanagement/features/asset/presentation/widgets/invoice_field.dart';
 import 'package:assetmanagement/features/asset/presentation/widgets/service_schedule_attachment_field.dart';
-import 'package:assetmanagement/features/asset/presentation/widgets/show_brand_dialog.dart';
-import 'package:assetmanagement/features/asset/presentation/widgets/show_category_dialog.dart';
+import 'package:assetmanagement/core/common/widgets/show_brand_dialog.dart';
+import 'package:assetmanagement/core/common/widgets/show_category_dialog.dart';
 import 'package:assetmanagement/core/common/widgets/show_location_dialog.dart';
-import 'package:assetmanagement/features/asset/presentation/widgets/show_status_dialog.dart';
+import 'package:assetmanagement/core/common/widgets/show_status_dialog.dart';
 import 'package:assetmanagement/features/asset/presentation/widgets/show_template_dialog.dart';
 import 'package:assetmanagement/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:flutter/material.dart';
@@ -121,12 +121,12 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
               ),
               child: BlocConsumer<AssetBloc, AssetState>(
                 listener: (context, state) {
-                  final AssetDetailResult assetDetailViewModel;
+                  final AssetDetailResult assetDetailResult;
                   final AssetDetailEntity assetDetailEntity;
 
-                  if (state is GetAssetDetailSuccsessState) {
-                    assetDetailViewModel = state.assetDetail;
-                    assetDetailEntity = assetDetailViewModel.assetDetailEntity;
+                  if (state.status == AssetStatus.getAssetDetailSuccess ) {
+                    assetDetailResult = state.assetDetailResult!;
+                    assetDetailEntity = assetDetailResult.assetDetailEntity;
 
                     oldData = EditAssetEntity(
                       id: '',
@@ -144,16 +144,16 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
                       warrantyEndYear: assetDetailEntity.warrantyEndYear,
                       serviceSchedules: assetDetailEntity.serviceSchedules,
                       assetParent: assetDetailEntity.assetParent,
-                      assetChilds: assetDetailEntity.assetChilds?.toList(),
+                      assetChilds: assetDetailResult.childsEntity.toList(),
                       invoiceFile: null,
                       notes: assetDetailEntity.notes,
                     );
 
-                    id = assetDetailViewModel.assetDetailEntity.id;
+                    id = assetDetailResult.assetDetailEntity.id;
                     imagePath =
-                        assetDetailViewModel.assetDetailEntity.imagePath;
+                        assetDetailResult.assetDetailEntity.imagePath;
                     invoicePath =
-                        assetDetailViewModel.assetDetailEntity.invoicePath;
+                        assetDetailResult.assetDetailEntity.invoicePath;
                     qrCodeController.text = assetDetailEntity.qrCode;
                     serialNumberController.text =
                         assetDetailEntity.serialNumber ?? '';
@@ -180,42 +180,42 @@ class _AssetDetailPageState extends State<AssetDetailPage> {
                     warrantyEndYearController.text = assetDetailEntity
                         .warrantyEndYear
                         .toString();
-                    imageUrl = assetDetailViewModel.imageUrl;
+                    imageUrl = assetDetailResult.imageUrl;
                     serviceSchedules = assetDetailEntity.serviceSchedules
                         ?.toList();
                     assetParent = assetDetailEntity.assetParent;
-                    assetChilds = assetDetailEntity.assetChilds?.toList();
-                    invoiceUrl = assetDetailViewModel.invoiceUrl;
+                    assetChilds = assetDetailResult.childsEntity.toList();
+                    invoiceUrl = assetDetailResult.invoiceUrl;
                     notesController.text = assetDetailEntity.notes ?? '';
                   }
-                  if (state is AddAssetSuccessState) {
+                  if (state.status == AssetStatus.addAssetSuccess) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text(state.message),
+                        content: Text('Berhasil menambahkan asset'),
                         backgroundColor: Theme.of(context).colorScheme.primary,
                       ),
                     );
                   }
-                  if (state is EditAssetSuccessState) {
+                  if (state.status == AssetStatus.editSucces) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text(state.message),
+                        content: Text('Berhasil mengedit asset'),
                         backgroundColor: Theme.of(context).colorScheme.primary,
                       ),
                     );
                   }
-                  if (state is AddToTemplateSuccessState) {
+                  if (state.status == AssetStatus.addTemplateSuccess) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text(state.message),
+                        content: Text('Berhasil menambahkan template asset'),
                         backgroundColor: Theme.of(context).colorScheme.primary,
                       ),
                     );
                   }
-                  if (state is AssetFailureState) {
+                  if (state.status == AssetStatus.failure) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text(state.message),
+                        content: Text(state.failure?.message ?? 'Sepertinya ada kesalahan'),
                         backgroundColor: Theme.of(context).colorScheme.error,
                       ),
                     );

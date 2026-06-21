@@ -1,6 +1,5 @@
 import 'package:assetmanagement/features/asset/domain/entities/asset_ref_entity.dart';
 import 'package:assetmanagement/features/asset/presentation/bloc/asset_bloc.dart';
-import 'package:assetmanagement/features/asset/presentation/bloc/asset_support_bloc.dart';
 import 'package:assetmanagement/features/asset/presentation/widgets/attachment_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -74,21 +73,23 @@ class _ParentFieldState extends State<ParentField> {
                               border: OutlineInputBorder(),
                             ),
                             onSubmitted: (value) {
-                              context.read<AssetSupportBloc>().add(
+                              context.read<AssetBloc>().add(
                                 GetAssetRefEvent(qrCode: value),
                               );
                             },
                           ),
 
-                          BlocBuilder<AssetSupportBloc, AssetState>(
+                          BlocBuilder<AssetBloc, AssetState>(
                             builder: (context, state) {
-                              if (state is GetAssetRefSuccsessState &&
-                                  state.assetRefEntity.isEmpty) {
+                              if (state.status ==
+                                      AssetStatus.getAssetRefSuccess &&
+                                  state.assetsRef.isEmpty) {
                                 return Text('Tidak ditemukan');
                               }
-                              if (state is GetAssetRefSuccsessState &&
-                                  state.assetRefEntity.isNotEmpty) {
-                                final assetRef = state.assetRefEntity.first;
+                              if (state.status ==
+                                      AssetStatus.getAssetRefSuccess &&
+                                  state.assetsRef.isNotEmpty) {
+                                final assetRef = state.assetsRef.first;
                                 final assetFullName =
                                     '${assetRef.qrCode} ${assetRef.categoryName}${assetRef.brandName.isNotEmpty ? ' ${assetRef.brandName}' : ''} ${assetRef.name}';
                                 return ListTile(

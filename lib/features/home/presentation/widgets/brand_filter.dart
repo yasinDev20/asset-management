@@ -1,6 +1,6 @@
 import 'package:assetmanagement/core/common/widgets/text_field.dart';
 import 'package:assetmanagement/features/asset_brand/domain/entities/brand_detail_entity.dart';
-import 'package:assetmanagement/features/asset/presentation/widgets/show_brand_dialog.dart';
+import 'package:assetmanagement/core/common/widgets/show_brand_dialog.dart';
 import 'package:flutter/material.dart';
 
 class BrandFilter extends StatefulWidget {

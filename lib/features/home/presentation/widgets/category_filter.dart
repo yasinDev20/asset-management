@@ -1,6 +1,6 @@
 import 'package:assetmanagement/core/common/widgets/text_field.dart';
 import 'package:assetmanagement/features/asset_category/domain/entities/category_detail_entity.dart';
-import 'package:assetmanagement/features/asset/presentation/widgets/show_category_dialog.dart';
+import 'package:assetmanagement/core/common/widgets/show_category_dialog.dart';
 import 'package:flutter/material.dart';
 
 class CategoryFilter extends StatefulWidget {

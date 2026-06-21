@@ -1,7 +1,6 @@
 import 'package:assetmanagement/core/error/failure.dart';
 import 'package:assetmanagement/features/asset_brand/domain/entities/add_brand_entity.dart';
 import 'package:assetmanagement/features/asset_brand/domain/entities/brand_detail_entity.dart';
-import 'package:assetmanagement/features/asset/domain/repositories/asset_repository.dart';
 import 'package:assetmanagement/features/asset_brand/domain/entities/edit_brand_entity.dart';
 import 'package:assetmanagement/features/asset_brand/domain/repositories/repo.dart';
 import 'package:assetmanagement/features/asset_brand/domain/usecases/add_brand.dart';

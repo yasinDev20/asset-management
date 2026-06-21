@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:assetmanagement/features/asset_brand/domain/entities/brand_detail_entity.dart';
 import 'package:assetmanagement/features/asset_location/domain/entities/location_detail_entity.dart';
 import 'package:equatable/equatable.dart';
 

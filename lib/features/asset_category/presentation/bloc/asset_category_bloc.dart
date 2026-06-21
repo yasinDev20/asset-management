@@ -40,7 +40,13 @@ class AssetCategoryBloc extends Bloc<AssetCategoryEvent, AssetCategoryState> {
     addRecentCategorySelectionUsecase,
   }) : super(AssetCategoryState()) {
     _categoryRepo = categoryRepo;
+    _searchCategoriesUsecase = searchCategoriesUsecase;
+    _getCategoryUsecase = getCategoryUsecase;
+    _addCategoryUsecase = addCategoryUsecase;
+    _editCategoryUsecase = editCategoryUsecase;
     _deleteCategoryUsecase = deleteCategoryUsecase;
+    _getRecentCategorySelectionsUsecase = getRecentCategorySelectionsUsecase;
+    _addRecentCategorySelectionUsecase = addRecentCategorySelectionUsecase;
 
     //TODO: create test
     on<GetCategoriesEvent>((event, emit) async {
@@ -48,7 +54,10 @@ class AssetCategoryBloc extends Bloc<AssetCategoryEvent, AssetCategoryState> {
       final result = await _getCategoryUsecase(id: event.id);
 
       result.fold(
-        (failure) => emit(state.copyWith(failure: failure)),
+        (failure) =>
+            emit(
+          state.copyWith(failure: failure, status: CategoryStatus.failure),
+        ),
         (r) => emit(
           state.copyWith(
             categoriesEntity: [r],
@@ -62,7 +71,10 @@ class AssetCategoryBloc extends Bloc<AssetCategoryEvent, AssetCategoryState> {
       final result = await _searchCategoriesUsecase(value: event.value);
 
       result.fold(
-        (failure) => emit(state.copyWith(failure: failure)),
+        (failure) =>
+          emit(
+          state.copyWith(failure: failure, status: CategoryStatus.failure),
+        ),
         (r) => emit(
           state.copyWith(
             categoriesEntity: r,
@@ -78,18 +90,30 @@ class AssetCategoryBloc extends Bloc<AssetCategoryEvent, AssetCategoryState> {
       emit(state.copyWith(status: CategoryStatus.loading));
       final result = await _addCategoryUsecase(category: event.categoryEntity);
 
-      result.fold((failure) => emit(state.copyWith(failure: failure)), (r) {
-        emit(state.copyWith(status: CategoryStatus.addSuccess));
-      });
+      result.fold(
+        (failure) =>
+            emit(
+          state.copyWith(failure: failure, status: CategoryStatus.failure),
+        ),
+        (r) {
+          emit(state.copyWith(status: CategoryStatus.addSuccess));
+        },
+      );
     });
 
     on<EditCategoryEvent>((event, emit) async {
       emit(state.copyWith(status: CategoryStatus.loading));
       final result = await _editCategoryUsecase(category: event.categoryEntity);
 
-      result.fold((failure) => emit(state.copyWith(failure: failure)), (r) {
-        emit(state.copyWith(status: CategoryStatus.editSucces));
-      });
+      result.fold(
+        (failure) =>
+           emit(
+          state.copyWith(failure: failure, status: CategoryStatus.failure),
+        ),
+        (r) {
+          emit(state.copyWith(status: CategoryStatus.editSucces));
+        },
+      );
     });
 
     on<DeleteCategoryEvent>((event, emit) async {
@@ -114,7 +138,7 @@ class AssetCategoryBloc extends Bloc<AssetCategoryEvent, AssetCategoryState> {
         (failure) => emit(
           state.copyWith(failure: failure, status: CategoryStatus.failure),
         ),
-        (r) => emit(state.copyWith()),
+        (r) => emit(state.copyWith(recentCategorySelections: r , status: CategoryStatus.getRecentSuccess)),
       );
     });
 

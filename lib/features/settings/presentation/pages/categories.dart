@@ -40,50 +40,57 @@ class _CategoriesPageState extends State<CategoriesPage> {
                   if (state.status == CategoryStatus.loading) {
                     return Center(child: CircularProgressIndicator());
                   }
-                  if (state.status == CategoryStatus.getSuccess) {
-                    final categories = state.categoriesEntity;
-
-                    return ListView.builder(
-                      itemCount: categories.length,
-                      itemBuilder: (context, index) {
-                        final category = categories[index];
-                        return ListTile(
-                            onTap: () async {
-                              final result = await context.pushNamed(
-                                RouteNames.editcategory,
-                                pathParameters: {
-                                  'id': category.id,
-                                  'code': category.code,
-                                  'name': category.name,
-                                },
-                              );
-
-                              if (result == true && mounted) {
-                              this.context.read<AssetCategoryBloc>().add(
-                                  SearchCategoriesEvent(''),
-                                );
-                              }
-                            },
-                          title: Row(
-                            spacing: 16,
-                            children: [
-                              Text((index + 1).toString()),
-                              Flexible(child: Text(category.name)),
-                              Flexible(child: Text('(${category.code})')),
-                              Icon(Icons.edit),
-                            ],
+                  if (state.status == CategoryStatus.failure) {
+                    return Center(
+                      child: Column(
+                        children: [
+                          Text(
+                            state.failure?.message ??
+                                'Sepertinya ada kesalahan',
                           ),
-                        );
-                      },
+                          TextButton(
+                            child: Text('Coba lagi'),
+                            onPressed: () => context
+                                .read<AssetCategoryBloc>()
+                                .add(GetCategoriesEvent('')),
+                          ),
+                        ],
+                      ),
                     );
                   }
-                  return Center(
-                    child: TextButton(
-                      child: Text('Coba lagi'),
-                      onPressed: () => context.read<AssetCategoryBloc>().add(
-                        GetCategoriesEvent(''),
-                      ),
-                    ),
+
+                  return ListView.builder(
+                    itemCount: state.categoriesEntity.length,
+                    itemBuilder: (context, index) {
+                      final category = state.categoriesEntity[index];
+                      return ListTile(
+                        onTap: () async {
+                          final result = await context.pushNamed(
+                            RouteNames.editcategory,
+                            pathParameters: {
+                              'id': category.id,
+                              'code': category.code,
+                              'name': category.name,
+                            },
+                          );
+
+                          if (result == true && mounted) {
+                            this.context.read<AssetCategoryBloc>().add(
+                              SearchCategoriesEvent(''),
+                            );
+                          }
+                        },
+                        title: Row(
+                          spacing: 16,
+                          children: [
+                            Text((index + 1).toString()),
+                            Flexible(child: Text(category.name)),
+                            Flexible(child: Text('(${category.code})')),
+                            Icon(Icons.edit),
+                          ],
+                        ),
+                      );
+                    },
                   );
                 },
               ),

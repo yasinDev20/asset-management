@@ -2,8 +2,6 @@ import 'package:assetmanagement/config/routes/routes.dart';
 import 'package:assetmanagement/core/common/bloc/app_bloc_observer.dart';
 import 'package:assetmanagement/core/theme/theme.dart';
 import 'package:assetmanagement/core/common/injection/injection.dart';
-import 'package:assetmanagement/features/asset/presentation/bloc/asset_list_bloc.dart';
-import 'package:assetmanagement/features/asset/presentation/bloc/asset_support_bloc.dart';
 import 'package:assetmanagement/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:assetmanagement/features/user/presentation/bloc/user_bloc.dart';
 import 'package:assetmanagement/firebase_options.dart';
@@ -53,18 +51,16 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final materialTheme = MaterialTheme(Typography.material2021().black);
-    //TODO: pindahkan yang tidak global
+    //Global Bloc
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (context) => myInjection<AuthBloc>()),
         BlocProvider(create: (context) => myInjection<UserBloc>()),
         BlocProvider(create: (context) => myInjection<AssetBloc>()),
-        BlocProvider(create: (context) => myInjection<AssetSupportBloc>()),
-        BlocProvider(create: (context) => myInjection<AssetListBloc>()),
       ],
 
       child: MaterialApp.router(
-        routerConfig: MyRouter().router,
+        routerConfig: MyRouter.router,
         debugShowCheckedModeBanner: false,
         theme: materialTheme.light(),
 
@@ -74,24 +70,7 @@ class MyApp extends StatelessWidget {
           FormBuilderLocalizations.delegate,
         ],
         builder: (context, child) {
-          return MultiBlocListener(
-            listeners: [
-              BlocListener<AssetBloc, AssetState>(
-                listenWhen: (previous, current) => current is AssetFailureState,
-                listener: (context, state) {
-                  if (state is AssetFailureState) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(state.message),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
-                  }
-                },
-              ),
-            ],
-            child: child!,
-          );
+          return child!;
         },
       ),
     );

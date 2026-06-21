@@ -22,7 +22,7 @@ class _SettingsPageState extends State<SettingsPage> {
               leading: Icon(Icons.category),
               title: Text('Senarai category'),
               onTap: () {
-                context.goNamed(RouteNames.categories);
+                context.pushNamed(RouteNames.categories);
               },
             ),
             //Brands

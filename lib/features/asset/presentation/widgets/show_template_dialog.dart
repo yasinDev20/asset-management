@@ -58,12 +58,12 @@ Future showTemplateDialog({
                           children: [
                             BlocBuilder<AssetBloc, AssetState>(
                               builder: (context, state) {
-                                if (state is AssetLoadingState) {
+                                if (state.status == AssetStatus.loading) {
                                   return CircularProgressIndicator();
                                 }
-                                if (state is GetTemplatesSuccsessState) {
+                                if (state.status == AssetStatus.getTemplatesSuccess) {
                                   final alltemplates =
-                                      state.assetTemplateEntity;
+                                      state.assetTemplates;
                                   return Expanded(
                                     child: ListView.builder(
                                       itemCount: alltemplates.length,

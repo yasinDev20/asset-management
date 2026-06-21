@@ -23,8 +23,10 @@ class AssetLocationBloc extends Bloc<AssetLocationEvent, AssetLocationState> {
   late final AddLocationUsecase _addLocationUsecase;
   late final EditLocationUsecase _editLocationUsecase;
   late final DeleteLocationUsecase _deleteLocationUsecase;
-  late final GetRecentLocationSelectionsUsecase _getRecentLocationSelectionsUsecase;
-  late final AddRecentLocationSelectionUsecase _addRecentLocationSelectionUsecase;
+  late final GetRecentLocationSelectionsUsecase
+  _getRecentLocationSelectionsUsecase;
+  late final AddRecentLocationSelectionUsecase
+  _addRecentLocationSelectionUsecase;
   AssetLocationBloc({
     required LocationRepo locationRepo,
     required GetLocationUsecase getLocationUsecase,
@@ -32,8 +34,10 @@ class AssetLocationBloc extends Bloc<AssetLocationEvent, AssetLocationState> {
     required AddLocationUsecase addLocationUsecase,
     required EditLocationUsecase editLocationUsecase,
     required DeleteLocationUsecase deleteLocationUsecase,
-    required GetRecentLocationSelectionsUsecase getRecentLocationSelectionsUsecase,
-    required AddRecentLocationSelectionUsecase addRecentLocationSelectionUsecase,
+    required GetRecentLocationSelectionsUsecase
+    getRecentLocationSelectionsUsecase,
+    required AddRecentLocationSelectionUsecase
+    addRecentLocationSelectionUsecase,
   }) : super(AssetLocationState()) {
     _locationRepo = locationRepo;
     _searchLocationsUsecase = searchLocationsUsecase;
@@ -49,7 +53,8 @@ class AssetLocationBloc extends Bloc<AssetLocationEvent, AssetLocationState> {
       final result = await _searchLocationsUsecase(value: event.value);
 
       result.fold(
-        (failure) => emit(state.copyWith(failure: failure)),
+        (failure) =>
+            state.copyWith(failure: failure, status: LocationStatus.failure),
         (r) => emit(
           state.copyWith(locationsEntity: r, status: LocationStatus.getSuccess),
         ),
@@ -60,7 +65,8 @@ class AssetLocationBloc extends Bloc<AssetLocationEvent, AssetLocationState> {
       final result = await _getLocationUsecase(id: event.id);
 
       result.fold(
-        (failure) => emit(state.copyWith(failure: failure)),
+        (failure) =>
+            state.copyWith(failure: failure, status: LocationStatus.failure),
         (r) => emit(
           state.copyWith(
             locationsEntity: [r],
@@ -74,33 +80,45 @@ class AssetLocationBloc extends Bloc<AssetLocationEvent, AssetLocationState> {
 
     on<AddLocationEvent>((event, emit) async {
       emit(state.copyWith(status: LocationStatus.loading));
-      final result = await _addLocationUsecase(
-        location: event.locationEntity,
-      );
+      final result = await _addLocationUsecase(location: event.locationEntity);
 
-      result.fold((failure) => emit(state.copyWith(failure: failure)), (r) {
-        emit(state.copyWith(status: LocationStatus.addSuccess));
-      });
+      result.fold(
+        (failure) => emit(
+          state.copyWith(failure: failure, status: LocationStatus.failure),
+        ),
+        (r) {
+          emit(state.copyWith(status: LocationStatus.addSuccess));
+        },
+      );
     });
 
     on<EditLocationEvent>((event, emit) async {
       emit(state.copyWith(status: LocationStatus.loading));
-      final result = await _editLocationUsecase(
-        location: event.locationEntity,
-      );
+      final result = await _editLocationUsecase(location: event.locationEntity);
 
-      result.fold((failure) => emit(state.copyWith(failure: failure)), (r) {
-        emit(state.copyWith(status: LocationStatus.editSucces));
-      });
+      result.fold(
+        (failure) =>
+             emit(
+          state.copyWith(failure: failure, status: LocationStatus.failure),
+        ),
+        (r) {
+          emit(state.copyWith(status: LocationStatus.editSucces));
+        },
+      );
     });
 
     on<DeleteLocationEvent>((event, emit) async {
       emit(state.copyWith(status: LocationStatus.loading));
       final result = await _deleteLocationUsecase(id: event.id);
 
-      result.fold((failure) => emit(state.copyWith(failure: failure)), (r) {
-        emit(state.copyWith(status: LocationStatus.deleteSuccses));
-      });
+      result.fold(
+        (failure) => emit(
+          state.copyWith(failure: failure, status: LocationStatus.failure),
+        ),
+        (r) {
+          emit(state.copyWith(status: LocationStatus.deleteSuccses));
+        },
+      );
     });
 
     on<GetRecentLocationSelectionsEvent>((event, emit) async {

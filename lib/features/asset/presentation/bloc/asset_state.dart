@@ -1,97 +1,62 @@
+// ignore_for_file: public_member_api_docs, sort_constructors_first
 part of 'asset_bloc.dart';
 
-abstract class AssetState extends Equatable {
-  const AssetState();
-
-  @override
-  List<Object> get props => [];
+enum AssetStatus {
+  initial,
+  getAssetDetailSuccess,
+  getAssetsLiteSuccess,
+  getAssetRefSuccess,
+  getTemplatesSuccess,
+  addAssetSuccess,
+  addTemplateSuccess,
+  editSucces,
+  deleteAssetSuccses,
+  deleteTemplateSuccses,
+  loadMoreState,
+  loadingMoreState,
+  failure,
+  loading,
 }
 
-abstract class AssetSuccesState extends AssetState implements Equatable {
-  final String message;
-
-  const AssetSuccesState({required this.message});
-
-  @override
-  List<Object> get props => [];
-}
-
-class AssetInitial extends AssetState {}
-
-class AssetLoadingState extends AssetState {}
-
-class AssetFailureState extends AssetState {
-  final Failure failure;
-
-  const AssetFailureState({required this.failure});
-  String get message => '[${failure.code}] ${failure.message}';
-
-  @override
-  List<Object> get props => [failure];
-}
-
-class GetAssetRefSuccsessState extends AssetState {
-  final List<AssetRefEntity> assetRefEntity;
-
-  const GetAssetRefSuccsessState({required this.assetRefEntity});
-}
-
-class GetAssetsLiteSuccessState extends AssetState {
-  final List<AssetLiteEntity> assets;
+class AssetState extends Equatable {
+  final AssetStatus? status;
+  final AssetDetailResult? assetDetailResult;
+  final List<AssetLiteEntity> assetsLite;
   final bool hasReachedMax;
-
-  const GetAssetsLiteSuccessState({
-    required this.assets,
-    required this.hasReachedMax,
+  final List<AssetRefEntity> assetsRef;
+  final List<AssetTemplateEntity> assetTemplates;
+  final Failure? failure;
+  const AssetState({
+    this.status = AssetStatus.initial,
+    this.assetsLite = const [],
+    this.failure,
+    this.assetsRef = const [],
+    this.assetDetailResult,
+    this.hasReachedMax = false,
+    this.assetTemplates = const [],
   });
 
-  GetAssetsLiteSuccessState copyWith({
-    List<AssetLiteEntity>? assets,
+  @override
+  List<Object?> get props => [status, assetsLite, failure];
+
+  AssetState copyWith({
+    AssetStatus? status,
+    AssetDetailResult? assetDetailResult,
+    List<AssetLiteEntity>? assetsLite,
     bool? hasReachedMax,
-  }) => GetAssetsLiteSuccessState(
-    assets: assets ?? this.assets,
-    hasReachedMax: hasReachedMax ?? this.hasReachedMax,
-  );
+    List<AssetRefEntity>? assetsRef,
+    List<AssetTemplateEntity>? assetTemplates,
+    Failure? failure,
+  }) {
+    return AssetState(
+      status: status ?? this.status,
+      assetDetailResult: assetDetailResult ?? this.assetDetailResult,
+      assetsLite: assetsLite ?? this.assetsLite,
+      hasReachedMax: hasReachedMax ?? this.hasReachedMax,
+      assetsRef: assetsRef ?? this.assetsRef,
+      assetTemplates: assetTemplates ?? this.assetTemplates,
+      failure: failure ?? this.failure,
+    );
+  }
 }
 
-class AssetLoadingMoreState extends AssetState {
-  final List<AssetLiteEntity> currentAssets;
-  const AssetLoadingMoreState({required this.currentAssets});
-}
-
-class GetAssetDetailSuccsessState extends AssetState {
-  final AssetDetailResult assetDetail;
-
-  const GetAssetDetailSuccsessState({required this.assetDetail});
-}
-
-class DownloadFileSuccessState extends AssetState {
-  final FileEntity file;
-
-  const DownloadFileSuccessState({required this.file});
-}
-
-class AddAssetSuccessState extends AssetState {
-  final String message;
-  const AddAssetSuccessState({required this.message});
-}
-
-class EditAssetSuccessState extends AssetState {
-  final String message;
-  const EditAssetSuccessState({required this.message});
-}
-
-class AddToTemplateSuccessState extends AssetState {
-  final String message;
-  const AddToTemplateSuccessState({required this.message});
-}
-
-class DeleteTemplatesSuccsessState extends AssetState {
-  final String message = 'Berhasil menghapus template';
-  const DeleteTemplatesSuccsessState();
-}
-
-class GetTemplatesSuccsessState extends AssetState {
-  final List<AssetTemplateEntity> assetTemplateEntity;
-  const GetTemplatesSuccsessState({required this.assetTemplateEntity});
-}

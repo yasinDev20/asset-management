@@ -1,16 +1,18 @@
 import 'package:assetmanagement/core/common/injection/injection.dart';
 import 'package:assetmanagement/core/common/widgets/show_feedback.dart';
 import 'package:assetmanagement/core/common/widgets/text_form_field.dart';
-import 'package:assetmanagement/features/asset_location/domain/entities/location_detail_entity.dart';
-import 'package:assetmanagement/features/asset_location/presentation/bloc/asset_location_bloc.dart';
+import 'package:assetmanagement/features/asset_brand/domain/entities/add_brand_entity.dart';
+import 'package:assetmanagement/features/asset_brand/domain/entities/brand_detail_entity.dart';
+import 'package:assetmanagement/features/asset_brand/presentation/bloc/asset_brand_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
-Future showLocationDialog({
+Future showBrandDialog({
   required BuildContext context,
-  required void Function(LocationDetailEntity selectedLocation) onSelected,
-  TextEditingController? locationController,
+  required void Function(BrandDetailEntity selectedBrand) onSelected,
+  TextEditingController? brandController,
 }) async {
   TextEditingController searchController = TextEditingController();
 
@@ -20,8 +22,7 @@ Future showLocationDialog({
     builder: (context) {
       return BlocProvider(
         create: (context) =>
-            myInjection<AssetLocationBloc>()
-              ..add(GetRecentLocationSelectionsEvent()),
+            myInjection<AssetBrandBloc>()..add(GetRecentBrandSelectionsEvent()),
         child: StatefulBuilder(
           builder: (context, setStateDialog) {
             return Dialog(
@@ -50,8 +51,8 @@ Future showLocationDialog({
 
                           onFieldSubmitted: (newValue) {
                             if (newValue.isNotEmpty) {
-                              context.read<AssetLocationBloc>().add(
-                                SearchLocationsEvent(newValue),
+                              context.read<AssetBrandBloc>().add(
+                                SearchBrandsEvent(newValue),
                               );
                             }
                           },
@@ -61,12 +62,9 @@ Future showLocationDialog({
                         Expanded(
                           child: Column(
                             children: [
-                              BlocConsumer<
-                                AssetLocationBloc,
-                                AssetLocationState
-                              >(
+                              BlocConsumer<AssetBrandBloc, AssetBrandState>(
                                 listener: (context, state) {
-                                  if (state.status == LocationStatus.failure) {
+                                  if (state.status == BrandStatus.failure) {
                                     ShowFeedback.showSnackbar(
                                       isFailure: true,
                                       context: context,
@@ -75,33 +73,31 @@ Future showLocationDialog({
                                   }
                                 },
                                 builder: (context, state) {
-                                  if (state.status == LocationStatus.loading) {
+                                  if (state.status == BrandStatus.loading) {
                                     return CircularProgressIndicator();
                                   }
-
-                                  if (state.locationsEntity.isNotEmpty) {
-                                    final allLocations = state.locationsEntity;
+                                  if (state.brandsEntity.isNotEmpty) {
+                                    final allBrands = state.brandsEntity;
                                     return Expanded(
                                       child: ListView.builder(
-                                        itemCount: allLocations.length,
+                                        itemCount: allBrands.length,
                                         itemBuilder: (context, index) {
-                                          final location = allLocations[index];
+                                          final brand = allBrands[index];
                                           return ListTile(
-                                            title: Text(location.name),
+                                            title: Text(brand.name),
                                             tileColor: Theme.of(
                                               context,
                                             ).colorScheme.surface,
                                             onTap: () {
-                                              onSelected(location);
-                                              locationController?.text =
-                                                  location.name;
+                                              onSelected(brand);
+                                              brandController?.text =
+                                                  brand.name;
 
-                                              context.read<AssetLocationBloc>().add(
-                                                AddRecentLocationSelectionEvent(
-                                                  locationEntity: location,
+                                              context.read<AssetBrandBloc>().add(
+                                                AddRecentBrandSelectionEvent(
+                                                  brandEntity: brand,
                                                 ),
                                               );
-
                                               context.pop();
                                             },
                                           );
@@ -110,8 +106,31 @@ Future showLocationDialog({
                                     );
                                   }
 
-                                  return Center(
-                                    child: Text('Lokasi tidak ditemukan'),
+                                  if (state.status == BrandStatus.getSuccess &&
+                                      state.brandsEntity.isEmpty) {
+                                    return Center(
+                                      child: Text('Kategori tidak ditemukan'),
+                                    );
+                                  }
+
+                                  return ListTile(
+                                    tileColor: Theme.of(
+                                      context,
+                                    ).colorScheme.surface,
+                                    title: Text('Tidak ada merk'),
+                                    onTap: () {
+                                      onSelected(
+                                        BrandDetailEntity(
+                                          id: '550e8400-e29b-41d4-a716-446655440000',
+                                          ownerId:
+                                              '550e8400-e29b-41d4-a716-446655440000',
+                                          name: 'No Brand',
+                                        ),
+                                      );
+
+                                      brandController?.text = 'Tidak ada merk';
+                                      context.pop();
+                                    },
                                   );
                                 },
                               ),

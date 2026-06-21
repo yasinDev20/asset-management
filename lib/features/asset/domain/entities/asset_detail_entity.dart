@@ -30,7 +30,6 @@ class AssetDetailEntity extends Equatable {
   final int? warrantyEndYear;
   final List<ServiceScheduleEntity>? serviceSchedules;
   final AssetRefEntity? assetParent;
-  final List<AssetRefEntity>? assetChilds;
   final String? invoicePath;
   final String? notes;
   final String createdAt;
@@ -54,7 +53,6 @@ class AssetDetailEntity extends Equatable {
     required this.warrantyEndYear,
     required this.serviceSchedules,
     required this.assetParent,
-    required this.assetChilds,
     required this.invoicePath,
     required this.notes,
     required this.createdAt,
@@ -89,7 +87,6 @@ class AssetDetailEntity extends Equatable {
       ?warrantyEndYear,
       ?serviceSchedules,
       ?assetParent,
-      ?assetChilds,
       ?invoicePath,
       ?notes,
       createdAt,

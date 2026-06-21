@@ -1,7 +1,5 @@
 import 'package:assetmanagement/features/asset/domain/entities/asset_filter_entity.dart';
 import 'package:assetmanagement/features/asset/presentation/bloc/asset_bloc.dart';
-import 'package:assetmanagement/features/asset/presentation/bloc/asset_list_bloc.dart';
-import 'package:assetmanagement/features/asset/presentation/bloc/asset_support_bloc.dart';
 import 'package:assetmanagement/features/home/presentation/widgets/brand_filter.dart';
 import 'package:assetmanagement/features/home/presentation/widgets/category_filter.dart';
 import 'package:assetmanagement/features/home/presentation/widgets/location_filter.dart';
@@ -18,7 +16,7 @@ Future<AssetFilterEntity?> showFilterOption({
   AssetFilterEntity filter = initialValue ?? AssetFilterEntity();
 
   void applyFilter(BuildContext context) {
-    context.read<AssetListBloc>().add(GetAssetsLiteEvent(filter: filter));
+    context.read<AssetBloc>().add(GetAssetsLiteEvent(filter: filter));
   }
 
   return await showDialog(

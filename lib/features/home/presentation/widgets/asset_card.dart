@@ -215,7 +215,7 @@ class Status extends StatelessWidget {
           ? Text(
               'Tersedia',
               style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                color: Colors.red,
+                color: Colors.green,
               ),
             )
           : Text(

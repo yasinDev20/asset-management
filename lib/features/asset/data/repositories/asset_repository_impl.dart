@@ -64,13 +64,7 @@ class AssetRepositoryImpl extends AssetRepository {
     return await runCatching(() async {
       final result = await _assetRemoteDataSource.getAssetDetail(id);
 
-      final assetChildData = await _assetRemoteDataSource.getAssetRefs(
-        assetId: result.id,
-      );
-
-      return result.toEntity(
-        assetChildData: assetChildData.map((e) => e.toEntity()).toList(),
-      );
+      return result.toEntity();
     });
   }
 

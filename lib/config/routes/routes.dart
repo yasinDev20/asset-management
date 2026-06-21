@@ -1,6 +1,7 @@
 import 'package:assetmanagement/config/routes/route_names.dart';
 import 'package:assetmanagement/core/common/injection/injection.dart';
 import 'package:assetmanagement/core/common/pages/not_found.dart';
+import 'package:assetmanagement/features/asset/presentation/bloc/asset_bloc.dart';
 import 'package:assetmanagement/features/asset/presentation/pages/asset_detail.dart';
 import 'package:assetmanagement/features/asset_brand/domain/entities/edit_brand_entity.dart';
 import 'package:assetmanagement/features/asset_brand/presentation/bloc/asset_brand_bloc.dart';
@@ -26,9 +27,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 class MyRouter {
-  GoRouter get router => GoRouter(
+  static final GoRouter router = GoRouter(
     initialLocation:
-        '/${RouteNames.settings}', //ubah ini untuk ke page sedang di develop
+        '/${RouteNames.home}', //ubah ini untuk ke page sedang di develop
     errorPageBuilder: (context, state) {
       return const MaterialPage(child: NotFoundPage());
     },
@@ -93,14 +94,14 @@ class MyRouter {
         routes: [
           //home
           GoRoute(
-            path: '/',
+            path: RouteNames.home,
             name: RouteNames.home,
             pageBuilder: (context, state) =>
                 const MaterialPage(child: HomePage()),
             routes: [
               //User
               GoRoute(
-                path: '/${RouteNames.user}',
+                path: RouteNames.user,
                 name: RouteNames.user,
                 pageBuilder: (context, state) =>
                     const MaterialPage(child: UsersPage()),
@@ -122,7 +123,7 @@ class MyRouter {
 
               //Detail asset
               GoRoute(
-                path: '/${RouteNames.assetDetail}/:id',
+                path: '${RouteNames.assetDetail}/:id',
                 name: RouteNames.assetDetail,
                 pageBuilder: (context, state) => MaterialPage(
                   child: AssetDetailPage(
@@ -131,7 +132,7 @@ class MyRouter {
                   ),
                 ),
               ),
-
+              //Add Asset
               GoRoute(
                 path: RouteNames.addAsset,
                 name: RouteNames.addAsset,
@@ -139,249 +140,377 @@ class MyRouter {
                   child: AssetDetailPage(id: null, mode: AssetFormMode.add),
                 ),
               ),
-            ],
-          ),
-        ],
-      ),
 
-      GoRoute(
-        path: '/${RouteNames.settings}',
-        name: RouteNames.settings,
-        pageBuilder: (context, state) =>
-            const MaterialPage(child: SettingsPage()),
-        routes: [
-          //category
-          GoRoute(
-            path: RouteNames.categories,
-            name: RouteNames.categories,
-            pageBuilder: (context, state) => MaterialPage(
-              child: BlocProvider(
-                create: (context) => myInjection<AssetCategoryBloc>(),
-                child: CategoriesPage(),
-              ),
-            ),
-            routes: [
+              //Settings
               GoRoute(
-                path: '${RouteNames.editcategory}/:id/:name/:code',
-                name: RouteNames.editcategory,
-                pageBuilder: (context, state) {
-                  return MaterialPage(
-                    child: BlocProvider(
-                      create: (context) => myInjection<AssetCategoryBloc>(),
-                      child: Builder(
-                        builder: (context) {
-                          return BlocListener<
-                            AssetCategoryBloc,
-                            AssetCategoryState
-                          >(
-                            listener: (context, state) {
-                              if (state.status == CategoryStatus.editSucces) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text('Berhasil mengedit kategori'),
-                                    backgroundColor: Colors.green,
-                                  ),
-                                );
-                              }
-                              if (state.status == CategoryStatus.failure) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(state.failure?.message ?? ''),
-                                    backgroundColor: Colors.red,
-                                  ),
-                                );
-                              }
-                            },
-                            child: EditFieldPage(
-                              title: 'kategori',
-                              id: state.pathParameters['id']!,
-                              code: state.pathParameters['code']!,
-                              name: state.pathParameters['name']!,
-                              onDeleted: () =>
-                                  context.read<AssetCategoryBloc>().add(
-                                    DeleteCategoryEvent(
-                                      id: state.pathParameters['id']!,
-                                    ),
-                                  ),
-                              onEdit:
-                                  ({
-                                    required id,
-                                    required code,
-                                    required name,
-                                  }) {
-                                    context.read<AssetCategoryBloc>().add(
-                                      EditCategoryEvent(
-                                        categoryEntity: EditCategoryEntity(
-                                          id: id,
-                                          name: name,
-                                          code: code,
-                                        ),
-                                      ),
-                                    );
+                path: RouteNames.settings,
+                name: RouteNames.settings,
+                pageBuilder: (context, state) =>
+                    const MaterialPage(child: SettingsPage()),
+                routes: [
+                  //category
+                  GoRoute(
+                    path: RouteNames.categories,
+                    name: RouteNames.categories,
+                    pageBuilder: (context, state) => MaterialPage(
+                      child: BlocProvider(
+                        create: (context) => myInjection<AssetCategoryBloc>(),
+                        child: CategoriesPage(),
+                      ),
+                    ),
+                    routes: [
+                      //edit
+                      GoRoute(
+                        path: '${RouteNames.editcategory}/:id/:name/:code',
+                        name: RouteNames.editcategory,
+                        pageBuilder: (context, state) {
+                          return MaterialPage(
+                            child: BlocProvider(
+                              create: (context) =>
+                                  myInjection<AssetCategoryBloc>(),
+                              child: Builder(
+                                builder: (context) {
+                                  return BlocListener<
+                                    AssetCategoryBloc,
+                                    AssetCategoryState
+                                  >(
+                                    listener: (context, state) {
+                                      if (state.status ==
+                                          CategoryStatus.editSucces) {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              'Berhasil mengedit kategori',
+                                            ),
+                                            backgroundColor: Colors.green,
+                                          ),
+                                        );
+                                        //refetch for homeview because AssetBloc is global state
+                                        context.read<AssetBloc>().add(
+                                          GetAssetsLiteEvent(),
+                                        );
 
-                                    context.read<AssetCategoryBloc>().add(
-                                      SearchCategoriesEvent(''),
-                                    );
-                                  },
+                                        //pop page and return true for triger refetch categories page
+                                        context.pop(true);
+                                      }
+                                      if (state.status ==
+                                          CategoryStatus.deleteSuccses) {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              'Berhasil menghapus kategori',
+                                            ),
+                                            backgroundColor: Colors.green,
+                                          ),
+                                        );
+                                        //refetch for homeview because AssetBloc is global state
+                                        context.read<AssetBloc>().add(
+                                          GetAssetsLiteEvent(),
+                                        );
+
+                                        //pop page and return true for triger refetch categories page
+                                        context.pop(true);
+                                      }
+                                      if (state.status ==
+                                          CategoryStatus.failure) {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              state.failure?.message ?? '',
+                                            ),
+                                            backgroundColor: Colors.red,
+                                          ),
+                                        );
+                                      }
+                                    },
+                                    child: EditFieldPage(
+                                      title: 'kategori',
+                                      id: state.pathParameters['id']!,
+                                      code: state.pathParameters['code']!,
+                                      name: state.pathParameters['name']!,
+                                      onDeleted: () =>
+                                          context.read<AssetCategoryBloc>().add(
+                                            DeleteCategoryEvent(
+                                              id: state.pathParameters['id']!,
+                                            ),
+                                          ),
+                                      onEdit:
+                                          ({
+                                            required id,
+                                            required code,
+                                            required name,
+                                          }) {
+                                            context
+                                                .read<AssetCategoryBloc>()
+                                                .add(
+                                                  EditCategoryEvent(
+                                                    categoryEntity:
+                                                        EditCategoryEntity(
+                                                          id: id,
+                                                          name: name,
+                                                          code: code,
+                                                        ),
+                                                  ),
+                                                );
+
+                                            context
+                                                .read<AssetCategoryBloc>()
+                                                .add(SearchCategoriesEvent(''));
+                                          },
+                                    ),
+                                  );
+                                },
+                              ),
                             ),
                           );
                         },
                       ),
-                    ),
-                  );
-                },
-              ),
-            ],
-          ),
-          //brand
-          GoRoute(
-            path: RouteNames.brands,
-            name: RouteNames.brands,
-            pageBuilder: (context, state) => MaterialPage(
-              child: BlocProvider(
-                create: (context) => myInjection<AssetBrandBloc>(),
-                child: BrandsPage(),
-              ),
-            ),
-            routes: [
-              GoRoute(
-                path: '${RouteNames.editbrand}/:id/:name',
-                name: RouteNames.editbrand,
-                pageBuilder: (context, state) {
-                  return MaterialPage(
-                    child: BlocProvider(
-                      create: (context) => myInjection<AssetBrandBloc>(),
-                      child: Builder(
-                        builder: (context) {
-                          return BlocListener<AssetBrandBloc, AssetBrandState>(
-                            listener: (context, state) {
-                              if (state.status == BrandStatus.editSucces) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text('Berhasil mengedit merek'),
-                                    backgroundColor: Colors.green,
-                                  ),
-                                );
-                              }
+                    ],
+                  ),
 
-                              if (state.status == BrandStatus.failure) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(state.failure?.message ?? ''),
-                                    backgroundColor: Colors.red,
-                                  ),
-                                );
-                              }
-                            },
-                            child: EditFieldPage(
-                              title: 'merek',
-                              id: state.pathParameters['id']!,
-                              name: state.pathParameters['name']!,
-                              onDeleted: () =>
-                                  context.read<AssetBrandBloc>().add(
-                                    DeleteBrandEvent(
+                  //brand
+                  GoRoute(
+                    path: RouteNames.brands,
+                    name: RouteNames.brands,
+                    pageBuilder: (context, state) => MaterialPage(
+                      child: BlocProvider(
+                        create: (context) => myInjection<AssetBrandBloc>(),
+                        child: BrandsPage(),
+                      ),
+                    ),
+                    routes: [
+                      GoRoute(
+                        path: '${RouteNames.editbrand}/:id/:name',
+                        name: RouteNames.editbrand,
+                        pageBuilder: (context, state) {
+                          return MaterialPage(
+                            child: BlocProvider(
+                              create: (context) =>
+                                  myInjection<AssetBrandBloc>(),
+                              child: Builder(
+                                builder: (context) {
+                                  return BlocListener<
+                                    AssetBrandBloc,
+                                    AssetBrandState
+                                  >(
+                                    listener: (context, state) {
+                                      if (state.status ==
+                                          BrandStatus.editSucces) {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              'Berhasil mengedit merek',
+                                            ),
+                                            backgroundColor: Colors.green,
+                                          ),
+                                        );
+                                        //refetch for homeview because AssetBloc is global state
+                                        context.read<AssetBloc>().add(
+                                          GetAssetsLiteEvent(),
+                                        );
+
+                                        //pop page and return true for triger refetch brands page
+                                        context.pop(true);
+                                      }
+                                      if (state.status ==
+                                          BrandStatus.deleteSuccses) {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              'Berhasil menghapus merek',
+                                            ),
+                                            backgroundColor: Colors.green,
+                                          ),
+                                        );
+                                        //refetch for homeview because AssetBloc is global state
+                                        context.read<AssetBloc>().add(
+                                          GetAssetsLiteEvent(),
+                                        );
+
+                                        //pop page and return true for triger refetch brands page
+                                        context.pop(true);
+                                      }
+
+                                      if (state.status == BrandStatus.failure) {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              state.failure?.message ?? '',
+                                            ),
+                                            backgroundColor: Colors.red,
+                                          ),
+                                        );
+                                      }
+                                    },
+                                    child: EditFieldPage(
+                                      title: 'merek',
                                       id: state.pathParameters['id']!,
+                                      name: state.pathParameters['name']!,
+                                      onDeleted: () =>
+                                          context.read<AssetBrandBloc>().add(
+                                            DeleteBrandEvent(
+                                              id: state.pathParameters['id']!,
+                                            ),
+                                          ),
+                                      onEdit:
+                                          ({
+                                            required id,
+                                            required code,
+                                            required name,
+                                          }) {
+                                            context.read<AssetBrandBloc>().add(
+                                              EditBrandEvent(
+                                                brandEntity: EditBrandEntity(
+                                                  id: id,
+                                                  name: name,
+                                                ),
+                                              ),
+                                            );
+                                          },
                                     ),
-                                  ),
-                              onEdit:
-                                  ({
-                                    required id,
-                                    required code,
-                                    required name,
-                                  }) {
-                                    context.read<AssetBrandBloc>().add(
-                                      EditBrandEvent(
-                                        brandEntity: EditBrandEntity(
-                                          id: id,
-                                          name: name,
-                                        ),
-                                      ),
-                                    );
-                                  },
+                                  );
+                                },
+                              ),
                             ),
                           );
                         },
                       ),
+                    ],
+                  ),
+
+                  //location
+                  GoRoute(
+                    path: RouteNames.locations,
+                    name: RouteNames.locations,
+                    pageBuilder: (context, state) => MaterialPage(
+                      child: BlocProvider(
+                        create: (context) => myInjection<AssetLocationBloc>(),
+                        child: LocationsPage(),
+                      ),
                     ),
-                  );
-                },
-              ),
-            ],
-          ),
-          //location
-          GoRoute(
-            path: RouteNames.locations,
-            name: RouteNames.locations,
-            pageBuilder: (context, state) => MaterialPage(
-              child: BlocProvider(
-                create: (context) => myInjection<AssetLocationBloc>(),
-                child: LocationsPage(),
-              ),
-            ),
-            routes: [
-              GoRoute(
-                path: '${RouteNames.editlocation}/:id/:name',
-                name: RouteNames.editlocation,
-                pageBuilder: (context, state) {
-                  return MaterialPage(
-                    child: BlocProvider(
-                      create: (context) => myInjection<AssetLocationBloc>(),
-                      child: Builder(
-                        builder: (context) {
-                          return BlocListener<
-                            AssetLocationBloc,
-                            AssetLocationState
-                          >(
-                            listener: (context, state) {
-                              if (state.status == LocationStatus.editSucces) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text('Berhasil mengedit lokasi'),
-                                    backgroundColor: Colors.green,
-                                  ),
-                                );
-                              }
-                              if (state.status == LocationStatus.failure) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(state.failure?.message ?? ''),
-                                    backgroundColor: Colors.red,
-                                  ),
-                                );
-                              }
-                            },
-                            child: EditFieldPage(
-                              title: 'lokasi',
-                              id: state.pathParameters['id']!,
-                              name: state.pathParameters['name']!,
-                              onDeleted: () =>
-                                  context.read<AssetLocationBloc>().add(
-                                    DeleteLocationEvent(
+                    routes: [
+                      GoRoute(
+                        path: '${RouteNames.editlocation}/:id/:name',
+                        name: RouteNames.editlocation,
+                        pageBuilder: (context, state) {
+                          return MaterialPage(
+                            child: BlocProvider(
+                              create: (context) =>
+                                  myInjection<AssetLocationBloc>(),
+                              child: Builder(
+                                builder: (context) {
+                                  return BlocListener<
+                                    AssetLocationBloc,
+                                    AssetLocationState
+                                  >(
+                                    listener: (context, state) {
+                                      if (state.status ==
+                                          LocationStatus.editSucces) {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              'Berhasil mengedit lokasi',
+                                            ),
+                                            backgroundColor: Colors.green,
+                                          ),
+                                        );
+
+                                        //refetch for homeview because AssetBloc is global state
+                                        context.read<AssetBloc>().add(
+                                          GetAssetsLiteEvent(),
+                                        );
+
+                                        //pop page and return true for triger refetch locations page
+                                        context.pop(true);
+                                      }
+                                      if (state.status ==
+                                          LocationStatus.deleteSuccses) {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              'Berhasil menghapus lokasi',
+                                            ),
+                                            backgroundColor: Colors.green,
+                                          ),
+                                        );
+
+                                        //refetch for homeview because AssetBloc is global state
+                                        context.read<AssetBloc>().add(
+                                          GetAssetsLiteEvent(),
+                                        );
+
+                                        //pop page and return true for triger refetch locations page
+                                        context.pop(true);
+                                      }
+                                      if (state.status ==
+                                          LocationStatus.failure) {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              state.failure?.message ?? '',
+                                            ),
+                                            backgroundColor: Colors.red,
+                                          ),
+                                        );
+                                      }
+                                    },
+                                    child: EditFieldPage(
+                                      title: 'lokasi',
                                       id: state.pathParameters['id']!,
+                                      name: state.pathParameters['name']!,
+                                      onDeleted: () =>
+                                          context.read<AssetLocationBloc>().add(
+                                            DeleteLocationEvent(
+                                              id: state.pathParameters['id']!,
+                                            ),
+                                          ),
+                                      onEdit:
+                                          ({
+                                            required id,
+                                            required code,
+                                            required name,
+                                          }) {
+                                            context
+                                                .read<AssetLocationBloc>()
+                                                .add(
+                                                  EditLocationEvent(
+                                                    locationEntity:
+                                                        EditLocationEntity(
+                                                          id: id,
+                                                          name: name,
+                                                        ),
+                                                  ),
+                                                );
+                                          },
                                     ),
-                                  ),
-                              onEdit:
-                                  ({
-                                    required id,
-                                    required code,
-                                    required name,
-                                  }) {
-                                    context.read<AssetLocationBloc>().add(
-                                      EditLocationEvent(
-                                        locationEntity: EditLocationEntity(
-                                          id: id,
-                                          name: name,
-                                        ),
-                                      ),
-                                    );
-                                  },
+                                  );
+                                },
+                              ),
                             ),
                           );
                         },
                       ),
-                    ),
-                  );
-                },
+                    ],
+                  ),
+                ],
               ),
             ],
           ),

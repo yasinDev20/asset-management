@@ -10,8 +10,6 @@ import 'package:assetmanagement/features/asset/domain/usecases/get_asset_detail.
 import 'package:assetmanagement/features/asset/domain/usecases/get_assets_lite.dart';
 import 'package:assetmanagement/features/asset/domain/usecases/get_template.dart';
 import 'package:assetmanagement/features/asset/presentation/bloc/asset_bloc.dart';
-import 'package:assetmanagement/features/asset/presentation/bloc/asset_list_bloc.dart';
-import 'package:assetmanagement/features/asset/presentation/bloc/asset_support_bloc.dart';
 import 'package:assetmanagement/features/asset_brand/data/datasources/local_datasource.dart';
 import 'package:assetmanagement/features/asset_brand/data/datasources/remote_datasource.dart';
 import 'package:assetmanagement/features/asset_brand/data/repositories/repo_impl.dart';
@@ -64,6 +62,7 @@ import 'package:assetmanagement/features/user/domain/usecases/add_user.dart';
 import 'package:assetmanagement/features/user/domain/usecases/get_all_user.dart';
 import 'package:assetmanagement/features/user/domain/usecases/get_user.dart';
 import 'package:assetmanagement/features/user/presentation/bloc/user_bloc.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -87,6 +86,10 @@ Future<void> injectionInit() async {
     () => GoogleAuthProvider(),
   );
 
+  // Register Firestore
+  myInjection.registerLazySingleton<FirebaseFirestore>(
+    () => FirebaseFirestore.instance,
+  );
   // Register FirebaseAuth
   myInjection.registerLazySingleton<FirebaseAuth>(() => FirebaseAuth.instance);
 
@@ -107,12 +110,7 @@ Future<void> injectionInit() async {
   myInjection.registerLazySingleton<AuthRepository>(
     () => AuthRepositoryImpl(authRemoteDataSource: myInjection()),
   );
-  myInjection.registerLazySingleton<UserRepository>(
-    () => UserRepositoryImpl(
-      firebaseAuth: myInjection(),
-      firebaseFirestore: myInjection(),
-    ),
-  );
+
   myInjection.registerLazySingleton<AssetRepository>(
     () => AssetRepositoryImpl(
       assetLocalDatasource: myInjection(),
@@ -335,7 +333,7 @@ Future<void> injectionInit() async {
   myInjection.registerFactory(
     () => AssetBloc(
       assetRepository: myInjection(),
-
+      getAssetLitesUsecase: myInjection(),
       getAssetDetailUsecase: myInjection(),
       addAssetUsecase: myInjection(),
       editAssetUsecase: myInjection(),
@@ -345,15 +343,6 @@ Future<void> injectionInit() async {
     ),
   );
 
-  myInjection.registerFactory(
-    () => AssetSupportBloc(assetRepository: myInjection()),
-  );
-  myInjection.registerFactory(
-    () => AssetListBloc(
-      getAssetsUsecase: myInjection(),
-      assetRepository: myInjection(),
-    ),
-  );
   myInjection.registerFactory(
     () => AssetCategoryBloc(
       categoryRepo: myInjection(),
