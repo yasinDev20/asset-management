@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:dartz/dartz.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart'; // For PlatformException
 import 'package:google_sign_in/google_sign_in.dart';
@@ -29,20 +28,7 @@ Future<Either<Failure, T>> runCatching<T>(Future<T> Function() fn) async {
         code: e.code.toString(),
       ),
     );
-  } on FirebaseAuthException catch (e, st) {
-    debugPrint('Firebase Auth exception: $e\n$st');
-    return left(
-      AuthFailure(message: e.message ?? 'Authentication failed', code: e.code),
-    );
-  } on FirebaseException catch (e, st) {
-    debugPrint('Firebase exception: $e\n$st');
-    return left(
-      ServerFailure(
-        message: e.message ?? 'A Firebase error occurred',
-        code: e.code,
-      ),
-    );
-  } on PlatformException catch (e, st) {
+  }on PlatformException catch (e, st) {
     debugPrint('Platform exception: $e\n$st');
     return left(
       PermissionFailure(

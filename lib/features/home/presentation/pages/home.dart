@@ -148,9 +148,7 @@ class _HomePageState extends State<HomePage> {
             children: [
               Flexible(
                 child: BlocSelector<AuthBloc, AuthState, String?>(
-                  selector: (state) => state is AuthenticatedState
-                      ? state.authEntity.user.name
-                      : null,
+                  selector: (state) =>  state.authEntity?.user.name,
                   builder: (context, name) {
                     return Text(
                       'Halo, $name',

@@ -1,44 +1,33 @@
 part of 'auth_bloc.dart';
 
-abstract class AuthState extends Equatable {
-  const AuthState();
+enum AuthStatus { initial, loading, success, failure }
+
+class AuthState extends Equatable {
+  final AuthStatus status;
+  final AuthEntity? authEntity;
+  final bool clearAuthEntity;
+  final Failure? failure;
+
+  const AuthState({
+    this.status = AuthStatus.initial,
+    this.authEntity,
+    this.clearAuthEntity = false,
+    this.failure,
+  });
 
   @override
-  List<Object> get props => [];
-}
+  List<Object?> get props => [status, authEntity, clearAuthEntity, failure];
 
-class AuthInitialState extends AuthState {
-  @override
-  List<Object> get props => [];
-}
-
-class AuthLoadingState extends AuthState {}
-
-class EmailRegisterSuccessState extends AuthState {}
-
-class ForgotPasswordSuccessState extends AuthState {}
-
-class AuthenticatedState extends AuthState {
-  final AuthEntity authEntity;
-
-  const AuthenticatedState({required this.authEntity});
-
-  @override
-  List<Object> get props => [authEntity];
-}
-
-class UnAuthenticatedState extends AuthState {
-  @override
-  List<Object> get props => [];
-}
-
-//Todo: refactor AuthFailureState
-class FailureState extends AuthState {
-  final Failure failure;
-
-  const FailureState({required this.failure});
-  String get message => '[${failure.code}] ${failure.message}';
-
-  @override
-  List<Object> get props => [failure];
+  AuthState copyWith({
+    AuthStatus? status,
+    AuthEntity? authEntity,
+    bool clearAuthEntity = false,
+    Failure? failure,
+  }) {
+    return AuthState(
+      status: status ?? this.status,
+      authEntity: clearAuthEntity ? null : (authEntity ?? this.authEntity),
+      failure: failure,
+    );
+  }
 }

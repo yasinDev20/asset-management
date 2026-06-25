@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:assetmanagement/core/error/failure.dart';
 import 'package:assetmanagement/features/authentication/domain/entities/auth_entity.dart';
 import 'package:dartz/dartz.dart';
@@ -5,6 +6,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 abstract class AuthRepository {
   Future<Either<Failure, Unit>> emailRegister({
+    required String name,
     required String email,
     required String password,
   });
@@ -12,12 +14,13 @@ abstract class AuthRepository {
     required String email,
     required String password,
   });
-  Future<Either<Failure, AuthEntity>> googleSignIn({
-    required GoogleSignInAccount googleSignInAccaount,
-  });
+  Future<Either<Failure, Unit>> googleSignIn(
+  );
   Future<Either<Failure, AuthEntity>> getUser({required String id});
   Future<Either<Failure, Unit>> forgotPassword(String email);
   Future<Either<Failure, Unit>> signOut();
+  Stream<String?> authStateChanges();
+  Stream<GoogleSignInAccount?> googleSignInStateChanges();
 
   // // Tambahan untuk local data
   // Future<void> saveToken(String token);

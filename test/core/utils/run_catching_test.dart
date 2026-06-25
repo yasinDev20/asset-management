@@ -8,7 +8,6 @@ import 'package:dartz/dartz.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 void main() {
   debugPrint = (String? message, {int? wrapWidth}) {};
@@ -41,40 +40,7 @@ void main() {
       },
     );
 
-    test('should map FirebaseAuthException to AuthFailure', () async {
-      final result = await runCatching(() async {
-        throw FirebaseAuthException(
-          message: 'Wrong password',
-          code: 'wrong-password',
-        );
-      });
-
-      expect(result.isLeft(), true);
-
-      result.fold((failure) {
-        expect(failure, isA<AuthFailure>());
-        expect(failure.message, 'Wrong password');
-        expect(failure.code, 'wrong-password');
-      }, (_) => fail('Should not return Right'));
-    });
-
-    test('should map FirebaseException to ServerFailure', () async {
-      final result = await runCatching(() async {
-        throw FirebaseException(
-          plugin: 'firestore',
-          message: 'Something failed',
-          code: '500',
-        );
-      });
-
-      expect(result.isLeft(), true);
-
-      result.fold((failure) {
-        expect(failure, isA<ServerFailure>());
-        expect(failure.message, 'Something failed');
-        expect(failure.code, '500');
-      }, (_) => fail('Should not return Right'));
-    });
+    
 
     test('should map PlatformException to PermissionFailure', () async {
       final result = await runCatching(() async {

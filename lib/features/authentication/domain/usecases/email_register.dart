@@ -6,7 +6,15 @@ class EmailRegisterUsecase {
   final AuthRepository _authRepository;
   EmailRegisterUsecase(this._authRepository);
 
-  Future<Either<Failure, Unit>> call({required String email, required String password}) async{
-   return await _authRepository.emailRegister(email: email, password: password);
+  Future<Either<Failure, Unit>> call({
+    required String name,
+    required String email,
+    required String password,
+  }) async {
+    return await _authRepository.emailRegister(
+      name: name,
+      email: email,
+      password: password,
+    );
   }
 }

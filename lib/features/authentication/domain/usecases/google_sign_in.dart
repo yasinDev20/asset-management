@@ -1,16 +1,12 @@
 import 'package:assetmanagement/core/error/failure.dart';
-import 'package:assetmanagement/features/authentication/domain/entities/auth_entity.dart';
 import 'package:assetmanagement/features/authentication/domain/repositories/auth_repository.dart';
 import 'package:dartz/dartz.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 
 class GoogleSignInUsecase {
   final AuthRepository _authRepository;
   GoogleSignInUsecase(this._authRepository);
 
-  Future<Either<Failure, AuthEntity>> call({
-    required GoogleSignInAccount googleSignInAccaount,
-  }) async {
-    return await _authRepository.googleSignIn(googleSignInAccaount: googleSignInAccaount);
+  Future<Either<Failure, Unit>> call() async {
+    return await _authRepository.googleSignIn();
   }
 }

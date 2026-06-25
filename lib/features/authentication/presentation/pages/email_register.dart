@@ -1,9 +1,11 @@
 import 'package:assetmanagement/core/common/widgets/button.dart';
+import 'package:assetmanagement/core/common/widgets/show_feedback.dart';
 import 'package:assetmanagement/core/common/widgets/text_form_field.dart';
 import 'package:assetmanagement/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:go_router/go_router.dart';
 
 class EmailRegisterPage extends StatefulWidget {
   const EmailRegisterPage({super.key});
@@ -14,6 +16,7 @@ class EmailRegisterPage extends StatefulWidget {
 
 class _EmailRegisterState extends State<EmailRegisterPage> {
   final _formKey = GlobalKey<FormState>();
+  final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController =
@@ -21,6 +24,7 @@ class _EmailRegisterState extends State<EmailRegisterPage> {
 
   @override
   void dispose() {
+    nameController.dispose();
     emailController.dispose();
     passwordController.dispose();
     confirmPasswordController.dispose();
@@ -43,6 +47,11 @@ class _EmailRegisterState extends State<EmailRegisterPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 spacing: 24,
                 children: [
+                  CommonTextFormField(
+                    validator: FormBuilderValidators.required(),
+                    labelText: 'Name',
+                    controller: nameController,
+                  ),
                   CommonTextFormField(
                     validator: FormBuilderValidators.email(),
                     labelText: 'Email',
@@ -75,14 +84,12 @@ class _EmailRegisterState extends State<EmailRegisterPage> {
 
                   BlocListener<AuthBloc, AuthState>(
                     listener: (context, state) {
-                      if (state is EmailRegisterSuccessState) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(
-                              'Akun berhasil terdaftar. Silahkan login',
-                            ),
-                          ),
+                      if (state.status == AuthStatus.success) {
+                        ShowFeedback.showSnackbar(
+                          context: context,
+                          text: 'Akun berhasil terdaftar. Silahkan login',
                         );
+                        context.pop();
                       }
                     },
                     child: CommonButton(
@@ -91,6 +98,7 @@ class _EmailRegisterState extends State<EmailRegisterPage> {
                         if (_formKey.currentState?.validate() ?? false) {
                           context.read<AuthBloc>().add(
                             EmailRegisterEvent(
+                              name: nameController.text,
                               email: emailController.text,
                               password: passwordController.text,
                             ),

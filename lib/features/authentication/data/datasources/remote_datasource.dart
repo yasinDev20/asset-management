@@ -1,61 +1,51 @@
 import 'dart:async';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:io' ;
 import 'package:assetmanagement/core/error/exception.dart';
 import 'package:assetmanagement/features/authentication/data/models/auth_model.dart';
 import 'package:assetmanagement/features/authentication/data/models/user_model.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 abstract class AuthRemoteDatasource {
-  Future<void> emailRegister({required String email, required String password});
+  Future<void> emailRegister({
+    required String name,
+    required String email,
+    required String password,
+  });
   Future<AuthModel> emailPasswordSignIn({
     required String email,
     required String password,
   });
-  Future<AuthModel> googleSignIn({
-    required GoogleSignInAccount googleSignInAccaount,
-  });
+  Future<void> googleSignIn();
+  Stream<GoogleSignInAccount?> googleSignInStateChanges();
   Future<AuthModel> getUser(String id);
+  Stream<String?> authStateChanges();
   Future<void> forgotPassword(String email);
   Future<void> signOut();
 }
 
 class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
-  bool isWeb;
-  final FirebaseAuth firebaseAuth;
-  final FirebaseFirestore firestore;
-  final GoogleSignIn googleSignInPackage;
-  final GoogleAuthProvider googleAuthProvider;
+  final GoogleSignIn _googleSignInPackage;
+  final SupabaseClient _supabaseClient;
 
   AuthRemoteDatasourceImpl({
-    required this.isWeb,
-    required this.firebaseAuth,
-    required this.firestore,
-    required this.googleSignInPackage,
-    required this.googleAuthProvider,
-  });
+    required GoogleSignIn googleSignInPackage,
+    required SupabaseClient supabaseClient,
+  }) : _googleSignInPackage = googleSignInPackage,
+       _supabaseClient = supabaseClient;
 
   @override
   Future<void> emailRegister({
+    required String name,
     required String email,
     required String password,
   }) async {
-    final userCredential = await firebaseAuth.createUserWithEmailAndPassword(
+    await _supabaseClient.auth.signUp(
       email: email,
       password: password,
+      data: {'name': name},
     );
-
-    final uid = userCredential.user!.uid;
-    final usersRef = firestore.collection('users').doc(uid);
-
-    final user = userCredential.user!;
-    await usersRef.set({
-      'id': user.uid,
-      'name': user.displayName ?? 'name',
-      'email': user.email,
-      'createdAt': DateTime.now().toIso8601String(),
-    });
   }
 
   @override
@@ -63,7 +53,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
     required String email,
     required String password,
   }) async {
-    final userCredential = await firebaseAuth.signInWithEmailAndPassword(
+    final userCredential = await _supabaseClient.auth.signInWithPassword(
       email: email,
       password: password,
     );
@@ -78,18 +68,14 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
       );
     }
 
-    final docSnap = await firestore.collection('users').doc(user.uid).get();
-
-    if (!docSnap.exists || docSnap.data() == null) {
-      throw AppException(
-        type: ExceptionType.server,
-        code: 'DATA_NOT_FOUND',
-        message: 'user data not found',
-      );
-    }
+    final response = await _supabaseClient
+        .from('users')
+        .select('*')
+        .eq('id', user.id)
+        .single();
 
     return AuthModel(
-      user: UserModel.fromMap(docSnap.data()!),
+      user: UserModel.fromMap(response),
       accessToken: 'firebaseauth',
       tokenType: 'Bearer',
       refreshToken: 'firebaseauth',
@@ -99,118 +85,79 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   }
 
   @override
-  Future<AuthModel> googleSignIn({
-    required GoogleSignInAccount googleSignInAccaount,
-  }) async {
-    late UserCredential userCredential;
-    //tambahkan clientId dan serverClientId untuk ios dan web jika tidak menggunakan firebase
-    // String clientId ='';
-
-    // String serverClientId =
-
-    // const List<String> scopes = <String>[
-    //   // 'https://www.googleapis.com/auth/contacts.readonly',
-    // ];
-
-    if (isWeb) {
-      googleAuthProvider.setCustomParameters({
-        'login_hint': 'user@example.com',
-      });
-
-      userCredential = await firebaseAuth.signInWithPopup(googleAuthProvider);
-    } else {
-      //ANDROID / IOS / DESKTOP
-
+  Future<void> googleSignIn() async {
+    if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
+      final googleSignInAccaount = await _googleSignInPackage.authenticate();
       final idToken = googleSignInAccaount.authentication.idToken;
+      if (idToken == null) {
+        throw AppException(
+          type: ExceptionType.auth,
+          code: 'google_sign_in_failed',
+          message: 'Google sign in failed: No user returned',
+        );
+      }
 
-      final credential = GoogleAuthProvider.credential(idToken: idToken);
-
-      userCredential = await firebaseAuth.signInWithCredential(credential);
-    }
-
-    if (userCredential.user == null) {
-      // If userCredential.user is null, throw an exception to avoid returning null.
-      throw AppException(
-        type: ExceptionType.auth,
-        code: 'google_sign_in_failed',
-        message: 'Google sign in failed: No user returned',
+      await _supabaseClient.auth.signInWithIdToken(
+        provider: OAuthProvider.google,
+        idToken: idToken,
       );
+    } else {
+      await _supabaseClient.auth.signInWithOAuth(OAuthProvider.google);
     }
-
-    final uid = userCredential.user!.uid;
-    final usersRef = firestore.collection('users').doc(uid);
-
-    // Ambil data user dari Firestore
-    var doc = await usersRef.get();
-
-    // Jika belum ada, buat user baru
-    if (!doc.exists || doc.data() == null) {
-      final user = userCredential.user!;
-      await usersRef.set({
-        'id': user.uid,
-        'name': user.displayName,
-        'email': user.email,
-        'createdAt': DateTime.now().toIso8601String(),
-      });
-
-      // Ambil ulang setelah create
-      doc = await usersRef.get();
-    }
-
-    if (!doc.exists || doc.data() == null) {
-      throw AppException(
-        type: ExceptionType.server,
-        code: 'DATA_NOT_FOUND',
-        message: 'user data not found',
-      );
-    }
-    // Pasti sudah ada data user di sini
-    final userModel = UserModel.fromMap(doc.data()!);
-
-    return AuthModel(
-      user: userModel,
-      accessToken: 'firebaseauth',
-      tokenType: 'Bearer',
-      refreshToken: 'firebaseauth',
-      expiresIn: DateTime(2025),
-      refreshExpiresAt: DateTime(2025),
-    );
   }
 
   @override
   Future<AuthModel> getUser(String id) async {
-    final docSnapshot = await firestore.collection('users').doc(id).get();
+    final currentSession = _supabaseClient.auth.currentSession;
+    final response = await _supabaseClient
+        .from('users')
+        .select('*')
+        .eq('id', id)
+        .single();
 
-    if (!docSnapshot.exists || docSnapshot.data() == null) {
-      throw AppException(
-        type: ExceptionType.server,
-        code: 'DATA_NOT_FOUND',
-        message: 'user data not found',
-      );
-    }
-
-    final userModel = UserModel.fromMap(docSnapshot.data()!);
+    final userModel = UserModel.fromMap(response);
 
     return AuthModel(
       user: userModel,
-      accessToken: 'firebaseauth',
-      tokenType: 'Bearer',
-      refreshToken: 'firebaseauth',
-      expiresIn: DateTime(2025),
-      refreshExpiresAt: DateTime(2025),
+      accessToken: currentSession?.accessToken ?? '',
+      tokenType: currentSession?.tokenType ?? '',
+      refreshToken: currentSession?.refreshToken ?? '',
+      expiresIn: currentSession?.expiresIn != null
+          ? DateTime.fromMillisecondsSinceEpoch(currentSession!.expiresIn!)
+          : DateTime(2000),
+      refreshExpiresAt: currentSession?.expiresIn != null
+          ? DateTime.fromMillisecondsSinceEpoch(currentSession!.expiresAt!)
+          : DateTime(2000),
     );
   }
 
-  
-  
   @override
-  Future<void> forgotPassword(String email) async{
-    await firebaseAuth.sendPasswordResetEmail(email: email);
+  Future<void> forgotPassword(String email) async {
+    await _supabaseClient.auth.resetPasswordForEmail(email);
   }
 
   @override
   Future<void> signOut() async {
-    await googleSignInPackage.signOut();
-    await firebaseAuth.signOut();
+    await _supabaseClient.auth.signOut();
+    await _googleSignInPackage.signOut();
+  }
+
+  @override
+  Stream<String?> authStateChanges() {
+    return _supabaseClient.auth.onAuthStateChange.map((event) {
+      final userId = event.session?.user.id;
+      return userId;
+    });
+  }
+
+  @override
+  Stream<GoogleSignInAccount?> googleSignInStateChanges() {
+    return _googleSignInPackage.authenticationEvents.map((event) {
+      final user = switch (event) {
+        GoogleSignInAuthenticationEventSignIn(:final user) => user,
+        GoogleSignInAuthenticationEventSignOut() => null,
+      };
+      return user;
+    });
   }
 }

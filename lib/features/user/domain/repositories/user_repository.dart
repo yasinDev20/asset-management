@@ -12,5 +12,5 @@ abstract class UserRepository {
     required int limit,
   });
   Future<Either<Failure, Unit>> addUser(UserEntity userData);
-  Future<Either<Failure, Unit>> forgotPassword(String email);
+ 
 }

@@ -1,5 +1,8 @@
 import 'package:assetmanagement/config/routes/route_names.dart';
+import 'package:assetmanagement/core/common/widgets/show_feedback.dart';
+import 'package:assetmanagement/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:assetmanagement/core/constant/Icon_assets.dart';
 import 'package:go_router/go_router.dart';
@@ -11,27 +14,22 @@ class AppShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SelectionArea(child: SafeArea(child: child)),
-      //  BlocListener<AuthBloc, AuthState>(
-      //   listener: (context, state) {
-      //     switch (state) {
-      //       case FailureState(message: final message):
-      //         ScaffoldMessenger.of(
-      //           context,
-      //         ).showSnackBar(SnackBar(content: Text(message)));
-      //         context.goNamed(RouteNames.login);
-
-      //       case UnAuthenticatedState():
-      //         ScaffoldMessenger.of(
-      //           context,
-      //         ).showSnackBar(const SnackBar(content: Text('Please login')));
-      //         context.goNamed(RouteNames.login);
-      //     }
-      //   },
-      //   child: 
-        
-      //   SelectionArea(child: SafeArea(child: child)),
-      // ),
+      body:
+          BlocListener<AuthBloc, AuthState>(
+            listener: (context, state) {
+              if (state.authEntity == null) {
+                context.goNamed(RouteNames.login);
+              }
+              if (state.status == AuthStatus.failure) {
+                ShowFeedback.showSnackbar(
+                  isFailure: true,
+                  context: context,
+                  text: state.failure?.message,
+                );
+              }
+            },
+            child: SelectionArea(child: SafeArea(child: child)),
+          ),
 
       bottomNavigationBar: NavigationBar(
         selectedIndex: _selectedIndex(context),

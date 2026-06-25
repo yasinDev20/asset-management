@@ -1,5 +1,8 @@
 import 'package:assetmanagement/config/routes/route_names.dart';
+import 'package:assetmanagement/core/common/widgets/button.dart';
+import 'package:assetmanagement/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -13,7 +16,19 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Pengaturan')),
+      appBar: AppBar(
+        title: Text('Pengaturan'),
+
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16),
+            child: CommonButton(
+              text: 'Sign Out',
+              onPressed: () => context.read<AuthBloc>().add(AuthSignOutEvent()),
+            ),
+          ),
+        ],
+      ),
       body: Center(
         child: Column(
           children: [

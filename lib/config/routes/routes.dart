@@ -10,6 +10,7 @@ import 'package:assetmanagement/features/asset_category/presentation/bloc/asset_
 import 'package:assetmanagement/features/asset_location/domain/entities/edit_location_entity.dart';
 import 'package:assetmanagement/features/asset_location/presentation/bloc/asset_location_bloc.dart';
 import 'package:assetmanagement/features/authentication/domain/entities/user_entity.dart';
+import 'package:assetmanagement/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:assetmanagement/features/authentication/presentation/pages/email_register.dart';
 import 'package:assetmanagement/features/authentication/presentation/pages/login.dart';
 import 'package:assetmanagement/features/home/presentation/pages/home.dart';
@@ -29,42 +30,43 @@ import 'package:go_router/go_router.dart';
 class MyRouter {
   static final GoRouter router = GoRouter(
     initialLocation:
-        '/${RouteNames.home}', //ubah ini untuk ke page sedang di develop
+        '/${RouteNames.login}', //ubah ini untuk ke page sedang di develop
     errorPageBuilder: (context, state) {
       return const MaterialPage(child: NotFoundPage());
     },
 
-    // redirect: (context, state) {
-    //   final authState = context.read<AuthBloc>().state;
-    //   final currentPath = state.uri.path;
-    //   final loginPath =
-    //       '/${RouteNames.home}'; //ubah ini untuk ke page sedang di develop
-    //   final forgotPasswordPath =
-    //       '/${RouteNames.login}/${RouteNames.forgotPassword}';
-    //   final emailRegisterPath =
-    //       '/${RouteNames.login}/${RouteNames.emailRegister}';
-    //   final publicPath = [loginPath, emailRegisterPath, forgotPasswordPath];
+    redirect: (context, state) {
+      final authState = context.read<AuthBloc>().state;
+      final currentPath = state.uri.path;
+      final loginPath =
+          '/${RouteNames.login}'; //ubah ini untuk ke page sedang di develop
+      final forgotPasswordPath =
+          '/${RouteNames.login}/${RouteNames.forgotPassword}';
+      final emailRegisterPath =
+          '/${RouteNames.login}/${RouteNames.emailRegister}';
+      final publicPath = [loginPath, emailRegisterPath, forgotPasswordPath];
 
-    //   // debugPrint(authState.toString());
+      // debugPrint(authState.toString());
 
-    //   // 1️⃣ Biarkan auth proses dulu (ex: auto login)
-    //   if (authState is AuthInitialState || authState is AuthLoadingState) {
-    //     return null;
-    //   }
+      // 1️⃣ Biarkan auth proses dulu (ex: auto login)
+      if (authState.status == AuthStatus.initial ||
+          authState.status == AuthStatus.loading) {
+        return null;
+      }
 
-    //   // 2️⃣ Sudah login → jangan ke login page
-    //   if (authState is AuthenticatedState && currentPath == loginPath) {
-    //     return '/';
-    //   }
+      // 2️⃣ Sudah login → jangan ke login page
+      if (authState.authEntity != null && currentPath == loginPath) {
+        return '/';
+      }
 
-    //   // 3️⃣ Belum login → arahkan ke login
-    //   if (authState is! AuthenticatedState &&
-    //       !publicPath.contains(currentPath)) {
-    //     return loginPath;
-    //   }
+      // 3️⃣ Belum login → arahkan ke login
+      if (authState.authEntity == null && !publicPath.contains(currentPath)) {
+        return loginPath;
+      }
 
-    //   return null;
-    // },
+      return null;
+    },
+
     routes: [
       //login
       GoRoute(
@@ -87,6 +89,7 @@ class MyRouter {
         ],
       ),
 
+      //sign in only
       ShellRoute(
         builder: (context, state, child) {
           return AppShell(child: child);

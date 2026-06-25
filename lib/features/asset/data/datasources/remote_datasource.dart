@@ -132,7 +132,6 @@ class AssetRemoteDataSourceImpl implements AssetRemoteDataSource {
     return AssetDetailModel.fromMap(response.first);
   }
 
-  //TODO: need owner id agar tidak menagmbil aset owner lain
   @override
   Future<List<AssetRefModel>> getAssetRefs({
     String? assetId,

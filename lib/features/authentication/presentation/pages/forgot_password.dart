@@ -46,7 +46,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
               BlocListener<AuthBloc, AuthState>(
                 listener: (context, state) {
-                  if (state is ForgotPasswordSuccessState) {
+                  if (state.status == AuthStatus.success) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text(

@@ -55,17 +55,13 @@ import 'package:assetmanagement/features/authentication/domain/usecases/google_s
 import 'package:assetmanagement/features/authentication/domain/usecases/email_password_sign_in.dart';
 import 'package:assetmanagement/features/authentication/domain/usecases/sign_out.dart';
 import 'package:assetmanagement/features/authentication/presentation/bloc/auth_bloc.dart';
-import 'package:assetmanagement/features/authentication/presentation/bloc/auth_event_listener.dart';
-import 'package:assetmanagement/features/user/data/repositories/user_repository_impl.dart';
-import 'package:assetmanagement/features/user/domain/repositories/user_repository.dart';
 import 'package:assetmanagement/features/user/domain/usecases/add_user.dart';
 import 'package:assetmanagement/features/user/domain/usecases/get_all_user.dart';
 import 'package:assetmanagement/features/user/domain/usecases/get_user.dart';
 import 'package:assetmanagement/features/user/presentation/bloc/user_bloc.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:dio/dio.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
+
 import 'package:get_it/get_it.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -81,28 +77,12 @@ Future<void> injectionInit() async {
   //Google SignIn
   myInjection.registerLazySingleton(() => GoogleSignIn.instance);
 
-  //Google Provider
-  myInjection.registerLazySingleton<GoogleAuthProvider>(
-    () => GoogleAuthProvider(),
-  );
-
-  // Register Firestore
-  myInjection.registerLazySingleton<FirebaseFirestore>(
-    () => FirebaseFirestore.instance,
-  );
-  // Register FirebaseAuth
-  myInjection.registerLazySingleton<FirebaseAuth>(() => FirebaseAuth.instance);
-
   // Register supabase
   myInjection.registerLazySingleton<SupabaseClient>(
     () => Supabase.instance.client,
   );
   // Register Dio
   myInjection.registerLazySingleton<Dio>(() => Dio());
-
-  myInjection.registerLazySingleton<AuthEventListener>(
-    () => AuthEventListenerImpl(),
-  );
 
   //Depedency ---
 
@@ -142,11 +122,9 @@ Future<void> injectionInit() async {
   //--- Data Source
   myInjection.registerLazySingleton<AuthRemoteDatasource>(
     () => AuthRemoteDatasourceImpl(
-      isWeb: kIsWeb,
       googleSignInPackage: myInjection(),
-      googleAuthProvider: myInjection(),
-      firebaseAuth: myInjection(),
-      firestore: myInjection(),
+
+      supabaseClient: myInjection(),
     ),
   );
 
@@ -312,7 +290,7 @@ Future<void> injectionInit() async {
   //---Bloc
   myInjection.registerFactory(
     () => AuthBloc(
-      authEventListener: myInjection(),
+      authRepository: myInjection(),
       emailRegisterUsecase: myInjection(),
       getUserUseCase: myInjection(),
       emailPasswordSignUsecase: myInjection(),

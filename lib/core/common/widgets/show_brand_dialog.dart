@@ -1,11 +1,9 @@
 import 'package:assetmanagement/core/common/injection/injection.dart';
 import 'package:assetmanagement/core/common/widgets/show_feedback.dart';
 import 'package:assetmanagement/core/common/widgets/text_form_field.dart';
-import 'package:assetmanagement/features/asset_brand/domain/entities/add_brand_entity.dart';
 import 'package:assetmanagement/features/asset_brand/domain/entities/brand_detail_entity.dart';
 import 'package:assetmanagement/features/asset_brand/presentation/bloc/asset_brand_bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 

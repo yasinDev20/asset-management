@@ -4,8 +4,6 @@ import 'package:assetmanagement/core/theme/theme.dart';
 import 'package:assetmanagement/core/common/injection/injection.dart';
 import 'package:assetmanagement/features/authentication/presentation/bloc/auth_bloc.dart';
 import 'package:assetmanagement/features/user/presentation/bloc/user_bloc.dart';
-import 'package:assetmanagement/firebase_options.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -18,11 +16,15 @@ import 'package:path_provider/path_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:assetmanagement/features/asset/presentation/bloc/asset_bloc.dart';
 
+import 'package:web/web.dart' as web;
+
 void main() async {
   if (kDebugMode) {
     Bloc.observer = AppBlocObserver();
   }
   WidgetsFlutterBinding.ensureInitialized();
+  await injectionInit();
+  Intl.defaultLocale = 'id_ID';
 
   if (!kIsWeb) {
     var dir = await getApplicationDocumentsDirectory();
@@ -33,15 +35,21 @@ void main() async {
   await Hive.openBox('recentBrandSelections');
   await Hive.openBox('recentLocationSelections');
 
-  Intl.defaultLocale = 'id_ID';
   await Supabase.initialize(
     url: 'https://uzzuacawolizquuqylev.supabase.co',
     anonKey: 'sb_publishable_D5bcN2CFRoD9ihmEGwACsg_2Es-7dSz',
   );
-  await injectionInit();
-  await GoogleSignIn.instance.initialize();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await myInjection<GoogleSignIn>().initialize(
+    //web client id
+    serverClientId: kIsWeb
+        ? null
+        : '1060762376589-ijpes02hb25vnue9s99j2ev3p9o4s68k.apps.googleusercontent.com',
+  );
 
+  // Hapus query code dari google sign in redirect URL tanpa reload
+  if (kIsWeb) {
+    web.window.history.replaceState(null, '', '/');
+  }
   runApp(const MyApp());
 }
 
