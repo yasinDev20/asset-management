@@ -1,6 +1,4 @@
 import 'package:assetmanagement/core/error/failure.dart';
-import 'package:assetmanagement/features/authentication/domain/entities/auth_entity.dart';
-import 'package:assetmanagement/features/authentication/domain/entities/user_entity.dart';
 import 'package:assetmanagement/features/authentication/domain/repositories/auth_repository.dart';
 import 'package:assetmanagement/features/authentication/domain/usecases/email_password_sign_in.dart';
 import 'package:dartz/dartz.dart';
@@ -13,53 +11,57 @@ void main() {
   late EmailPasswordSignUsecase emailPasswordSignUsecase;
   late MockAuthRepository mockAuthRepository;
 
+  const email = 'email';
+  const password = 'password';
+
   setUp(() {
     mockAuthRepository = MockAuthRepository();
     emailPasswordSignUsecase = EmailPasswordSignUsecase(mockAuthRepository);
   });
 
-  test('should return AuthEntity when email and password are valid', () async {
-    const email = 'test@email.com';
-    const password = '123456';
-    
-    final authEntity = AuthEntity(
-      user: UserEntity(id: 'test', email: 'email', name: 'name', createdAt: DateTime(2025)),
-      accessToken: 'accessToken',
-      tokenType: 'tokenType',
-      refreshToken: 'refreshToken',
-      expiresIn: DateTime(2025),
-      refreshExpiresAt: DateTime(2025),
+  test('should return Right(unit) when repo sign in succeds', () async {
+    when(
+      () => mockAuthRepository.emailPasswordSignIn(
+        email: email,
+        password: password,
+      ),
+    ).thenAnswer((_) async => Right(unit));
+
+    final result = await emailPasswordSignUsecase.call(
+      email: email,
+      password: password,
     );
 
-    when(
-      () => mockAuthRepository.emailPasswordSignIn(email: email, password: password),
-    ).thenAnswer((_) async => Right(authEntity));
-
-    // final result = await usecase(email, password);
-    final result = await emailPasswordSignUsecase.call(email, password);
-
-    expect(result, equals(Right(authEntity)));
-    verify(() => mockAuthRepository.emailPasswordSignIn(email: email, password: password)).called(1);
+    expect(result, equals(Right(unit)));
+    verify(
+      () => mockAuthRepository.emailPasswordSignIn(
+        email: email,
+        password: password,
+      ),
+    ).called(1);
+    verifyNoMoreInteractions(mockAuthRepository);
   });
 
-  test('should return Failure when sign in fails', () async {
-    const email = 'test@email.com';
-    const password = 'wrong';
+  test('should return Failure when repo sign in fails', () async {
+    when(
+      () => mockAuthRepository.emailPasswordSignIn(
+        email: email,
+        password: password,
+      ),
+    ).thenAnswer((_) async => Left(AuthFailure(message: 'user not found')));
 
-    when(() => mockAuthRepository.emailPasswordSignIn(email: email, password: password)).thenAnswer(
-      (_) async => Left(AuthFailure(message: 'user not found', code: '404')),
+    final result = await emailPasswordSignUsecase(
+      email: email,
+      password: password,
     );
 
-    final result = await emailPasswordSignUsecase(email, password);
-
-    expect(result, Left(AuthFailure(message: 'user not found', code: '404')));
-    verify(() => mockAuthRepository.emailPasswordSignIn(email: email, password: password)).called(1);
-
-    result.fold(
-      (failure) {
-      expect(failure, isA<AuthFailure>());
-      expect(failure.message, 'user not found');
-      expect(failure.code, '404');
-    }, (_) => fail('Should return Left Failure'));
+    expect(result, Left(AuthFailure(message: 'user not found')));
+    verify(
+      () => mockAuthRepository.emailPasswordSignIn(
+        email: email,
+        password: password,
+      ),
+    ).called(1);
+    verifyNoMoreInteractions(mockAuthRepository);
   });
 }

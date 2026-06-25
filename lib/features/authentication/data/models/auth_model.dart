@@ -11,62 +11,24 @@ import 'package:assetmanagement/features/authentication/domain/entities/auth_ent
 
 class AuthModel extends Equatable {
   final UserModel user;
-  final String accessToken;
-  final String tokenType;
-  final String refreshToken;
-  final DateTime expiresIn;
-  final DateTime refreshExpiresAt;
 
-  const AuthModel({
-    required this.user,
-    required this.accessToken,
-    required this.tokenType,
-    required this.refreshToken,
-    required this.expiresIn,
-    required this.refreshExpiresAt,
-  });
+  const AuthModel({required this.user});
 
   AuthEntity toEntity() {
-    return AuthEntity(
-      user: user.toEntity(),
-      accessToken: accessToken,
-      tokenType: tokenType,
-      refreshToken: refreshToken,
-      expiresIn: expiresIn,
-      refreshExpiresAt: refreshExpiresAt,
-    );
+    return AuthEntity(user: user.toEntity());
   }
 
   factory AuthModel.fromEntity(AuthEntity entity) {
-    return AuthModel(
-      user: UserModel.fromEntity(entity.user),
-      accessToken: entity.accessToken,
-      tokenType: entity.tokenType,
-      refreshToken: entity.refreshToken,
-      expiresIn: entity.expiresIn,
-      refreshExpiresAt: entity.refreshExpiresAt,
-    );
+    return AuthModel(user: UserModel.fromEntity(entity.user));
   }
 
   Map<String, dynamic> toMap() {
-    return <String, dynamic>{
-      'user': user.toMap(),
-      'accessToken': accessToken,
-      'tokenType': tokenType,
-      'refreshToken': refreshToken,
-      'expiresIn': expiresIn.toIso8601String(),
-      'refreshExpiresAt': refreshExpiresAt.toIso8601String(),
-    };
+    return <String, dynamic>{'user': user.toMap()};
   }
 
   factory AuthModel.fromMap(Map<String, dynamic> map) {
     return AuthModel(
       user: UserModel.fromMap(map['user'] as Map<String, dynamic>),
-      accessToken: map['accessToken'] as String,
-      tokenType: map['tokenType'] as String,
-      refreshToken: map['refreshToken'] as String,
-      expiresIn: DateTime.parse(map['expiresIn']),
-      refreshExpiresAt: DateTime.parse(map['refreshExpiresAt']),
     );
   }
 
@@ -77,13 +39,6 @@ class AuthModel extends Equatable {
 
   @override
   List<Object> get props {
-    return [
-      user,
-      accessToken,
-      tokenType,
-      refreshToken,
-      expiresIn,
-      refreshExpiresAt,
-    ];
+    return [user];
   }
 }

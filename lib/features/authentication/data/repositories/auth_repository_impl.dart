@@ -33,16 +33,16 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<Either<Failure, AuthEntity>> emailPasswordSignIn({
+  Future<Either<Failure, Unit>> emailPasswordSignIn({
     required String email,
     required String password,
   }) async {
     return runCatching(() async {
-      final result = await _authRemoteDataSource.emailPasswordSignIn(
+       await _authRemoteDataSource.emailPasswordSignIn(
         email: email,
         password: password,
       );
-      return result.toEntity();
+      return unit;
     });
   }
 

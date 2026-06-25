@@ -1,4 +1,3 @@
-
 import 'package:assetmanagement/core/error/failure.dart';
 import 'package:assetmanagement/features/authentication/domain/repositories/auth_repository.dart';
 import 'package:assetmanagement/features/authentication/domain/usecases/forgot_password.dart';
@@ -12,25 +11,28 @@ void main() {
   late MockAuthRepository mockAuthRepository;
   late ForgotPasswordUsecase forgotPasswordUsecase;
 
+  const String email = 'email@gmail.com';
   setUp(() {
     mockAuthRepository = MockAuthRepository();
     forgotPasswordUsecase = ForgotPasswordUsecase(mockAuthRepository);
   });
 
-  test('should return unit when forgot password request succeeds', () async {
-    const String email = 'email@gmail.com';
+  test(
+    'should return Right(unit) when repo forgot password succeeds',
+    () async {
+      when(
+        () => mockAuthRepository.forgotPassword(email),
+      ).thenAnswer((_) async => Right(unit));
 
-    when(
-      () => mockAuthRepository.forgotPassword(email),
-    ).thenAnswer((_) async => Right(unit));
+      final result = await forgotPasswordUsecase.call(email);
 
-    final result = await forgotPasswordUsecase.call(email);
+      expect(result, Right(unit));
 
-    expect(result, Right(unit));
-  });
+      verify(() => mockAuthRepository.forgotPassword(email)).called(1);
+    },
+  );
 
-  test('should return Failure when forgot password request fails', () async {
-     const String email = 'email@gmail.com';
+  test('should return Failure when repo forgot password fails', () async {
     when(() => mockAuthRepository.forgotPassword(email)).thenAnswer(
       (_) async =>
           Left(AuthFailure(code: 'user_not_found', message: 'user not found')),
@@ -45,5 +47,4 @@ void main() {
       ),
     );
   });
-
 }

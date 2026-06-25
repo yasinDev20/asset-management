@@ -11,75 +11,52 @@ class MockAuthRepository extends Mock implements AuthRepository {}
 
 void main() {
   late GetUserUsecase getUserUsecase;
-  late MockAuthRepository authRepository;
+  late MockAuthRepository mockAuthRepository;
+
+  const String id = 'test';
+  const String email = 'email';
+  const String name = 'name';
+  final authEntity = AuthEntity(
+    user: UserEntity(
+      id: id,
+      email: email,
+      name: name,
+      createdAt: DateTime(2025),
+    ),
+  );
 
   setUp(() {
-    authRepository = MockAuthRepository();
-    getUserUsecase = GetUserUsecase(
-      authRepository,
-    );
+    mockAuthRepository = MockAuthRepository();
+    getUserUsecase = GetUserUsecase(mockAuthRepository);
   });
 
-  test('should return AuthEntity when get user succeeds', () async {
-    final authEntity = AuthEntity(
-      user: UserEntity(
-        id: 'test',
-        email: 'email',
-        name: 'name',
-        createdAt: DateTime(2025),
-      ),
-      accessToken: 'accessToken',
-      tokenType: 'tokenType',
-      refreshToken: 'refreshToken',
-      expiresIn: DateTime(2025),
-      refreshExpiresAt: DateTime(2025),
-    );
-
+  test('should return Right(authEntity) when repo get user succeeds', () async {
     when(
-      () => authRepository.getUser(id: authEntity.user.id),
+      () => mockAuthRepository.getUser(id: id),
     ).thenAnswer((_) async => Right(authEntity));
 
-    final result = await getUserUsecase.call(id: authEntity.user.id);
+    final result = await getUserUsecase.call(id: id);
 
     expect(result, equals(Right(authEntity)));
-    verify(
-      () => authRepository.getUser(id: authEntity.user.id),
-    ).called(1);
+    verify(() => mockAuthRepository.getUser(id: id)).called(1);
+    verifyNoMoreInteractions(mockAuthRepository);
   });
 
-  test('should return Failure when get user fails', () async {
-    final authEntity = AuthEntity(
-      user: UserEntity(
-        id: 'test',
-        email: 'email',
-        name: 'name',
-        createdAt: DateTime(2025),
-      ),
-      accessToken: 'accessToken',
-      tokenType: 'tokenType',
-      refreshToken: 'refreshToken',
-      expiresIn: DateTime(2025),
-      refreshExpiresAt: DateTime(2025),
-    );
-
-    when(
-      () => authRepository.getUser(id: authEntity.user.id),
-    ).thenAnswer(
+  test('should return Failure when repo get user fails', () async {
+    when(() => mockAuthRepository.getUser(id: id)).thenAnswer(
       (_) async => Left(
         NetworkFailure(message: 'NETWORK FAILURE', code: 'NETWORK_FAILURE'),
       ),
     );
 
-    final result = await getUserUsecase.call(id: authEntity.user.id);
+    final result = await getUserUsecase.call(id: id);
 
     expect(
       result,
       Left(NetworkFailure(message: 'NETWORK FAILURE', code: 'NETWORK_FAILURE')),
     );
 
-    result.fold((l) {
-      expect(l.code, equals('NETWORK_FAILURE'));
-      expect(l.message, equals('NETWORK FAILURE'));
-    }, (_) => fail('Should return Left Failure'));
+    verify(() => mockAuthRepository.getUser(id: id)).called(1);
+    verifyNoMoreInteractions(mockAuthRepository);
   });
 }

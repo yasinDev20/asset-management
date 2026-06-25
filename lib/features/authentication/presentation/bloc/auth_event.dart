@@ -9,15 +9,15 @@ class IntialEvent extends AuthEvent{
   List<Object?> get props => [];
 }
 
-class AuthLoggedOutEvent extends AuthEvent{
+class LoggedOutEvent extends AuthEvent{
   @override
   List<Object?> get props =>[];
   
 }
-class AuthLoggedInEvent extends AuthEvent{
+class LoggedInEvent extends AuthEvent{
   final String userId;
 
-  const AuthLoggedInEvent({required this.userId});
+  const LoggedInEvent({required this.userId});
 
   @override
   List<Object?> get props =>[userId];
@@ -57,10 +57,10 @@ class EmailPasswordSignEvent extends AuthEvent {
   @override
   List<Object> get props => [email, password];
 }
-class ForgotPassworEvent extends AuthEvent {
+class ForgotPasswordEvent extends AuthEvent {
   final String email;
 
-  const ForgotPassworEvent(
+  const ForgotPasswordEvent(
   this.email,
   );
 
@@ -68,7 +68,7 @@ class ForgotPassworEvent extends AuthEvent {
   List<Object> get props => [email];
 }
 
-class  AuthSignOutEvent extends AuthEvent{
+class  SignOutEvent extends AuthEvent{
   @override
   List<Object?> get props => [];
   

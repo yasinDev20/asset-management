@@ -4,159 +4,148 @@ import 'package:assetmanagement/features/authentication/data/datasources/remote_
 import 'package:assetmanagement/features/authentication/data/models/auth_model.dart';
 import 'package:assetmanagement/features/authentication/data/models/user_model.dart';
 import 'package:assetmanagement/features/authentication/data/repositories/auth_repository_impl.dart';
-import 'package:assetmanagement/features/authentication/domain/entities/auth_entity.dart';
 import 'package:dartz/dartz.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:mocktail/mocktail.dart';
-
-class MockFirebaseAuth extends Mock implements FirebaseAuth {}
-
-class MockGoogleSignInAccount extends Mock implements GoogleSignInAccount {}
 
 class MockAuthRemoteDataSource extends Mock implements AuthRemoteDatasource {}
 
 void main() {
   debugPrint = (String? message, {int? wrapWidth}) {}; //menghilangkan logging
 
-  late MockGoogleSignInAccount mockGoogleSignInAccount;
-  late MockAuthRemoteDataSource authRemoteDataSource;
+  late MockAuthRemoteDataSource mockAuthRemoteDataSource;
   late AuthRepositoryImpl authRepositoryImpl;
-  late AuthModel authModel;
-  late AuthEntity authEntity;
-  late String email;
-  late String password;
 
+  const id = 'id';
+  const name = 'name';
+  const email = 'test@email.com';
+  const password = '123456';
+  final authModel = AuthModel(
+    user: UserModel(
+      id: id,
+      email: email,
+      name: name,
+      createdAt: DateTime(2026),
+      updatedAt: DateTime(2026),
+    ),
+  );
+
+  final authEntity = authModel.toEntity();
   setUp(() {
-    mockGoogleSignInAccount = MockGoogleSignInAccount();
-
-    email = 'test@email.com';
-    password = '123456';
-
-    authModel = AuthModel(
-      user: UserModel(
-        id: 'id',
-        email: 'email',
-        name: 'name',
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-      ),
-      accessToken: 'accessToken',
-      tokenType: 'tokenType',
-      refreshToken: 'refreshToken',
-      expiresIn: DateTime.now(),
-      refreshExpiresAt: DateTime.now(),
-    );
-
-    authEntity = authModel.toEntity();
-
-    authRemoteDataSource = MockAuthRemoteDataSource();
+    mockAuthRemoteDataSource = MockAuthRemoteDataSource();
     authRepositoryImpl = AuthRepositoryImpl(
-      authRemoteDataSource: authRemoteDataSource,
+      authRemoteDataSource: mockAuthRemoteDataSource,
     );
   });
 
   group('emailRegister', () {
-    test('should return unit when email register suceeds', () async {
-      // Arrange
-      when(
-        () => authRemoteDataSource.emailRegister(
+    test(
+      'should return Right(unit) when remote email register suceeds',
+      () async {
+        // Arrange
+        when(
+          () => mockAuthRemoteDataSource.emailRegister(
+            name: name,
+            email: email,
+            password: password,
+          ),
+        ).thenAnswer((_) async {});
+
+        // Act
+        final result = await authRepositoryImpl.emailRegister(
+          name: name,
           email: email,
           password: password,
-        ),
-      ).thenAnswer((_) async => {});
+        );
 
-      // Act
-      final result = await authRepositoryImpl.emailRegister(email: email, password: password);
-
-      // Assert
-      expect(result, Right(unit));
-      verify(
-        () => authRemoteDataSource.emailRegister(
-          email: email,
-          password: password,
-        ),
-      ).called(1);
-    });
-
-    test('should return Failure when email register throws exception', () async {
-      when(
-        () => authRemoteDataSource.emailRegister(
-          email: email,
-          password: password,
-        ),
-      ).thenThrow(
-        AppException(
-          message: 'Network Failure',
-          type: ExceptionType.network,
-          code: 'NETWORK_ERROR',
-        ),
-      );
-
-      final result = await authRepositoryImpl.emailRegister(
-        email: email,
-        password: password,
-      );
-
-      expect(result.isLeft(), true);
-
-      result.fold((failure) {
-        expect(failure, isA<NetworkFailure>());
-        expect(failure.message, 'Network Failure');
-        expect(failure.code, 'NETWORK_ERROR');
-      }, (_) => fail('Should not return Right'));
-
-      verify(
-        () => authRemoteDataSource.emailRegister(
-          email: email,
-          password: password,
-        ),
-      ).called(1);
-    });
-  });
-  group('emailPasswordSignIn', () {
-    test('should return AuthEntity when email and password sign in succeeds', () async {
-      // Arrange
-      when(
-        () => authRemoteDataSource.emailPasswordSignIn(
-          email: email,
-          password: password,
-        ),
-      ).thenAnswer((_) async => authModel);
-
-      // Act
-      final result = await authRepositoryImpl.emailPasswordSignIn(
-        email: email,
-        password: password,
-      );
-
-      // Assert
-      expect(result, Right(authEntity));
-
-      verify(
-        () => authRemoteDataSource.emailPasswordSignIn(
-          email: email,
-          password: password,
-        ),
-      ).called(1);
-    });
+        // Assert
+        expect(result, Right(unit));
+        verify(
+          () => mockAuthRemoteDataSource.emailRegister(
+            name: name,
+            email: email,
+            password: password,
+          ),
+        ).called(1);
+        verifyNoMoreInteractions(mockAuthRemoteDataSource);
+      },
+    );
 
     test(
-      'should return Failure when email and password sign in throws exception',
+      'should return Left(Failure) when remote email register throws exception',
       () async {
         when(
-          () => authRemoteDataSource.emailPasswordSignIn(
+          () => mockAuthRemoteDataSource.emailRegister(
+            name: name,
             email: email,
             password: password,
           ),
         ).thenThrow(
-          AppException(
-            message: 'Network Failure',
-            type: ExceptionType.network,
-            code: 'NETWORK_ERROR',
+          AppException(message: 'Network Failure', type: ExceptionType.network),
+        );
+
+        final result = await authRepositoryImpl.emailRegister(
+          name: name,
+          email: email,
+          password: password,
+        );
+
+        expect(result, Left(NetworkFailure(message: 'Network Failure')));
+
+        verify(
+          () => mockAuthRemoteDataSource.emailRegister(
+            name: name,
+            email: email,
+            password: password,
           ),
+        ).called(1);
+
+        verifyNoMoreInteractions(mockAuthRemoteDataSource);
+      },
+    );
+  });
+  group('emailPasswordSignIn', () {
+    test(
+      'should return Right(authEntity) when remote emailPasswordSignIn succeeds',
+      () async {
+        // Arrange
+        when(
+          () => mockAuthRemoteDataSource.emailPasswordSignIn(
+            email: email,
+            password: password,
+          ),
+        ).thenAnswer((_) async {});
+
+        // Act
+        final result = await authRepositoryImpl.emailPasswordSignIn(
+          email: email,
+          password: password,
+        );
+
+        // Assert
+        expect(result, Right(unit));
+
+        verify(
+          () => mockAuthRemoteDataSource.emailPasswordSignIn(
+            email: email,
+            password: password,
+          ),
+        ).called(1);
+        verifyNoMoreInteractions(mockAuthRemoteDataSource);
+      },
+    );
+
+    test(
+      'should return Left(Failure) when remote emailPasswordSignIn throws exception',
+      () async {
+        when(
+          () => mockAuthRemoteDataSource.emailPasswordSignIn(
+            email: email,
+            password: password,
+          ),
+        ).thenThrow(
+          AppException(message: 'Network Failure', type: ExceptionType.network),
         );
 
         final result = await authRepositoryImpl.emailPasswordSignIn(
@@ -164,200 +153,150 @@ void main() {
           password: password,
         );
 
-        expect(result.isLeft(), true);
-
-        result.fold((failure) {
-          expect(failure, isA<NetworkFailure>());
-          expect(failure.message, 'Network Failure');
-          expect(failure.code, 'NETWORK_ERROR');
-        }, (_) => fail('Should not return Right'));
+        expect(result, Left(NetworkFailure(message: 'Network Failure')));
 
         verify(
-          () => authRemoteDataSource.emailPasswordSignIn(
+          () => mockAuthRemoteDataSource.emailPasswordSignIn(
             email: email,
             password: password,
           ),
         ).called(1);
+        verifyNoMoreInteractions(mockAuthRemoteDataSource);
       },
     );
   });
 
   group('googleSignIn', () {
-    test('should return AuthEntity when google sign in succeeds', () async {
-      // Arrange
-      when(
-        () => authRemoteDataSource.googleSignIn(
-          googleSignInAccaount: mockGoogleSignInAccount,
-        ),
-      ).thenAnswer((_) async => authModel);
+    test(
+      'should return Right(authEntity) when remote googleSignIn succeeds',
+      () async {
+        // Arrange
+        when(
+          () => mockAuthRemoteDataSource.googleSignIn(),
+        ).thenAnswer((_) async {});
 
-      // Act
-      final result = await authRepositoryImpl.googleSignIn(
-        googleSignInAccaount: mockGoogleSignInAccount,
-      );
+        // Act
+        final result = await authRepositoryImpl.googleSignIn();
 
-      // Assert
-      expect(result, Right(authEntity));
+        // Assert
+        expect(result, Right(unit));
 
-      verify(
-        () => authRemoteDataSource.googleSignIn(
-          googleSignInAccaount: mockGoogleSignInAccount,
-        ),
-      ).called(1);
-    });
+        verify(() => mockAuthRemoteDataSource.googleSignIn()).called(1);
+        verifyNoMoreInteractions(mockAuthRemoteDataSource);
+      },
+    );
 
-    test('should return Failure when google sign in throws exception', () async {
-      when(
-        () => authRemoteDataSource.googleSignIn(
-          googleSignInAccaount: mockGoogleSignInAccount,
-        ),
-      ).thenThrow(
-        AppException(
-          message: 'Network Failure',
-          type: ExceptionType.network,
-          code: 'NETWORK_ERROR',
-        ),
-      );
+    test(
+      'should return Left(Failure) when remote googleSignIn throws exception',
+      () async {
+        when(() => mockAuthRemoteDataSource.googleSignIn()).thenThrow(
+          AppException(message: 'Network Failure', type: ExceptionType.network),
+        );
 
-      final result = await authRepositoryImpl.googleSignIn(
-        googleSignInAccaount: mockGoogleSignInAccount,
-      );
+        final result = await authRepositoryImpl.googleSignIn();
 
-      expect(result.isLeft(), true);
+        expect(result, Left(NetworkFailure(message: 'Network Failure')));
 
-      result.fold((failure) {
-        expect(failure, isA<NetworkFailure>());
-        expect(failure.message, 'Network Failure');
-        expect(failure.code, 'NETWORK_ERROR');
-      }, (_) => fail('Should not return Right'));
-
-      verify(
-        () => authRemoteDataSource.googleSignIn(
-          googleSignInAccaount: mockGoogleSignInAccount,
-        ),
-      ).called(1);
-    });
+        verify(() => mockAuthRemoteDataSource.googleSignIn()).called(1);
+        verifyNoMoreInteractions(mockAuthRemoteDataSource);
+      },
+    );
   });
 
   group('getUser', () {
-    test('should return AuthEntity when get user succeeds', () async {
-      when(
-        () => authRemoteDataSource.getUser(authEntity.user.id),
-      ).thenAnswer((_) async => authModel);
-
-      final result = await authRepositoryImpl.getUser(
-        id: authEntity.user.id,
-      );
-
-      expect(result, equals(Right(authEntity)));
-      verify(
-        () => authRemoteDataSource.getUser(authEntity.user.id),
-      ).called(1);
-    });
-
     test(
-      'should return Failure when get user throws exception',
+      'should return Right(authEntity) when remote getUser succeeds',
       () async {
         when(
-          () => authRemoteDataSource.getUser(authEntity.user.id),
-        ).thenThrow(
-          AppException(
-            type: ExceptionType.network,
-            code: 'NETWORK_ERROR',
-            message: 'Network Failure',
-          ),
+          () => mockAuthRemoteDataSource.getUser(id),
+        ).thenAnswer((_) async => authModel);
+
+        final result = await authRepositoryImpl.getUser(id: id);
+
+        expect(result, equals(Right(authEntity)));
+        verify(() => mockAuthRemoteDataSource.getUser(id)).called(1);
+        verifyNoMoreInteractions(mockAuthRemoteDataSource);
+      },
+    );
+
+    test(
+      'should return Left(Failure) when remote getUser throws exception',
+      () async {
+        when(() => mockAuthRemoteDataSource.getUser(id)).thenThrow(
+          AppException(type: ExceptionType.network, message: 'Network Failure'),
         );
 
-        final result = await authRepositoryImpl.getUser(
-          id: authEntity.user.id,
-        );
+        final result = await authRepositoryImpl.getUser(id: id);
 
-        expect(result.isLeft(), true);
+        expect(result, Left(NetworkFailure(message: 'Network Failure')));
 
-        result.fold((failure) {
-          expect(failure, isA<NetworkFailure>());
-          expect(failure.message, 'Network Failure');
-          expect(failure.code, 'NETWORK_ERROR');
-        }, (_) => fail('Should not return Right'));
-
-        verify(
-          () => authRemoteDataSource.getUser(authEntity.user.id),
-        ).called(1);
+        verify(() => mockAuthRemoteDataSource.getUser(id)).called(1);
+        verifyNoMoreInteractions(mockAuthRemoteDataSource);
       },
     );
   });
 
   group('forgotPassword', () {
-    test('should return unit when forgot password succeeds', () async {
-      // Arrange
-      when(
-        () => authRemoteDataSource.forgotPassword(email),
-      ).thenAnswer((_) async => {});
+    test(
+      'should return Right(unit) when remote forgotPassword succeeds',
+      () async {
+        // Arrange
+        when(
+          () => mockAuthRemoteDataSource.forgotPassword(email),
+        ).thenAnswer((_) async {});
 
-      // Act
-     final result  = await authRepositoryImpl.forgotPassword(email);
+        // Act
+        final result = await authRepositoryImpl.forgotPassword(email);
 
-      // Assert
-      expect(result, Right(unit));
-      verify(() => authRemoteDataSource.forgotPassword(email)).called(1);
-    });
+        // Assert
+        expect(result, Right(unit));
+        verify(() => mockAuthRemoteDataSource.forgotPassword(email)).called(1);
+        verifyNoMoreInteractions(mockAuthRemoteDataSource);
+      },
+    );
 
     test(
-      'should return Failure when forgot password throws exception',
+      'should return Left(Failure) when forgot password throws exception',
       () async {
-        when(() => authRemoteDataSource.forgotPassword(email)).thenThrow(
-          AppException(
-            message: 'Network Failure',
-            type: ExceptionType.network,
-            code: 'NETWORK_ERROR',
-          ),
+        when(() => mockAuthRemoteDataSource.forgotPassword(email)).thenThrow(
+          AppException(message: 'Network Failure', type: ExceptionType.network),
         );
 
         final result = await authRepositoryImpl.forgotPassword(email);
 
-        expect(result.isLeft(), true);
+        expect(result, Left(NetworkFailure(message: 'Network Failure')));
 
-        result.fold((failure) {
-          expect(failure, isA<NetworkFailure>());
-          expect(failure.message, 'Network Failure');
-          expect(failure.code, 'NETWORK_ERROR');
-        }, (_) => fail('Should not return Right'));
-
-        verify(() => authRemoteDataSource.forgotPassword(email)).called(1);
+        verify(() => mockAuthRemoteDataSource.forgotPassword(email)).called(1);
+        verifyNoMoreInteractions(mockAuthRemoteDataSource);
       },
     );
   });
 
   group('signOut', () {
-    test('should return unit when sign out succeeds', () async {
-      when(() => authRemoteDataSource.signOut()).thenAnswer((_) async => {});
+    test('should return Right(unit) when remote signOut succeeds', () async {
+      when(() => mockAuthRemoteDataSource.signOut()).thenAnswer((_) async {});
       final result = await authRepositoryImpl.signOut();
 
       expect(result, Right(unit));
 
-      verify(() => authRemoteDataSource.signOut()).called(1);
+      verify(() => mockAuthRemoteDataSource.signOut()).called(1);
+      verifyNoMoreInteractions(mockAuthRemoteDataSource);
     });
 
-    test('should return Failure when sign out throws exception', () async {
-      when(() => authRemoteDataSource.signOut()).thenThrow(
-        AppException(
-          type: ExceptionType.network,
-          code: 'NETWORK_ERROR',
-          message: 'Network Failure',
-        ),
-      );
+    test(
+      'should return Left(Failure) when sign out throws exception',
+      () async {
+        when(() => mockAuthRemoteDataSource.signOut()).thenThrow(
+          AppException(type: ExceptionType.network, message: 'Network Failure'),
+        );
 
-      final result = await authRepositoryImpl.signOut();
+        final result = await authRepositoryImpl.signOut();
 
-      expect(result.isLeft(), true);
+        expect(result, Left(NetworkFailure(message: 'Network Failure')));
 
-      result.fold((failure) {
-        expect(failure, isA<NetworkFailure>());
-        expect(failure.message, 'Network Failure');
-        expect(failure.code, 'NETWORK_ERROR');
-      }, (_) => fail('Should not return Right'));
-
-      verify(() => authRemoteDataSource.signOut()).called(1);
-    });
+        verify(() => mockAuthRemoteDataSource.signOut()).called(1);
+        verifyNoMoreInteractions(mockAuthRemoteDataSource);
+      },
+    );
   });
 }

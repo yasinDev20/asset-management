@@ -9,6 +9,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockAuthRepository extends Mock implements AuthRepository {}
+
 class MockGoogleSignInAccount extends Mock implements GoogleSignInAccount {}
 
 void main() {
@@ -17,44 +18,31 @@ void main() {
   late MockGoogleSignInAccount mockGoogleSignInAccount;
 
   setUp(() {
-    mockGoogleSignInAccount =  MockGoogleSignInAccount();
+    mockGoogleSignInAccount = MockGoogleSignInAccount();
     mockAuthRepository = MockAuthRepository();
-    googleSignInUsecase = GoogleSignInUsecase(
-       mockAuthRepository,
-    );
+    googleSignInUsecase = GoogleSignInUsecase(mockAuthRepository);
   });
 
-  test('should return AuthEntity when googleSignIn succeeds', () async {
-    final authEntity = AuthEntity(
-      user: UserEntity(
-        id: 'test',
-        email: 'email',
-        name: 'name',
-        createdAt: DateTime(2025),
-      ),
-      accessToken: 'accessToken',
-      tokenType: 'tokenType',
-      refreshToken: 'refreshToken',
-      expiresIn: DateTime(2025),
-      refreshExpiresAt: DateTime(2025),
-    );
-
+  test('should return Right(unit) when repo googleSignIn succeeds', () async {
     when(
-      () => mockAuthRepository.googleSignIn(googleSignInAccaount: mockGoogleSignInAccount),
-    ).thenAnswer((_) async => Right(authEntity));
+      () => mockAuthRepository.googleSignIn(),
+    ).thenAnswer((_) async => Right(unit));
 
-    final result = await googleSignInUsecase.call(googleSignInAccaount: mockGoogleSignInAccount);
+    final result = await googleSignInUsecase.call();
 
-    expect(result, equals(Right(authEntity)));
+    expect(result, equals(Right(unit)));
+
+    verify(() => mockAuthRepository.googleSignIn()).called(1);
+    verifyNoMoreInteractions(mockAuthRepository);
   });
 
   test('should return Failure when googleSignIn fails', () async {
-    when(() => mockAuthRepository.googleSignIn(googleSignInAccaount: mockGoogleSignInAccount )).thenAnswer(
+    when(() => mockAuthRepository.googleSignIn()).thenAnswer(
       (_) async =>
           Left(AuthFailure(code: 'user_not_found', message: 'user not found')),
     );
 
-    final result = await googleSignInUsecase.call(googleSignInAccaount: mockGoogleSignInAccount);
+    final result = await googleSignInUsecase.call();
 
     expect(
       result,
@@ -62,5 +50,8 @@ void main() {
         Left(AuthFailure(message: 'user not found', code: 'user_not_found')),
       ),
     );
+
+    verify(() => mockAuthRepository.googleSignIn()).called(1);
+    verifyNoMoreInteractions(mockAuthRepository);
   });
 }

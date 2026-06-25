@@ -80,7 +80,7 @@ class _UsersPageState extends State<UsersPage> {
                IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () {
-              context.read<AuthBloc>().add(AuthSignOutEvent());
+              context.read<AuthBloc>().add(SignOutEvent());
             },
             tooltip: 'Sign Out',
           ),

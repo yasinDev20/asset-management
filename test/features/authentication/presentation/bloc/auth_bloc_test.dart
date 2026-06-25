@@ -39,31 +39,31 @@ void main() {
   late MockSignOutUsecase mockSignOutUsecase;
   late AuthBloc authBloc;
 
-  const name = '';
+  const id = 'id';
+  const name = 'name';
   const email = 'test@email.com';
   const password = '123456';
   final authEntity = AuthEntity(
     user: UserEntity(
-      id: 'id',
+      id: id,
       email: email,
       name: name,
       createdAt: DateTime(2025),
     ),
-    accessToken: 'accessToken',
-    tokenType: 'tokenType',
-    refreshToken: 'refreshToken',
-    expiresIn: DateTime(2025),
-    refreshExpiresAt: DateTime(2025),
   );
 
   setUp(() {
-    mockAuthRepository = MockAuthRepository();
     mockEmailRegisterUsecase = MockEmailRegisterUsecase();
     mockEmailPasswordSignUsecase = MockEmailPasswordSignUsecase();
     mockGoogleSignInUsecase = MockGoogleSignInUsecase();
     mockGetUserUsecase = MockGetUserUsecase();
     mockSignOutUsecase = MockSignOutUsecase();
     mockForgotPasswordUsecase = MockForgotPasswordUsecase();
+    mockAuthRepository = MockAuthRepository();
+    when(
+      () => mockAuthRepository.authStateChanges(),
+    ).thenAnswer((_) => Stream.empty());
+
     authBloc = AuthBloc(
       authRepository: mockAuthRepository,
       emailRegisterUsecase: mockEmailRegisterUsecase,
@@ -82,128 +82,323 @@ void main() {
   });
 
   //TODO : grouping test
-  blocTest<AuthBloc, AuthState>(
-    'emits [loading, succsess] when EmailRegisterEvent is added.',
-    setUp: () {
-      when(
-        () => mockEmailRegisterUsecase.call(
-          name: '',
-          email: email,
-          password: password,
+
+  group('EmailRegisterEvent', () {
+    blocTest<AuthBloc, AuthState>(
+      'emits [loading, succsess] when register is succeds.',
+      setUp: () {
+        when(
+          () => mockEmailRegisterUsecase.call(
+            name: name,
+            email: email,
+            password: password,
+          ),
+        ).thenAnswer((_) async => Right(unit));
+      },
+      build: () => authBloc,
+      act: (bloc) => bloc.add(
+        EmailRegisterEvent(name: name, email: email, password: password),
+      ),
+      expect: () => <AuthState>[
+        AuthState(status: AuthStatus.loading),
+        AuthState(status: AuthStatus.success),
+      ],
+
+      verify: (_) {
+        verify(
+          () => mockEmailRegisterUsecase.call(
+            name: name,
+            email: email,
+            password: password,
+          ),
+        ).called(1);
+        verifyNoMoreInteractions(mockEmailRegisterUsecase);
+      },
+    );
+
+    blocTest<AuthBloc, AuthState>(
+      'emits [loading, failure] when register fails',
+      setUp: () {
+        when(
+          () => mockEmailRegisterUsecase.call(
+            name: name,
+            email: email,
+            password: password,
+          ),
+        ).thenAnswer((_) async => Left(ServerFailure(message: 'Server error')));
+      },
+      build: () => authBloc,
+      act: (bloc) => bloc.add(
+        EmailRegisterEvent(name: name, email: email, password: password),
+      ),
+      expect: () => <AuthState>[
+        AuthState(status: AuthStatus.loading),
+        AuthState(
+          status: AuthStatus.failure,
+          failure: ServerFailure(message: 'Server error'),
         ),
-      ).thenAnswer((_) async => Right(unit));
-    },
-    build: () => authBloc,
-    act: (bloc) => bloc.add(
-      EmailRegisterEvent(name: name, email: email, password: password),
-    ),
-    expect: () => <AuthState>[
-      AuthState(status: AuthStatus.loading),
-      AuthState(status: AuthStatus.success),
-    ],
+      ],
 
-    verify: (_) {
-      verify(
-        () => mockEmailRegisterUsecase.call(
-          name: name,
-          email: email,
-          password: password,
+      verify: (_) {
+        verify(
+          () => mockEmailRegisterUsecase.call(
+            name: name,
+            email: email,
+            password: password,
+          ),
+        ).called(1);
+        verifyNoMoreInteractions(mockEmailRegisterUsecase);
+      },
+    );
+  });
+  group('EmailPasswordSignEvent', () {
+    blocTest<AuthBloc, AuthState>(
+      'emits [loading, succsess] when sign in is succeds.',
+      setUp: () {
+        when(
+          () => mockEmailPasswordSignUsecase.call(
+            email: email,
+            password: password,
+          ),
+        ).thenAnswer((_) async => Right(unit));
+      },
+      build: () => authBloc,
+      act: (bloc) =>
+          bloc.add(EmailPasswordSignEvent(email: email, password: password)),
+      expect: () => <AuthState>[
+        AuthState(status: AuthStatus.loading),
+        AuthState(status: AuthStatus.success),
+      ],
+
+      verify: (_) {
+        verify(
+          () => mockEmailPasswordSignUsecase.call(
+            email: email,
+            password: password,
+          ),
+        ).called(1);
+        verifyNoMoreInteractions(mockEmailPasswordSignUsecase);
+      },
+    );
+
+    blocTest<AuthBloc, AuthState>(
+      'emits [loading, failure] when sign in fails',
+      setUp: () {
+        when(
+          () => mockEmailPasswordSignUsecase.call(
+            email: email,
+            password: password,
+          ),
+        ).thenAnswer((_) async => Left(ServerFailure(message: 'Server error')));
+      },
+      build: () => authBloc,
+      act: (bloc) =>
+          bloc.add(EmailPasswordSignEvent(email: email, password: password)),
+      expect: () => <AuthState>[
+        AuthState(status: AuthStatus.loading),
+        AuthState(
+          status: AuthStatus.failure,
+          failure: ServerFailure(message: 'Server error'),
         ),
-      ).called(1);
-      verifyNoMoreInteractions(mockEmailRegisterUsecase);
-    },
-  );
+      ],
 
-  // blocTest<AuthBloc, AuthState>(
-  //   'emits [AuthLoadingState, AuthenticatedState] when EmailPasswordSignEvent is added',
-  //   build: () {
-  //     when(
-  //       () => mockEmailPasswordSignUsecase.call(email, password),
-  //     ).thenAnswer((_) async => Right(authEntity));
+      verify: (_) {
+        verify(
+          () => mockEmailPasswordSignUsecase.call(
+            email: email,
+            password: password,
+          ),
+        ).called(1);
+        verifyNoMoreInteractions(mockEmailPasswordSignUsecase);
+      },
+    );
+  });
 
-  //     return authBloc;
-  //   },
+  group('LoggedInEvent', () {
+    blocTest<AuthBloc, AuthState>(
+      'emits [loading, (succsess, authEntity)] when logged in is succeds.',
+      setUp: () {
+        when(
+          () => mockGetUserUsecase.call(id: id),
+        ).thenAnswer((_) async => Right(authEntity));
+      },
+      build: () => authBloc,
+      act: (bloc) => bloc.add(LoggedInEvent(userId: id)),
+      expect: () => <AuthState>[
+        AuthState(status: AuthStatus.loading),
+        AuthState(authEntity: authEntity, status: AuthStatus.success),
+      ],
 
-  //   act: (bloc) =>
-  //       bloc.add(EmailPasswordSignEvent(email: email, password: password)),
-  //   expect: () => [
-  //     AuthLoadingState(),
-  //     AuthenticatedState(authEntity: authEntity),
-  //   ],
+      verify: (_) {
+        verify(() => mockGetUserUsecase.call(id: id)).called(1);
+        verifyNoMoreInteractions(mockGetUserUsecase);
+      },
+    );
 
-  //   verify: (bloc) => verify(
-  //     () => mockEmailPasswordSignUsecase.call(email, password),
-  //   ).called(1),
-  // );
+    blocTest<AuthBloc, AuthState>(
+      'emits [loading, failure] when logged in fails',
+      setUp: () {
+        when(
+          () => mockGetUserUsecase.call(id: id),
+        ).thenAnswer((_) async => Left(ServerFailure(message: 'Server error')));
+      },
+      build: () => authBloc,
+      act: (bloc) => bloc.add(LoggedInEvent(userId: id)),
+      expect: () => <AuthState>[
+        AuthState(status: AuthStatus.loading),
+        AuthState(
+          status: AuthStatus.failure,
+          failure: ServerFailure(message: 'Server error'),
+        ),
+      ],
 
-  // blocTest<AuthBloc, AuthState>(
-  //   'emits [AuthLoadingState, ErrorState] when fails',
-  //   build: () {
-  //     // stub usecase.call(...) -> Left(Failure)
-  //     when(() => mockEmailPasswordSignUsecase(email, password)).thenAnswer(
-  //       (_) async => Left(
-  //         AuthFailure(message: 'AUTH FAILURE', code: 'AUTH FAILURE CODE'),
-  //       ),
-  //     );
-  //     return authBloc;
-  //   },
-  //   act: (bloc) =>
-  //       bloc.add(EmailPasswordSignEvent(email: email, password: password)),
-  //   expect: () => [
-  //     AuthLoadingState(),
-  //     FailureState(
-  //       failure: AuthFailure(
-  //         message: 'AUTH FAILURE',
-  //         code: 'AUTH FAILURE CODE',
-  //       ),
-  //     ),
-  //   ],
-  //   verify: (_) {
-  //     verify(() => mockEmailPasswordSignUsecase(email, password)).called(1);
-  //   },
-  // );
+      verify: (_) {
+        verify(() => mockGetUserUsecase.call(id: id)).called(1);
+        verifyNoMoreInteractions(mockGetUserUsecase);
+      },
+    );
+  });
+  group('LoggedOutEvent', () {
+    blocTest<AuthBloc, AuthState>(
+      'emits [(succsess, clearEntity)] when logged in is succeds.',
+      build: () => authBloc,
+      act: (bloc) => bloc.add(LoggedOutEvent()),
+      expect: () => <AuthState>[
+        AuthState(authEntity: null, status: AuthStatus.success),
+      ],
+    );
+  });
 
-  // group('ForgotPasswortEvent handler test', () {
-  //   blocTest<AuthBloc, AuthState>(
-  //     'emits [AuthLoadingState, ForgotPasswordSuccessState] when EmailRegisterEvent is added.',
-  //     build: () {
-  //       when(
-  //         () => mockForgotPasswordUsecase.call(email),
-  //       ).thenAnswer((_) async => Right(unit));
-  //       return authBloc;
-  //     },
-  //     act: (bloc) => bloc.add(ForgotPassworEvent(email)),
-  //     expect: () => <AuthState>[
-  //       AuthLoadingState(),
-  //       ForgotPasswordSuccessState(),
-  //     ],
-  //   );
+  group('GoogleSignInEvent', () {
+    blocTest<AuthBloc, AuthState>(
+      'emits [loading, succsess] when sign in is succeds.',
+      setUp: () {
+        when(
+          () => mockGoogleSignInUsecase.call(),
+        ).thenAnswer((_) async => Right(unit));
+      },
+      build: () => authBloc,
+      act: (bloc) => bloc.add(GoogleSignInEvent()),
+      expect: () => <AuthState>[
+        AuthState(status: AuthStatus.loading),
+        AuthState(status: AuthStatus.success),
+      ],
 
-  //   blocTest<AuthBloc, AuthState>(
-  //     'emits [AuthLoadingState, ErrorState] when ForgotPassworEvent handler fails',
-  //     build: () {
-  //       // stub usecase.call(...) -> Left(Failure)
-  //       when(() => mockForgotPasswordUsecase.call(email)).thenAnswer(
-  //         (_) async => Left(
-  //           AuthFailure(message: 'AUTH FAILURE', code: 'AUTH FAILURE CODE'),
-  //         ),
-  //       );
-  //       return authBloc;
-  //     },
-  //     act: (bloc) => bloc.add(ForgotPassworEvent(email)),
-  //     expect: () => [
-  //       AuthLoadingState(),
-  //       FailureState(
-  //         failure: AuthFailure(
-  //           message: 'AUTH FAILURE',
-  //           code: 'AUTH FAILURE CODE',
-  //         ),
-  //       ),
-  //     ],
-  //     verify: (_) {
-  //       verify(() => mockForgotPasswordUsecase(email)).called(1);
-  //     },
-  //   );
-  // });
+      verify: (_) {
+        verify(() => mockGoogleSignInUsecase.call()).called(1);
+        verifyNoMoreInteractions(mockGoogleSignInUsecase);
+      },
+    );
 
+    blocTest<AuthBloc, AuthState>(
+      'emits [loading, failure] when sign in fails',
+      setUp: () {
+        when(
+          () => mockGoogleSignInUsecase.call(),
+        ).thenAnswer((_) async => Left(ServerFailure(message: 'Server error')));
+      },
+      build: () => authBloc,
+      act: (bloc) => bloc.add(GoogleSignInEvent()),
+      expect: () => <AuthState>[
+        AuthState(status: AuthStatus.loading),
+        AuthState(
+          status: AuthStatus.failure,
+          failure: ServerFailure(message: 'Server error'),
+        ),
+      ],
+
+      verify: (_) {
+        verify(() => mockGoogleSignInUsecase.call()).called(1);
+        verifyNoMoreInteractions(mockGoogleSignInUsecase);
+      },
+    );
+  });
+  group('SignOutEvent', () {
+    blocTest<AuthBloc, AuthState>(
+      'emits [loading, succsess] when sign out is succeds.',
+      setUp: () {
+        when(
+          () => mockSignOutUsecase.call(),
+        ).thenAnswer((_) async => Right(unit));
+      },
+      build: () => authBloc,
+      act: (bloc) => bloc.add(SignOutEvent()),
+      expect: () => <AuthState>[
+        AuthState(status: AuthStatus.loading),
+        AuthState(status: AuthStatus.success),
+      ],
+
+      verify: (_) {
+        verify(() => mockSignOutUsecase.call()).called(1);
+        verifyNoMoreInteractions(mockSignOutUsecase);
+      },
+    );
+
+    blocTest<AuthBloc, AuthState>(
+      'emits [loading, failure] when sign out request fails',
+      setUp: () {
+        when(
+          () => mockSignOutUsecase.call(),
+        ).thenAnswer((_) async => Left(ServerFailure(message: 'Server error')));
+      },
+      build: () => authBloc,
+      act: (bloc) => bloc.add(SignOutEvent()),
+      expect: () => <AuthState>[
+        AuthState(status: AuthStatus.loading),
+        AuthState(
+          status: AuthStatus.failure,
+          failure: ServerFailure(message: 'Server error'),
+        ),
+      ],
+
+      verify: (_) {
+        verify(() => mockSignOutUsecase.call()).called(1);
+        verifyNoMoreInteractions(mockSignOutUsecase);
+      },
+    );
+  });
+  group('ForgotPasswordEvent', () {
+    blocTest<AuthBloc, AuthState>(
+      'emits [loading, success] when forgot password request is succeds.',
+      setUp: () {
+        when(
+          () => mockForgotPasswordUsecase.call(email),
+        ).thenAnswer((_) async => Right(unit));
+      },
+      build: () => authBloc,
+      act: (bloc) => bloc.add(ForgotPasswordEvent(email)),
+      expect: () => <AuthState>[
+        AuthState(status: AuthStatus.loading),
+        AuthState(status: AuthStatus.success),
+      ],
+
+      verify: (_) {
+        verify(() => mockForgotPasswordUsecase.call(email)).called(1);
+        verifyNoMoreInteractions(mockForgotPasswordUsecase);
+      },
+    );
+
+    blocTest<AuthBloc, AuthState>(
+      'emits [loading, failure] when forgot password request fails',
+      setUp: () {
+        when(
+          () => mockForgotPasswordUsecase.call(email),
+        ).thenAnswer((_) async => Left(ServerFailure(message: 'Server error')));
+      },
+      build: () => authBloc,
+      act: (bloc) => bloc.add(ForgotPasswordEvent(email)),
+      expect: () => <AuthState>[
+        AuthState(status: AuthStatus.loading),
+        AuthState(
+          status: AuthStatus.failure,
+          failure: ServerFailure(message: 'Server error'),
+        ),
+      ],
+
+      verify: (_) {
+        verify(() => mockForgotPasswordUsecase.call(email)).called(1);
+        verifyNoMoreInteractions(mockForgotPasswordUsecase);
+      },
+    );
+  });
 }

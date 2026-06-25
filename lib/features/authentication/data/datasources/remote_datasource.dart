@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:io' ;
+import 'dart:io';
 import 'package:assetmanagement/core/error/exception.dart';
 import 'package:assetmanagement/features/authentication/data/models/auth_model.dart';
 import 'package:assetmanagement/features/authentication/data/models/user_model.dart';
@@ -13,7 +13,7 @@ abstract class AuthRemoteDatasource {
     required String email,
     required String password,
   });
-  Future<AuthModel> emailPasswordSignIn({
+  Future<void> emailPasswordSignIn({
     required String email,
     required String password,
   });
@@ -49,38 +49,13 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
   }
 
   @override
-  Future<AuthModel> emailPasswordSignIn({
+  Future<void> emailPasswordSignIn({
     required String email,
     required String password,
   }) async {
-    final userCredential = await _supabaseClient.auth.signInWithPassword(
+    await _supabaseClient.auth.signInWithPassword(
       email: email,
       password: password,
-    );
-
-    final user = userCredential.user;
-
-    if (user == null) {
-      throw AppException(
-        type: ExceptionType.auth,
-        message: "User data is null",
-        code: "null-user",
-      );
-    }
-
-    final response = await _supabaseClient
-        .from('users')
-        .select('*')
-        .eq('id', user.id)
-        .single();
-
-    return AuthModel(
-      user: UserModel.fromMap(response),
-      accessToken: 'firebaseauth',
-      tokenType: 'Bearer',
-      refreshToken: 'firebaseauth',
-      expiresIn: DateTime(2025),
-      refreshExpiresAt: DateTime(2025),
     );
   }
 
@@ -117,18 +92,7 @@ class AuthRemoteDatasourceImpl implements AuthRemoteDatasource {
 
     final userModel = UserModel.fromMap(response);
 
-    return AuthModel(
-      user: userModel,
-      accessToken: currentSession?.accessToken ?? '',
-      tokenType: currentSession?.tokenType ?? '',
-      refreshToken: currentSession?.refreshToken ?? '',
-      expiresIn: currentSession?.expiresIn != null
-          ? DateTime.fromMillisecondsSinceEpoch(currentSession!.expiresIn!)
-          : DateTime(2000),
-      refreshExpiresAt: currentSession?.expiresIn != null
-          ? DateTime.fromMillisecondsSinceEpoch(currentSession!.expiresAt!)
-          : DateTime(2000),
-    );
+    return AuthModel(user: userModel);
   }
 
   @override

@@ -61,7 +61,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                   onPressed: () {
                     if (_formKey.currentState?.validate() ?? false) {
                       context.read<AuthBloc>().add(
-                        ForgotPassworEvent(emailController.text),
+                        ForgotPasswordEvent(emailController.text),
                       );
                     }
                   },

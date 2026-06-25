@@ -20,12 +20,19 @@ class _SettingsPageState extends State<SettingsPage> {
         title: Text('Pengaturan'),
 
         actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16),
-            child: CommonButton(
-              text: 'Sign Out',
-              onPressed: () => context.read<AuthBloc>().add(AuthSignOutEvent()),
-            ),
+          BlocSelector<AuthBloc, AuthState, bool>(
+            selector: (state) {
+              return state.status == AuthStatus.loading;
+            },
+            builder: (context, isLoading) {
+              return Padding(
+                padding: const EdgeInsets.only(right: 16),
+                child: CommonButton(
+                  text: isLoading ? 'Loading...' : 'Sign Out',
+                  onPressed: () => context.read<AuthBloc>().add(SignOutEvent()),
+                ),
+              );
+            },
           ),
         ],
       ),

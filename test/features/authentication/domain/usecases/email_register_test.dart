@@ -11,46 +11,68 @@ void main() {
   late MockAuthRepository mockAuthRepository;
   late EmailRegisterUsecase emailRegisterUsecase;
 
+  const String name = 'name';
+  const String email = 'email@gmail.com';
+  const String password = 'password';
   setUp(() {
     mockAuthRepository = MockAuthRepository();
     emailRegisterUsecase = EmailRegisterUsecase(mockAuthRepository);
   });
 
-  test('should return unit when emailRegister succeeds', () async {
-    const String email = 'email@gmail.com';
-    const String password = 'password';
-
+  test('should return Right(unit) when repo register succeeds', () async {
     when(
-      () => mockAuthRepository.emailRegister(email: email, password: password),
+      () => mockAuthRepository.emailRegister(
+        name: name,
+        email: email,
+        password: password,
+      ),
     ).thenAnswer((_) async => Right(unit));
 
     final result = await emailRegisterUsecase.call(
+      name: name,
       email: email,
       password: password,
     );
 
     expect(result, Right(unit));
+    verify(
+      () => mockAuthRepository.emailRegister(
+        name: name,
+        email: email,
+        password: password,
+      ),
+    ).called(1);
+    verifyNoMoreInteractions(mockAuthRepository);
   });
 
-
-   test('should return Failure when register fails', () async {
+  test('should return Failure when repo register fails', () async {
     const String email = 'email@gmail.com';
     const String password = 'password';
 
-    when(() => mockAuthRepository.emailRegister(email: email, password: password)).thenAnswer(
+    when(
+      () => mockAuthRepository.emailRegister(
+        name: name,
+        email: email,
+        password: password,
+      ),
+    ).thenAnswer(
       (_) async => Left(AuthFailure(message: 'error', code: 'error code')),
     );
 
-    final result = await emailRegisterUsecase.call(email: email, password: password);
+    final result = await emailRegisterUsecase.call(
+      name: name,
+      email: email,
+      password: password,
+    );
 
     expect(result, Left(AuthFailure(message: 'error', code: 'error code')));
-    verify(() => mockAuthRepository.emailRegister(email: email, password: password)).called(1);
-
-    result.fold(
-      (failure) {
-      expect(failure, isA<AuthFailure>());
-      expect(failure.message, 'error');
-      expect(failure.code, 'error code');
-    }, (_) => fail('Should return Left Failure'));
+    verify(
+      () => mockAuthRepository.emailRegister(
+        name: name,
+        email: email,
+        password: password,
+      ),
+    ).called(1);
+    verifyNoMoreInteractions(mockAuthRepository);
   });
 }

@@ -3,30 +3,11 @@ import 'package:assetmanagement/features/authentication/domain/entities/user_ent
 
 class AuthEntity extends Equatable {
   final UserEntity user;
-  final String accessToken;
-  final String tokenType;
-  final String refreshToken;
-  final DateTime expiresIn;
-  final DateTime refreshExpiresAt;
 
-  const AuthEntity({
-    required this.user,
-    required this.accessToken,
-    required this.tokenType,
-    required this.refreshToken,
-    required this.expiresIn,
-    required this.refreshExpiresAt,
-  });
+  const AuthEntity({required this.user});
 
   @override
-  List<Object> get props {
-    return [
-      user,
-      accessToken,
-      tokenType,
-      refreshToken,
-      expiresIn,
-      refreshExpiresAt,
-    ];
+  List<Object?> get props {
+    return [user];
   }
 }

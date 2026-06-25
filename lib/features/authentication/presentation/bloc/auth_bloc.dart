@@ -49,9 +49,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
     _authRepository.authStateChanges().listen((userId) {
       if (userId != null) {
-        add(AuthLoggedInEvent(userId: userId));
+        add(LoggedInEvent(userId: userId));
       } else {
-        add(AuthLoggedOutEvent());
+        add(LoggedOutEvent());
       }
     });
 
@@ -70,38 +70,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
     });
 
-    on<AuthLoggedInEvent>((event, emit) async {
-      // if (state is AuthenticatedState || state is AuthLoadingState) return;
-      final result = await _getUserUsacase.call(id: event.userId);
-
-      result.fold((failure) {
-        emit(state.copyWith(failure: failure, status: AuthStatus.failure));
-      }, (r) => emit(state.copyWith(authEntity: r, status: AuthStatus.success)));
-    });
-    on<AuthLoggedOutEvent>((event, emit) {
-      emit(state.copyWith(clearAuthEntity: true, status: AuthStatus.success));
-    });
-
     on<EmailPasswordSignEvent>((event, emit) async {
       emit(state.copyWith(status: AuthStatus.loading));
-      Either<Failure, AuthEntity> result = await _emailPasswordSignUsecase.call(
-        event.email,
-        event.password,
-      );
-      result.fold(
-        (failure) {
-          emit(state.copyWith(failure: failure, status: AuthStatus.failure));
-        },
-        (succsess) {
-          emit(state.copyWith(authEntity: succsess, status: AuthStatus.success));
-        },
-      );
-    });
-
-    on<GoogleSignInEvent>((event, emit) async {
-      emit(state.copyWith(status: AuthStatus.loading));
-      final result = await _googleSignInUsecase.call(
-        
+      Either<Failure, Unit> result = await _emailPasswordSignUsecase.call(
+        email: event.email,
+        password: event.password,
       );
       result.fold(
         (failure) {
@@ -113,18 +86,36 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       );
     });
 
-    on<ForgotPassworEvent>((event, emit) async {
+    on<LoggedInEvent>((event, emit) async {
       emit(state.copyWith(status: AuthStatus.loading));
-      final result = await _forgotPasswordUsecase.call(event.email);
+      final result = await _getUserUsacase.call(id: event.userId);
 
       result.fold(
-        (failure) =>
-            emit(state.copyWith(failure: failure, status: AuthStatus.failure)),
-        (r) => emit(state.copyWith(status: AuthStatus.success)),
+        (failure) {
+          emit(state.copyWith(failure: failure, status: AuthStatus.failure));
+        },
+        (r) => emit(state.copyWith(authEntity: r, status: AuthStatus.success)),
+      );
+    });
+    on<LoggedOutEvent>((event, emit) {
+      emit(state.copyWith(clearAuthEntity: true, status: AuthStatus.success));
+    });
+
+    on<GoogleSignInEvent>((event, emit) async {
+      emit(state.copyWith(status: AuthStatus.loading));
+      final result = await _googleSignInUsecase.call();
+      result.fold(
+        (failure) {
+          emit(state.copyWith(failure: failure, status: AuthStatus.failure));
+        },
+        (succsess) {
+          emit(state.copyWith(status: AuthStatus.success));
+        },
       );
     });
 
-    on<AuthSignOutEvent>((event, emit) async {
+    on<SignOutEvent>((event, emit) async {
+      emit(state.copyWith(status: AuthStatus.loading));
       Either<Failure, Unit> result = await _signOutUsecase.call();
       result.fold(
         (failure) {
@@ -133,6 +124,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         (succes) {
           emit(state.copyWith(authEntity: null, status: AuthStatus.success));
         },
+      );
+    });
+    on<ForgotPasswordEvent>((event, emit) async {
+      emit(state.copyWith(status: AuthStatus.loading));
+      final result = await _forgotPasswordUsecase.call(event.email);
+
+      result.fold(
+        (failure) =>
+            emit(state.copyWith(failure: failure, status: AuthStatus.failure)),
+        (r) => emit(state.copyWith(status: AuthStatus.success)),
       );
     });
   }
